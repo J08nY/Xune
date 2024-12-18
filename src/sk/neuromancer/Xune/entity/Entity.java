@@ -89,8 +89,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
         @Override
         public boolean onClick(float x, float y, Button b) {
-            for (int i = 0; i < clickableAreas.size(); i++) {
-                Clickable area = clickableAreas.get(i);
+            for (Clickable area : clickableAreas) {
                 if (area.onClick(x, y, b)) {
                     return true;
                 }
@@ -115,16 +114,19 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
 
         public static int getOffsetonFlag(Flag f) {
-            switch (f) {
-                case RED:
-                    return SPRITE_OFFSET_RED;
-                case GREEN:
-                    return SPRITE_OFFSET_GREEN;
-                case BLUE:
-                    return SPRITE_OFFSET_BLUE;
-                default:
-                    return 0;
-            }
+            return switch (f) {
+                case RED -> SPRITE_OFFSET_RED;
+                case GREEN -> SPRITE_OFFSET_GREEN;
+                case BLUE -> SPRITE_OFFSET_BLUE;
+            };
+        }
+
+        public void select() {
+            this.isSelected = true;
+        }
+
+        public void unselect() {
+            this.isSelected = false;
         }
 
         @Override

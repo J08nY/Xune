@@ -27,6 +27,7 @@ public class HUD implements Tickable, Renderable {
 
     private double mouseX, mouseY;
     private double fromX, fromY;
+    private boolean drag;
 
     public HUD(Game game) {
         this.game = game;
@@ -44,7 +45,8 @@ public class HUD implements Tickable, Renderable {
 
     @Override
     public void render() {
-        if (game.getInput().mouse.isLeftPressed()) {
+        if (drag) {
+            System.out.println("drag!");
             glPushMatrix();
             glBegin(GL_QUADS);
             glColor4f(0f, 1f, 0f, 0.2f);
@@ -68,8 +70,8 @@ public class HUD implements Tickable, Renderable {
 
         glPushMatrix();
         renderText(150, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 30, "MONEY: " + game.getLevel().getPlayer().money);
-        double mx = game.getInput().mouse.getX();
-        double my = game.getInput().mouse.getY();
+        double mx = mouseX;
+        double my = mouseY;
 
         renderText(150, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 60, "X: " + mx);
         renderText(150, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 90, "Y: " + my);
@@ -109,6 +111,9 @@ public class HUD implements Tickable, Renderable {
         if (game.getInput().mouse.isLeftPressed()) {
             fromX = game.getInput().mouse.getLastX();
             fromY = game.getInput().mouse.getLastY();
+            drag = true;
+        } else {
+            drag = false;
         }
     }
 

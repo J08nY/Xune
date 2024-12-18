@@ -31,14 +31,15 @@ public class Player extends EntityOwner {
         float mouseY = (float) game.getInput().mouse.getY();
 
         if (game.getInput().mouse.isLeftPressed()) {
-            float levelX = (float) game.getLevel().getLevelX(mouseX);
-            float levelY = (float) game.getLevel().getLevelY(mouseY);
+            float levelX = game.getLevel().getLevelX(mouseX);
+            float levelY = game.getLevel().getLevelY(mouseY);
 
             boolean handled = false;
             if (selected != null) {
-                if (!selected.onClick(levelX, levelY, Button.LEFT)) {
+                if (selected.onClick(levelX, levelY, Button.LEFT)) {
+                    selected.unselect();
+                    game.getSound().play(SoundManager.SOUND_BLIP_1);
                     selected = null;
-                } else {
                     handled = true;
                 }
             }
@@ -47,6 +48,8 @@ public class Player extends EntityOwner {
                     boolean clicked = e.onClick(levelX, levelY, Button.LEFT);
                     if (clicked) {
                         selected = (PlayableEntity) e;
+                        selected.select();
+                        game.getSound().play(SoundManager.SOUND_BLIP_1);
                         break;
                     }
                 }

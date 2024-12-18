@@ -2,11 +2,11 @@ package sk.neuromancer.Xune.sfx;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.lwjgl.openal.AL;
-import org.lwjgl.openal.AL10.*;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
 import sk.neuromancer.Xune.game.Game;
@@ -21,7 +21,7 @@ public class SoundManager implements Tickable {
     private long device;
     private long context;
 
-    private List<SoundPlayer> players = new ArrayList<SoundPlayer>();
+    private Queue<SoundPlayer> players = new LinkedList<>();
     private Sound[] sounds;
 
     private static final String[] soundNames = new String[]{
@@ -72,12 +72,10 @@ public class SoundManager implements Tickable {
 
     @Override
     public void tick(int tickCount) {
-        for (int i = 0; i < players.size(); i++) {
-            SoundPlayer player = players.get(i);
-            if (player.getState() == SoundPlayerState.STOPPED) {
-                players.remove(i);
-                player.destroy();
-            }
+        SoundPlayer head = players.peek();
+        if (head != null && head.getState() == SoundPlayerState.STOPPED) {
+            players.remove();
+            head.destroy();
         }
     }
 

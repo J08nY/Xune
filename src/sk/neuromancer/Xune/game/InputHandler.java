@@ -232,7 +232,7 @@ public class InputHandler implements Tickable {
     @Override
     public void tick(int tickCount) {
         mouse.resetDrag();
-        mouse.resetPress();
+        //mouse.resetPress();
         scroller.resetDelta();
     }
 

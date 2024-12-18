@@ -1,22 +1,10 @@
 package sk.neuromancer.Xune.sfx;
 
-import static org.lwjgl.openal.AL10.AL_BUFFER;
-import static org.lwjgl.openal.AL10.AL_GAIN;
-import static org.lwjgl.openal.AL10.AL_PITCH;
-import static org.lwjgl.openal.AL10.AL_POSITION;
-import static org.lwjgl.openal.AL10.AL_VELOCITY;
-import static org.lwjgl.openal.AL10.alDeleteSources;
-import static org.lwjgl.openal.AL10.alGenSources;
-import static org.lwjgl.openal.AL10.alSourcefv;
-import static org.lwjgl.openal.AL10.alSourcePause;
-import static org.lwjgl.openal.AL10.alSourcePlay;
-import static org.lwjgl.openal.AL10.alSourceStop;
-import static org.lwjgl.openal.AL10.alSourcef;
-import static org.lwjgl.openal.AL10.alSourcei;
-
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
+
+import static org.lwjgl.openal.AL10.*;
 
 public class SoundPlayer {
 
@@ -83,6 +71,11 @@ public class SoundPlayer {
     }
 
     public SoundPlayerState getState() {
+        switch (alGetSourcei(source, AL_SOURCE_STATE)) {
+            case AL_PLAYING -> state = SoundPlayerState.PLAYING;
+            case AL_STOPPED -> state = SoundPlayerState.STOPPED;
+            case AL_PAUSED -> state = SoundPlayerState.PAUSED;
+        }
         return state;
     }
 

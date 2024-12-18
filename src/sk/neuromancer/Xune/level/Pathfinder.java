@@ -164,16 +164,6 @@ public class Pathfinder implements Tickable {
                 /* FATALITY!!!! */
             }
         }
-        try {
-            PrintWriter debug = new PrintWriter("gridDebug.txt", "UTF-8");
-            for (int i = 0; i < this.gridHeight; i++) {
-                for (int j = 0; j < this.gridWidth; j++) {
-                    debug.write(String.valueOf(tempGrid[j][i]));
-                }
-            }
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
 
     }
 

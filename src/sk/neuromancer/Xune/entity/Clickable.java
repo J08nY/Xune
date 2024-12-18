@@ -100,7 +100,6 @@ public interface Clickable {
             float dx = (this.x + this.offsetX) - x;
             float dy = (this.y + this.offsetY) - y;
             float dist = (float) Math.sqrt(dx * dx + dy * dy);
-            System.out.println(dist);
             return dist <= radius;
         }
 

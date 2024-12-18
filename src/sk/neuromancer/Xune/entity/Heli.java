@@ -27,8 +27,9 @@ public class Heli extends PlayableEntity {
     public void render() {
         glPushMatrix();
         glTranslatef(x, y, 0);
-        ((ClickableCircle) this.clickableAreas.get(0)).render();
         SpriteSheet.ENTITY_SHEET.getSprite(animation).render();
+        if (isSelected)
+            ((ClickableCircle) this.clickableAreas.get(0)).render();
         glPopMatrix();
     }
 
@@ -56,7 +57,7 @@ public class Heli extends PlayableEntity {
     public boolean onClick(float x, float y, Button b) {
         boolean clicked = super.onClick(x, y, b);
         if (clicked) {
-            System.out.println("clicked heli!");
+            this.isSelected = !this.isSelected;
         }
         return clicked;
     }
