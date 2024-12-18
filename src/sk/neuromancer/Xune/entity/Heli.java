@@ -27,7 +27,7 @@ public class Heli extends PlayableEntity {
     public void render() {
         glPushMatrix();
         glTranslatef(x, y, 0);
-        ((ClickableCircle) this.clickableAreas.get(0)).render();
+        //((ClickableCircle) this.clickableAreas.get(0)).render();
         SpriteSheet.ENTITY_SHEET.getSprite(animation).render();
         glPopMatrix();
     }
@@ -43,7 +43,7 @@ public class Heli extends PlayableEntity {
 
         if (tickCount % 5 == 0) {
             wing = !wing;
-            setPosition(x + 3, y + 2);
+            //setPosition(x + 3, y + 2);
         }
 
         if (tickCount % 60 == 0) {

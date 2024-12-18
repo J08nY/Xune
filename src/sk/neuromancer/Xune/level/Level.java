@@ -47,6 +47,13 @@ public class Level implements Renderable, Tickable {
             this.zoom *= 0.98f;
         }
 
+        float dy = this.game.getInput().scroller.getDeltaY();
+        if (dy > 0) {
+            this.zoom *= 1.02f;
+        } else if (dy < 0) {
+            this.zoom *= 0.98f;
+        }
+
         if (this.game.getInput().W.isPressed()) {
             this.yOff += 5 * this.zoom;
         } else if (this.game.getInput().A.isPressed()) {
@@ -102,12 +109,10 @@ public class Level implements Renderable, Tickable {
             for (int i = 0; i < lvl.length; i++) {
                 String[] row = lvl[i].split(",");
                 for (int j = 0; j < row.length; j++) {
-                    this.level[j][i] = new Tile(Byte.valueOf(row[j]), j, i);
+                    this.level[j][i] = new Tile(Byte.parseByte(row[j]), j, i);
                 }
             }
             //this.pathfinder = new Pathfinder(this);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -142,7 +147,7 @@ public class Level implements Renderable, Tickable {
     }
 
     /**
-     * @param levelX
+     * @param levelPointX
      * @return Point sized Screen X coordinate
      */
     public int getScreenX(float levelPointX) {
@@ -150,7 +155,7 @@ public class Level implements Renderable, Tickable {
     }
 
     /**
-     * @param levelY
+     * @param levelPointY
      * @return Point sized Screen Y coordinate
      */
     public int getScreenY(float levelPointY) {

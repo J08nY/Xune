@@ -14,6 +14,7 @@ import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.sfx.SoundPlayer.SoundPlayerState;
 
 import static org.lwjgl.openal.ALC10.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class SoundManager implements Tickable {
     private Game game;
@@ -52,12 +53,12 @@ public class SoundManager implements Tickable {
     public SoundManager(Game game) {//TODO nejako manazovat Gain..
         this.game = game;
         this.device = alcOpenDevice((ByteBuffer) null);
-        if (device == 0) {
+        if (device == NULL) {
             throw new IllegalStateException("Failed to open the default OpenAL device.");
         }
         ALCCapabilities deviceCaps = ALC.createCapabilities(device);
         this.context = alcCreateContext(device, (IntBuffer) null);
-        if (context == 0) {
+        if (context == NULL) {
             throw new IllegalStateException("Failed to create OpenAL context.");
         }
         alcMakeContextCurrent(context);

@@ -197,6 +197,7 @@ public interface Clickable {
 
         @Override
         public void render() {
+            //TODO: Fix
             float[] vertices = new float[60];
             for (int i = 0; i < 30; i++) {
                 vertices[2 * i] = 2 * i;

@@ -96,20 +96,6 @@ public class Window {
         glfwDestroyWindow(handle);
     }
 
-    public static void renderPoly(float[] vertexArray) {//TODO Do�asn� metoda na debug
-        if (vertexArray.length % 2 != 0)
-            return;
-        glPushMatrix();
-        glColor3f(1f, 0f, 0f);
-        glBegin(GL_POLYGON);
-        for (int i = 0; i < vertexArray.length / 2; i++) {
-            glVertex2f(vertexArray[2 * i], vertexArray[2 * i + 1]);
-        }
-        glEnd();
-        glPopMatrix();
-        glColor3f(1f, 1f, 1f);
-    }
-
     public static void renderPoints(float[] vertexArray) {
         if (vertexArray.length % 2 != 0)
             return;

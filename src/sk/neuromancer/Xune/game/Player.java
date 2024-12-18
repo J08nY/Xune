@@ -6,6 +6,7 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Entity.Flag;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.EntityOwner;
+import sk.neuromancer.Xune.entity.Heli;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
@@ -22,6 +23,7 @@ public class Player extends EntityOwner {
         this.game = g;
         this.level = level;
         this.addEntity(new Base(24 * 3.5f, 11 * 0.5f, this, this.flag));
+        this.addEntity(new Heli(10, 10, this, this.flag));
         this.selected = null;
     }
 
