@@ -21,74 +21,75 @@ import org.lwjgl.BufferUtils;
 
 public class SoundPlayer {
 
-	public enum SoundPlayerState{
-		INITIAL,PLAYING,PAUSED,STOPPED;
-	}
-	private Sound sound;
-	private int source;
+    public enum SoundPlayerState {
+        INITIAL, PLAYING, PAUSED, STOPPED;
+    }
 
-	private FloatBuffer sourcePosition;
-	private FloatBuffer sourceVelocity;
-	private float pitch;
-	private float gain;
+    private Sound sound;
+    private int source;
 
-	private SoundPlayerState state;
+    private FloatBuffer sourcePosition;
+    private FloatBuffer sourceVelocity;
+    private float pitch;
+    private float gain;
 
-	public static final float[] ZERO_SOURCE_POSITION = new float[]{0.0f,0.0f,0.0f};
-	public static final float[] ZERO_SOURCE_VELOCITY = new float[]{0.0f,0.0f,0.0f};
-	public static final float DEFAULT_GAIN = 1.0f;
-	public static final float DEFAULT_PITCH = 1.0f;
+    private SoundPlayerState state;
 
-	public SoundPlayer(Sound sound){
-		this(sound, DEFAULT_PITCH, DEFAULT_GAIN, ZERO_SOURCE_POSITION, ZERO_SOURCE_VELOCITY);
-	}
+    public static final float[] ZERO_SOURCE_POSITION = new float[]{0.0f, 0.0f, 0.0f};
+    public static final float[] ZERO_SOURCE_VELOCITY = new float[]{0.0f, 0.0f, 0.0f};
+    public static final float DEFAULT_GAIN = 1.0f;
+    public static final float DEFAULT_PITCH = 1.0f;
 
-	public SoundPlayer(Sound sound, float pitch, float gain, float[] position, float[] velocity){
-		this.sound = sound;
-		this.state = SoundPlayerState.INITIAL;
+    public SoundPlayer(Sound sound) {
+        this(sound, DEFAULT_PITCH, DEFAULT_GAIN, ZERO_SOURCE_POSITION, ZERO_SOURCE_VELOCITY);
+    }
 
-		this.pitch = pitch;
-		this.gain = gain;
-		
-		FloatBuffer pos = BufferUtils.createFloatBuffer(3).put(position);
-		pos.rewind();
-		this.sourcePosition = pos;
-		
-		FloatBuffer vel = BufferUtils.createFloatBuffer(3).put(velocity);
-		vel.rewind();
-		this.sourceVelocity = vel;
+    public SoundPlayer(Sound sound, float pitch, float gain, float[] position, float[] velocity) {
+        this.sound = sound;
+        this.state = SoundPlayerState.INITIAL;
 
-		this.source = alGenSources();
-		checkALError();
+        this.pitch = pitch;
+        this.gain = gain;
 
-		alSourcei(this.source, AL_BUFFER, sound.getBuffer());
-		alSourcef(this.source, AL_PITCH,this.pitch);
-		alSourcef(this.source, AL_GAIN,this.gain);
-		alSource(this.source, AL_POSITION,this.sourcePosition);
-		alSource(this.source, AL_VELOCITY,this.sourceVelocity);
-	}
+        FloatBuffer pos = BufferUtils.createFloatBuffer(3).put(position);
+        pos.rewind();
+        this.sourcePosition = pos;
 
-	public void play(){
-		state = SoundPlayerState.PLAYING;
-		alSourcePlay(source);
-	}
+        FloatBuffer vel = BufferUtils.createFloatBuffer(3).put(velocity);
+        vel.rewind();
+        this.sourceVelocity = vel;
 
-	public void pause(){
-		state = SoundPlayerState.PAUSED;
-		alSourcePause(source);
-	}
+        this.source = alGenSources();
+        checkALError();
 
-	public void stop(){
-		state = SoundPlayerState.STOPPED;
-		alSourceStop(source);
-	}
+        alSourcei(this.source, AL_BUFFER, sound.getBuffer());
+        alSourcef(this.source, AL_PITCH, this.pitch);
+        alSourcef(this.source, AL_GAIN, this.gain);
+        alSource(this.source, AL_POSITION, this.sourcePosition);
+        alSource(this.source, AL_VELOCITY, this.sourceVelocity);
+    }
 
-	public SoundPlayerState getState(){
-		return state;
-	}
+    public void play() {
+        state = SoundPlayerState.PLAYING;
+        alSourcePlay(source);
+    }
 
-	public void destroy(){
-		alDeleteSources(source);
-	}
+    public void pause() {
+        state = SoundPlayerState.PAUSED;
+        alSourcePause(source);
+    }
+
+    public void stop() {
+        state = SoundPlayerState.STOPPED;
+        alSourceStop(source);
+    }
+
+    public SoundPlayerState getState() {
+        return state;
+    }
+
+    public void destroy() {
+        alDeleteSources(source);
+    }
 
 }

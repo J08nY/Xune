@@ -1,4 +1,5 @@
 package sk.neuromancer.Xune.gfx;
+
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
@@ -42,87 +43,87 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GLContext;
 
 public class Window {
-	private long handle;
+    private long handle;
 
-	private int width,height;
+    private int width, height;
 
-	public Window(int width, int height){
-		this.width = width;
-		this.height = height;
-		init();
-	}
+    public Window(int width, int height) {
+        this.width = width;
+        this.height = height;
+        init();
+    }
 
-	private void init(){
-		glfwInit();
+    private void init() {
+        glfwInit();
 
-		glfwDefaultWindowHints();
-		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-		handle = glfwCreateWindow(width, height, "Xune", NULL, NULL);
+        handle = glfwCreateWindow(width, height, "Xune", NULL, NULL);
 
-		ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		glfwSetWindowPos(
-				handle,
-				(GLFWVidMode.width(vidmode) - width) / 2,
-				(GLFWVidMode.height(vidmode) - height) / 2
-				);
-		glfwMakeContextCurrent(handle);
-		//glfwSwapInterval(1);
+        ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        glfwSetWindowPos(
+                handle,
+                (GLFWVidMode.width(vidmode) - width) / 2,
+                (GLFWVidMode.height(vidmode) - height) / 2
+        );
+        glfwMakeContextCurrent(handle);
+        //glfwSwapInterval(1);
 
-		GLContext.createFromCurrent();
+        GLContext.createFromCurrent();
 
-		glViewport(0,0,width,height);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0, width, height, 0, -1, 1);
+        glViewport(0, 0, width, height);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, width, height, 0, -1, 1);
 
-		//glEnable(GL_TEXTURE_2D);
-		glDisable(GL_DEPTH_TEST);
+        //glEnable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
 
-		glEnable(GL_BLEND); 
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glClearColor(0f, 0f, 0f, 1.0f);
-	}
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glClearColor(0f, 0f, 0f, 1.0f);
+    }
 
-	public void show(){
-		glfwShowWindow(handle);
-	}
+    public void show() {
+        glfwShowWindow(handle);
+    }
 
-	public long getHandle(){
-		return handle;
-	}
+    public long getHandle() {
+        return handle;
+    }
 
-	public void quit(){
-		glfwDestroyWindow(handle);
-	}
-	
-	public static void renderPoly(float[] vertexArray){//TODO Do�asn� metoda na debug
-		if(vertexArray.length % 2 != 0)
-			return;
-		glPushMatrix();
-		glColor3f(1f,0f,0f);
-		glBegin(GL_POLYGON);
-		for(int i = 0; i< vertexArray.length/2;i++){
-			glVertex2f(vertexArray[2*i],vertexArray[2*i+1]);
-		}
-		glEnd();
-		glPopMatrix();
-		glColor3f(1f,1f,1f);
-	}
-	
-	public static void renderPoints(float[] vertexArray){
-		if(vertexArray.length % 2 != 0)
-			return;
-		glPushMatrix();
-		//glColor3f(0f,1f,0f);
-		glPointSize(10.0f);
-		glBegin(GL_POINTS);
-		for(int i = 0; i< vertexArray.length/2;i++){
-			glVertex2f(vertexArray[2*i],vertexArray[2*i+1]);
-		}
-		glEnd();
-		glPopMatrix();
-		glColor3f(1f,1f,1f);
-	}
+    public void quit() {
+        glfwDestroyWindow(handle);
+    }
+
+    public static void renderPoly(float[] vertexArray) {//TODO Do�asn� metoda na debug
+        if (vertexArray.length % 2 != 0)
+            return;
+        glPushMatrix();
+        glColor3f(1f, 0f, 0f);
+        glBegin(GL_POLYGON);
+        for (int i = 0; i < vertexArray.length / 2; i++) {
+            glVertex2f(vertexArray[2 * i], vertexArray[2 * i + 1]);
+        }
+        glEnd();
+        glPopMatrix();
+        glColor3f(1f, 1f, 1f);
+    }
+
+    public static void renderPoints(float[] vertexArray) {
+        if (vertexArray.length % 2 != 0)
+            return;
+        glPushMatrix();
+        //glColor3f(0f,1f,0f);
+        glPointSize(10.0f);
+        glBegin(GL_POINTS);
+        for (int i = 0; i < vertexArray.length / 2; i++) {
+            glVertex2f(vertexArray[2 * i], vertexArray[2 * i + 1]);
+        }
+        glEnd();
+        glPopMatrix();
+        glColor3f(1f, 1f, 1f);
+    }
 }
