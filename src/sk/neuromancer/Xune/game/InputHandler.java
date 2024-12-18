@@ -237,10 +237,10 @@ public class InputHandler implements Tickable {
     }
 
     public void quit() {
-        keyCallback.release();
-        mouseCallback.release();
-        cursorCallback.release();
-        scrollCallback.release();
+        //keyCallback.release();
+        //mouseCallback.release();
+        //cursorCallback.release();
+        //scrollCallback.release();
     }
 
 

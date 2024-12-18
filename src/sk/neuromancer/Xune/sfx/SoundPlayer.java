@@ -7,13 +7,12 @@ import static org.lwjgl.openal.AL10.AL_POSITION;
 import static org.lwjgl.openal.AL10.AL_VELOCITY;
 import static org.lwjgl.openal.AL10.alDeleteSources;
 import static org.lwjgl.openal.AL10.alGenSources;
-import static org.lwjgl.openal.AL10.alSource;
+import static org.lwjgl.openal.AL10.alSourcefv;
 import static org.lwjgl.openal.AL10.alSourcePause;
 import static org.lwjgl.openal.AL10.alSourcePlay;
 import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourcef;
 import static org.lwjgl.openal.AL10.alSourcei;
-import static org.lwjgl.openal.Util.checkALError;
 
 import java.nio.FloatBuffer;
 
@@ -60,13 +59,12 @@ public class SoundPlayer {
         this.sourceVelocity = vel;
 
         this.source = alGenSources();
-        checkALError();
 
         alSourcei(this.source, AL_BUFFER, sound.getBuffer());
         alSourcef(this.source, AL_PITCH, this.pitch);
         alSourcef(this.source, AL_GAIN, this.gain);
-        alSource(this.source, AL_POSITION, this.sourcePosition);
-        alSource(this.source, AL_VELOCITY, this.sourceVelocity);
+        alSourcefv(this.source, AL_POSITION, this.sourcePosition);
+        alSourcefv(this.source, AL_VELOCITY, this.sourceVelocity);
     }
 
     public void play() {

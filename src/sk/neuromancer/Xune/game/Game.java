@@ -127,7 +127,7 @@ public class Game implements Renderable {
         input.tick(tickCount);
         sound.tick(tickCount);
 
-        if (input.ESC.isPressed() || (glfwWindowShouldClose(window.getHandle())) == GL_TRUE)
+        if (input.ESC.isPressed() || glfwWindowShouldClose(window.getHandle()))
             stop();
     }
 

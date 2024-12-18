@@ -37,10 +37,8 @@ import static org.lwjgl.opengl.GL11.glVertex2f;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-import java.nio.ByteBuffer;
-
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.GL;
 
 public class Window {
     private long handle;
@@ -62,16 +60,16 @@ public class Window {
 
         handle = glfwCreateWindow(width, height, "Xune", NULL, NULL);
 
-        ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(
                 handle,
-                (GLFWVidMode.width(vidmode) - width) / 2,
-                (GLFWVidMode.height(vidmode) - height) / 2
+                (vidmode.width() - width) / 2,
+                (vidmode.height() - height) / 2
         );
         glfwMakeContextCurrent(handle);
         //glfwSwapInterval(1);
 
-        GLContext.createFromCurrent();
+        GL.createCapabilities();
 
         glViewport(0, 0, width, height);
         glMatrixMode(GL_PROJECTION);

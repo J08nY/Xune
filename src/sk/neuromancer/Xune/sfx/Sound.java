@@ -7,7 +7,6 @@ import static org.lwjgl.openal.AL10.AL_FORMAT_STEREO8;
 import static org.lwjgl.openal.AL10.alBufferData;
 import static org.lwjgl.openal.AL10.alDeleteBuffers;
 import static org.lwjgl.openal.AL10.alGenBuffers;
-import static org.lwjgl.openal.Util.checkALError;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -93,7 +92,6 @@ public class Sound {
 
 
             this.buffer = alGenBuffers();
-            checkALError();
 
             alBufferData(this.buffer, format, dataBuffer, sampleRate);
 

@@ -1,17 +1,24 @@
 package sk.neuromancer.Xune.sfx;
 
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.openal.ALContext;
-
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10.*;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALCCapabilities;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.sfx.SoundPlayer.SoundPlayerState;
 
+import static org.lwjgl.openal.ALC10.*;
+
 public class SoundManager implements Tickable {
     private Game game;
-    private ALContext context;
+    private long device;
+    private long context;
 
     private List<SoundPlayer> players = new ArrayList<SoundPlayer>();
     private Sound[] sounds;
@@ -44,8 +51,17 @@ public class SoundManager implements Tickable {
 
     public SoundManager(Game game) {//TODO nejako manazovat Gain..
         this.game = game;
-        this.context = ALContext.create();
-        this.context.makeCurrent();
+        this.device = alcOpenDevice((ByteBuffer) null);
+        if (device == 0) {
+            throw new IllegalStateException("Failed to open the default OpenAL device.");
+        }
+        ALCCapabilities deviceCaps = ALC.createCapabilities(device);
+        this.context = alcCreateContext(device, (IntBuffer) null);
+        if (context == 0) {
+            throw new IllegalStateException("Failed to create OpenAL context.");
+        }
+        alcMakeContextCurrent(context);
+        AL.createCapabilities(deviceCaps);
 
         this.sounds = new Sound[SoundManager.soundNames.length];
         for (int i = 0; i < this.sounds.length; i++) {
@@ -77,8 +93,6 @@ public class SoundManager implements Tickable {
         for (Sound s : sounds) {
             s.destroy();
         }
-        context.getDevice().destroy();
-        context.destroy();
     }
 
 }
