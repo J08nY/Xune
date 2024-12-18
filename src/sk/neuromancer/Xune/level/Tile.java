@@ -34,14 +34,14 @@ public class Tile implements Renderable {
             {true, true, true, true, true, false, true, false, false},
             {true, true, true, true, true, true, true, true, false}};
 
-    public static final int TILE_WIDTH = 23;
+    public static final int TILE_WIDTH = 24;
     public static final int TILE_HEIGHT = 11;
 
     public Tile(int type, int x, int y) {
         this.x = x;
         this.y = y;
-        this.px = (x + 0.5f * (y % 2)) * (Tile.TILE_WIDTH + 1);
-        this.py = 0.5f * y * (Tile.TILE_HEIGHT + 1);
+        this.px = (x + 0.5f * (y % 2)) * Tile.TILE_WIDTH;
+        this.py = 0.5f * y * Tile.TILE_HEIGHT;
 
         this.type = type;
         if (type < 3) {
