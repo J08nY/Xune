@@ -56,6 +56,10 @@ public class SpriteSheet {
         isInitiated = true;
     }
 
+    public int numSprites() {
+        return sprites.length;
+    }
+
     public Sprite getSprite(int index) {
         return sprites[index];
     }
