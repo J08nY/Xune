@@ -4,8 +4,8 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import sk.neuromancer.Xune.entity.Clickable.ClickableCircle;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 public class Heli extends PlayableEntity {
@@ -14,20 +14,20 @@ public class Heli extends PlayableEntity {
     private int heading;
     private boolean wing;
 
-    public Heli(float x, float y, EntityOwner owner, Flag flag) {//TODO prepisat Heli classu
+    public Heli(float x, float y, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);
         this.animation = baseSpriteId + PlayableEntity.getOffsetonFlag(flag);
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(this.animation);//modra heli..
         this.heading = 3;
-        this.clickableAreas.add(ClickableCircle.getCentered(x + 80, y + 80, 20, Button.LEFT, false));
-        //this.clickableAreas.add(ClickableCircle.getFromDimensions(x, y, this.sprite.getWidth()*this.sprite.getScaleFactor(), this.sprite.getWidth()*this.sprite.getScaleFactor(), Button.LEFT, false));
+        if (owner instanceof Player)
+            this.clickableAreas.add(ClickableCircle.getCentered(x, y, 11, 5, 10, Button.LEFT, false));
     }
 
     @Override
     public void render() {
         glPushMatrix();
         glTranslatef(x, y, 0);
-        //((ClickableCircle) this.clickableAreas.get(0)).render();
+        ((ClickableCircle) this.clickableAreas.get(0)).render();
         SpriteSheet.ENTITY_SHEET.getSprite(animation).render();
         glPopMatrix();
     }
@@ -50,5 +50,14 @@ public class Heli extends PlayableEntity {
             heading += 1;
             heading %= 8;
         }
+    }
+
+    @Override
+    public boolean onClick(float x, float y, Button b) {
+        boolean clicked = super.onClick(x, y, b);
+        if (clicked) {
+            System.out.println("clicked heli!");
+        }
+        return clicked;
     }
 }

@@ -25,6 +25,8 @@ public class Base extends PlayableEntity {
         //((ClickableTile) this.clickableAreas.get(0)).render();
         glTranslatef(x, y, 0);
         this.sprite.render();
+        if (isSelected)
+            SpriteSheet.TILE_SHEET.getSprite(17).render();
         glPopMatrix();
     }
 
@@ -37,6 +39,7 @@ public class Base extends PlayableEntity {
     public boolean onClick(float x, float y, Button b) {
         boolean clickedOn = super.onClick(x, y, b);
         if (clickedOn) {
+            this.isSelected = !this.isSelected;
             System.out.println("clickedOnBase");
         }
         return clickedOn;
