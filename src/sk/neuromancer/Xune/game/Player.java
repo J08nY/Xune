@@ -8,6 +8,9 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
+import static sk.neuromancer.Xune.level.Tile.TILE_HEIGHT;
+import static sk.neuromancer.Xune.level.Tile.TILE_WIDTH;
+
 public class Player extends EntityOwner {
     private Game game;
     private Level level;
@@ -19,9 +22,11 @@ public class Player extends EntityOwner {
         super(flag, money);
         this.game = g;
         this.level = level;
-        this.addEntity(new Base(24 * 3.5f, 11 * 0.5f, this, this.flag));
-        this.addEntity(new Refinery(24 * 4f, 11 * 0f, this, this.flag));
-        this.addEntity(new Heli(24 * 7.5f, 11 * 7.5f, this, this.flag));
+        this.addEntity(new Base(TILE_WIDTH * 3.5f, TILE_HEIGHT * 0.5f, this, this.flag));
+        this.addEntity(new Refinery(TILE_WIDTH * 4f, TILE_HEIGHT * 0f, this, this.flag));
+        this.addEntity(new Refinery(TILE_WIDTH * 5f, TILE_HEIGHT * 0f, this, this.flag));
+        this.addEntity(new Heli(TILE_WIDTH * 7.5f, TILE_HEIGHT * 7.5f, this, this.flag));
+        this.addEntity(new Harvester(TILE_WIDTH * 5.5f, TILE_HEIGHT * 6.5f, this, this.flag));
         this.selected = null;
     }
 
