@@ -1,25 +1,11 @@
 package sk.neuromancer.Xune.game;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ADD;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_KP_SUBTRACT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
-
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class InputHandler implements Tickable {
 
@@ -42,9 +28,10 @@ public class InputHandler implements Tickable {
 
     public class Mouse {
         private double x, y;
+        private boolean pressLeft, releaseLeft, pressRight, releaseRight;
         private boolean leftMB = false, rightMB = false;
-        private double lastX, lastY;
-        private boolean wasDragged = false;
+        private double leftX, leftY;
+        private double rightX, rightY;
 
         public void setPosition(double x, double y) {
             this.x = x;
@@ -52,25 +39,31 @@ public class InputHandler implements Tickable {
         }
 
         public void pressLeft() {
+            System.out.println("pressLeft");
             this.leftMB = true;
-            this.lastX = x;
-            this.lastY = y;
-            this.wasDragged = false;
+            this.leftX = x;
+            this.leftY = y;
+            this.pressLeft = true;
         }
 
         public void pressRight() {
+            System.out.println("pressRight");
             this.rightMB = true;
+            this.rightX = x;
+            this.rightY = y;
+            this.pressRight = true;
         }
 
         public void releaseLeft() {
+            System.out.println("releaseLeft");
             this.leftMB = false;
-            if (this.lastX != this.x || this.lastY != this.y) {
-                wasDragged = true;
-            }
+            this.releaseLeft = true;
         }
 
         public void releaseRight() {
+            System.out.println("releaseRight");
             this.rightMB = false;
+            this.releaseRight = true;
         }
 
         public double getX() {
@@ -81,36 +74,52 @@ public class InputHandler implements Tickable {
             return this.y;
         }
 
-        public double getLastX() {
-            return lastX;
+        public double getLastLeftX() {
+            return leftX;
         }
 
-        public double getLastY() {
-            return lastY;
+        public double getLastLeftY() {
+            return leftY;
         }
 
-        public boolean isLeftPressed() {
+        public double getLastRightX() {
+            return rightX;
+        }
+
+        public double getLastRightY() {
+            return rightY;
+        }
+
+        public boolean isLeftDown() {
             return this.leftMB;
         }
 
-        public boolean isRightPressed() {
+        public boolean isLeftPressed() {
+            return this.pressLeft;
+        }
+
+        public boolean isLeftDrag() {
+            return this.leftMB && (this.leftX != this.x || this.leftY != this.y);
+        }
+
+        public boolean isRightDown() {
             return this.rightMB;
         }
 
-        public boolean wasDragged() {
-            return this.wasDragged;
+        public boolean isRightPressed() {
+            return this.pressRight;
+        }
+
+        public boolean isRightDrag() {
+            return this.rightMB && (this.rightX != this.x || this.rightY != this.y);
         }
 
         public void resetPress() {
-            this.leftMB = false;
-            this.rightMB = false;
+            this.pressLeft = false;
+            this.pressRight = false;
+            this.releaseLeft = false;
+            this.releaseRight = false;
         }
-
-        public void resetDrag() {
-            this.wasDragged = false;
-        }
-
-
     }
 
     public class Scroller {
@@ -120,8 +129,8 @@ public class InputHandler implements Tickable {
         public void scroll(double xOff, double yOff) {
             deltaX = (float) xOff;
             deltaY = (float) yOff;
-            x += xOff;
-            y += yOff;
+            x += (float) xOff;
+            y += (float) yOff;
         }
 
         public float getXoffset() {
@@ -202,21 +211,13 @@ public class InputHandler implements Tickable {
             public void invoke(long window, int button, int action, int mods) {
                 if (action == GLFW_PRESS) {
                     switch (button) {
-                        case GLFW_MOUSE_BUTTON_LEFT:
-                            mouse.pressLeft();
-                            break;
-                        case GLFW_MOUSE_BUTTON_RIGHT:
-                            mouse.pressRight();
-                            break;
+                        case GLFW_MOUSE_BUTTON_LEFT -> mouse.pressLeft();
+                        case GLFW_MOUSE_BUTTON_RIGHT -> mouse.pressRight();
                     }
                 } else {
                     switch (button) {
-                        case GLFW_MOUSE_BUTTON_LEFT:
-                            mouse.releaseLeft();
-                            break;
-                        case GLFW_MOUSE_BUTTON_RIGHT:
-                            mouse.releaseRight();
-                            break;
+                        case GLFW_MOUSE_BUTTON_LEFT -> mouse.releaseLeft();
+                        case GLFW_MOUSE_BUTTON_RIGHT -> mouse.releaseRight();
                     }
                 }
             }
@@ -231,16 +232,16 @@ public class InputHandler implements Tickable {
 
     @Override
     public void tick(int tickCount) {
-        mouse.resetDrag();
-        //mouse.resetPress();
+        //This needs to be the last call during a tick.
+        mouse.resetPress();
         scroller.resetDelta();
     }
 
     public void quit() {
-        //keyCallback.release();
-        //mouseCallback.release();
-        //cursorCallback.release();
-        //scrollCallback.release();
+        keyCallback.free();
+        mouseCallback.free();
+        cursorCallback.free();
+        scrollCallback.free();
     }
 
 

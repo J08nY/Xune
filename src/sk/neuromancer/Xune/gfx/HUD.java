@@ -39,7 +39,6 @@ public class HUD implements Tickable, Renderable {
     @Override
     public void render() {
         if (drag) {
-            System.out.println("drag!");
             glPushMatrix();
             glBegin(GL_QUADS);
             glColor4f(0f, 1f, 0f, 0.2f);
@@ -50,7 +49,6 @@ public class HUD implements Tickable, Renderable {
             glEnd();
             glColor4f(1.f, 1.f, 1.f, 1.f);
             glPopMatrix();
-
         }
 
         glPushMatrix();
@@ -103,9 +101,9 @@ public class HUD implements Tickable, Renderable {
         }
         glfwSetCursorPos(game.getWindow(), mouseX, mouseY);
 
-        if (game.getInput().mouse.isLeftPressed()) {
-            fromX = game.getInput().mouse.getLastX();
-            fromY = game.getInput().mouse.getLastY();
+        if (game.getInput().mouse.isLeftDrag()) {
+            fromX = game.getInput().mouse.getLastLeftX();
+            fromY = game.getInput().mouse.getLastLeftY();
             drag = true;
         } else {
             drag = false;

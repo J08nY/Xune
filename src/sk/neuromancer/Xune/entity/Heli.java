@@ -14,13 +14,13 @@ public class Heli extends PlayableEntity {
     private int heading;
     private boolean wing;
 
-    public Heli(float x, float y, EntityOwner owner, Flag flag) {
+    public Heli(float x, float y, int heading, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);
         this.animation = baseSpriteId + PlayableEntity.getOffsetonFlag(flag);
-        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(this.animation);//modra heli..
-        this.heading = 3;
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(this.animation);
+        this.heading = heading;
         if (owner instanceof Player)
-            this.clickableAreas.add(ClickableCircle.getCentered(x, y, 11, 5, 10, Button.LEFT, false));
+            this.clickableAreas.add(ClickableCircle.getCentered(x, y, 11, 5, 7, Button.LEFT, false));
     }
 
     @Override
@@ -44,7 +44,6 @@ public class Heli extends PlayableEntity {
 
         if (tickCount % 5 == 0) {
             wing = !wing;
-            //setPosition(x + 3, y + 2);
         }
 
         if (tickCount % 60 == 0) {
@@ -53,12 +52,4 @@ public class Heli extends PlayableEntity {
         }
     }
 
-    @Override
-    public boolean onClick(float x, float y, Button b) {
-        boolean clicked = super.onClick(x, y, b);
-        if (clicked) {
-            this.isSelected = !this.isSelected;
-        }
-        return clicked;
-    }
 }

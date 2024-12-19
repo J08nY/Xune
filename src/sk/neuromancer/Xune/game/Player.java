@@ -4,7 +4,6 @@ import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.Clickable.Button;
 import sk.neuromancer.Xune.entity.Entity.Flag;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
@@ -21,10 +20,10 @@ public class Player extends EntityOwner {
         super(flag, money);
         this.game = g;
         this.level = level;
-        this.addEntity(new Base(tileX(1, 4), tileY(1, 4), this, this.flag));
-        this.addEntity(new Refinery(tileX(2, 4), tileY(2, 4), this, this.flag));
-        this.addEntity(new Harvester(tileX(1, 7), tileY(1, 7), this, this.flag));
-        this.addEntity(new Heli(tileX(7, 7), tileY(7, 7), this, this.flag));
+        this.addEntity(new Base(tileX(1, 4), tileY(1, 4), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Refinery(tileX(2, 4), tileY(2, 4), Entity.Orientation.NORTH,this, this.flag));
+        this.addEntity(new Harvester(tileX(1, 7), tileY(1, 7), Entity.Orientation.NORTH,this, this.flag));
+        this.addEntity(new Heli(tileX(7, 7), tileY(7, 7), 0,this, this.flag));
         this.selected = null;
     }
 
@@ -52,6 +51,7 @@ public class Player extends EntityOwner {
                     if (clicked) {
                         selected = (PlayableEntity) e;
                         selected.select();
+                        System.out.println("Selected " + e.getClass().getSimpleName());
                         game.getSound().play(SoundManager.SOUND_BLIP_1);
                         break;
                     }

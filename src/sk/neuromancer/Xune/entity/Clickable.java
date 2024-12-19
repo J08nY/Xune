@@ -1,22 +1,23 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.gfx.Window;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public interface Clickable {
 
-    public enum Button {
+    enum Button {
         LEFT, RIGHT;
     }
 
-    public boolean onClick(float x, float y, Button b);
+    boolean onClick(float x, float y, Button b);
 
-    public void setPosition(float x, float y);//mozno move?
+    void setPosition(float x, float y);
 
 
-    public class ClickableBox implements Clickable {
+    class ClickableBox implements Clickable {
         private float fromX, fromY;
         private float toX, toY;
         private Button button;
@@ -73,7 +74,7 @@ public interface Clickable {
 
     }
 
-    public class ClickableCircle implements Clickable, Renderable {
+    class ClickableCircle implements Clickable, Renderable {
         private float x, y;
         private float offsetX, offsetY;
         private float radius;
@@ -127,21 +128,22 @@ public interface Clickable {
         public void render() {
             glPushMatrix();
             glTranslatef(offsetX, offsetY, 0);
-            float[] vertices = new float[30];
-            for (int i = 0; i < 15; i++) {
-                float angle = (360 / 15) * i;
+            float[] vertices = new float[60];
+            for (int i = 0; i < 30; i++) {
+                float angle = (float) Math.toRadians(((float) 360 / 30) * i);
                 vertices[2 * i] = (float) (Math.cos(angle) * radius);//x;
                 vertices[2 * i + 1] = (float) (Math.sin(angle) * radius);//y;
             }
             glColor3f(1f, 0f, 0f);
             Window.renderPoints(vertices);
             glColor3f(1f, 1f, 1f);
-            glPopMatrix();;
+            glPopMatrix();
+            ;
         }
 
     }
 
-    public class ClickableTile implements Clickable, Renderable {
+    class ClickableTile implements Clickable, Renderable {
         private float x, y;
         private float width, height;
         private float k, l;
@@ -168,7 +170,7 @@ public interface Clickable {
             this.kOffsetTop = y - k * (x + halfWidth);
             this.kOffsetBottom = y + height - k * (x + halfWidth);
             this.lOffsetTop = (y - l * (x + halfWidth));
-            this.lOffsetBottom = -(y + 5 * height - l * (x - halfWidth));
+            this.lOffsetBottom = y - l * (x - halfWidth);
             this.button = button;
             this.isStatic = isStatic;
         }
@@ -198,7 +200,8 @@ public interface Clickable {
 
         @Override
         public void render() {
-            //TODO: Fix
+            SpriteSheet.TILE_SHEET.getSprite(17).render();
+            /*
             float[] vertices = new float[60];
             for (int i = 0; i < 30; i++) {
                 vertices[2 * i] = 2 * i;
@@ -219,11 +222,6 @@ public interface Clickable {
                 verticesFour[2 * i] = 2 * i;
                 verticesFour[2 * i + 1] = l * (2 * i) + lOffsetBottom;
             }
-            //float[] finishedVertices = new float[120];
-            //System.arraycopy(vertices, 0, finishedVertices, 0, 30);
-            //System.arraycopy(verticesTwo, 0, finishedVertices, 30, 30);
-            //System.arraycopy(verticesThree, 0, finishedVertices, 60, 30);
-            //System.arraycopy(verticesFour, 0, finishedVertices, 90, 30);
             glColor3f(1f, 0f, 0f);//koffsettop
             Window.renderPoints(vertices);
             glColor3f(0f, 1f, 0f);//koffsetbottom
@@ -231,7 +229,7 @@ public interface Clickable {
             glColor3f(0f, 0f, 1f);//loffsetbottom
             Window.renderPoints(verticesThree);
             glColor3f(1f, 1f, 1f);//loffsettop
-            Window.renderPoints(verticesFour);
+            Window.renderPoints(verticesFour);*/
         }
 
         @Override
@@ -243,7 +241,7 @@ public interface Clickable {
             this.kOffsetTop = y - k * (x + halfWidth);
             this.kOffsetBottom = y + height - k * (x + halfWidth);
             this.lOffsetTop = (y - l * (x + halfWidth));
-            this.lOffsetBottom = -(y + 2 * height - l * (x + halfWidth));
+            this.lOffsetBottom = y - l * (x - halfWidth);
         }
 
     }
