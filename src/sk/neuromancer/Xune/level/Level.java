@@ -6,7 +6,6 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -27,15 +26,17 @@ public class Level implements Renderable, Tickable {
     private Tile[][] level;
     private int width, height;
 
-    public float zoom = 1.0f;
+    public float zoom = 4.0f;
 
-    public float xOff = Game.CENTER_X;
-    public float yOff = Game.CENTER_Y;
+    public float xOff;
+    public float yOff;
 
     public static final String LEVEL_1 = "newlevel.lvl";
     public static final float ZOOM_SPEED = 0.02f;
     public static final float SCROLL_SPEED = 0.04f;
     public static final float MOVE_SPEED = 5f;
+    public static final float EDGE_MARGIN_X = Tile.TILE_WIDTH * 2;
+    public static final float EDGE_MARGIN_Y = Tile.TILE_HEIGHT * 4;
 
     public Level(Game game) {
         this.game = game;
@@ -54,16 +55,17 @@ public class Level implements Renderable, Tickable {
         if (dy > 0) {
             this.zoom *= 1 + SCROLL_SPEED;
         } else if (dy < 0) {
-            this.zoom *= 1 - SCROLL_SPEED;
+            if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(Game.HEIGHT) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(Game.WIDTH) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
+                this.zoom *= 1 - SCROLL_SPEED;
         }
 
-        if (this.game.getInput().W.isPressed()) {
+        if (this.game.getInput().W.isPressed() && getLevelY(0) > -EDGE_MARGIN_Y) {
             this.yOff += MOVE_SPEED * (1 / zoom);
-        } else if (this.game.getInput().A.isPressed()) {
+        } else if (this.game.getInput().A.isPressed() && getLevelX(0) > -EDGE_MARGIN_X) {
             this.xOff += MOVE_SPEED * (1 / zoom);
-        } else if (this.game.getInput().S.isPressed()) {
+        } else if (this.game.getInput().S.isPressed() && getLevelY(Game.HEIGHT) < (getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
             this.yOff -= MOVE_SPEED * (1 / zoom);
-        } else if (this.game.getInput().D.isPressed()) {
+        } else if (this.game.getInput().D.isPressed() && getLevelX(Game.WIDTH) < (getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
             this.xOff -= MOVE_SPEED * (1 / zoom);
         }
 
@@ -120,6 +122,8 @@ public class Level implements Renderable, Tickable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.xOff = Game.CENTER_X - getWidth() / 2;
+        this.yOff = Game.CENTER_Y - getHeight() / 2;
     }
 
     public void setPlayer(Player player) {
@@ -142,11 +146,19 @@ public class Level implements Renderable, Tickable {
         return this.level;
     }
 
-    public int getWidth() {
+    public float getWidth() {
+        return this.width * Tile.TILE_WIDTH;
+    }
+
+    public float getHeight() {
+        return (float) (this.height * Tile.TILE_HEIGHT) / 2;
+    }
+
+    public int getWidthInTiles() {
         return this.width;
     }
 
-    public int getHeight() {
+    public int getHeightInTiles() {
         return this.height;
     }
 

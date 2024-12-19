@@ -1,9 +1,5 @@
 package sk.neuromancer.Xune.entity;
 
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
@@ -24,16 +20,6 @@ public class Heli extends PlayableEntity {
     }
 
     @Override
-    public void render() {
-        glPushMatrix();
-        glTranslatef(x, y, 0);
-        SpriteSheet.ENTITY_SHEET.getSprite(animation).render();
-        if (isSelected)
-            ((ClickableCircle) this.clickableAreas.get(0)).render();
-        glPopMatrix();
-    }
-
-    @Override
     public void tick(int tickCount) {
         if (heading < 4) {
             animation = baseSpriteId + heading * 2;
@@ -50,6 +36,7 @@ public class Heli extends PlayableEntity {
             heading += 1;
             heading %= 8;
         }
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(animation);
     }
 
 }

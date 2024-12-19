@@ -27,9 +27,9 @@ public class Pathfinder implements Tickable {
     private void setupNewGrid() {
         Tile[][] tiles = this.l.getTiles();
 
-        for (int x = 0; x < this.l.getWidth(); x++) {
+        for (int x = 0; x < this.l.getWidthInTiles(); x++) {
 
-            for (int y = 0; y < this.l.getHeight(); y++) {
+            for (int y = 0; y < this.l.getHeightInTiles(); y++) {
                 Tile t = tiles[x][y];
                 boolean[] points = t.getPassable();//9
 				
@@ -57,8 +57,8 @@ public class Pathfinder implements Tickable {
         //System.out.println(tiles.length);//26
         //System.out.println(tiles[0].length);//70
 
-        this.gridWidth = (this.l.getWidth() + 1) * 2; //maxWIdth.... -1 je neparna sirka..
-        this.gridHeight = this.l.getHeight() + 2;//maxHeight... -1 je zase neparna sirka..
+        this.gridWidth = (this.l.getWidthInTiles() + 1) * 2; //maxWIdth.... -1 je neparna sirka..
+        this.gridHeight = this.l.getHeightInTiles() + 2;//maxHeight... -1 je zase neparna sirka..
         int[][] tempGrid = new int[this.gridWidth][this.gridHeight];
         for (int i = 0; i < this.gridWidth; i++) {
             for (int j = 0; j < this.gridHeight; j++) {
@@ -67,8 +67,8 @@ public class Pathfinder implements Tickable {
         }
 
 
-        for (int x = 0; x < this.l.getWidth(); x++) {
-            for (int y = 0; y < this.l.getHeight(); y++) {
+        for (int x = 0; x < this.l.getWidthInTiles(); x++) {
+            for (int y = 0; y < this.l.getHeightInTiles(); y++) {
                 /* INITIATE GRID FU!! */
 
                 Tile t = tiles[x][y];
