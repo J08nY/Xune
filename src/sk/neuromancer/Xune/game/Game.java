@@ -35,8 +35,10 @@ public class Game implements Renderable {
 
     private SoundManager sound;
 
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 600;
+    public static final int WIDTH = 1920;
+    public static final int HEIGHT = 1080;
+    public static final int CENTER_X = WIDTH / 2;
+    public static final int CENTER_Y = HEIGHT / 2;
 
     public static final int TPS = 120;
 

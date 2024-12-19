@@ -1,13 +1,6 @@
 package sk.neuromancer.Xune.level;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.game.Tickable;
 
 public class Pathfinder implements Tickable {

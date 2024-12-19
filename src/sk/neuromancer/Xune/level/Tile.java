@@ -40,8 +40,8 @@ public class Tile implements Renderable {
     public Tile(int type, int x, int y) {
         this.x = x;
         this.y = y;
-        this.px = (x + 0.5f * (y % 2)) * Tile.TILE_WIDTH;
-        this.py = 0.5f * y * Tile.TILE_HEIGHT;
+        this.px = tileX(x, y);
+        this.py = tileY(x, y);
 
         this.type = type;
         if (type < 3) {
@@ -58,6 +58,14 @@ public class Tile implements Renderable {
 
     public boolean isPassable(int point) {
         return pass[point];
+    }
+
+    public static float tileX(float x, float y) {
+        return (x + 0.5f * (y % 2)) * Tile.TILE_WIDTH;
+    }
+
+    public static float tileY(float x, float y) {
+        return 0.5f * y * Tile.TILE_HEIGHT;
     }
 
     @Override

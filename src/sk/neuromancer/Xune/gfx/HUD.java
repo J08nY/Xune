@@ -5,14 +5,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_HIDDEN;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
 import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslated;
-import static org.lwjgl.opengl.GL11.glVertex3d;
+import static org.lwjgl.opengl.GL11.*;
 
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
@@ -62,23 +55,25 @@ public class HUD implements Tickable, Renderable {
 
         glPushMatrix();
         glTranslated(0, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()), 0);
-        glPushMatrix();
-        glTranslated(10, 10, 0);
-        glPopMatrix();
         hudPanel.render();
         glPopMatrix();
 
         glPushMatrix();
-        renderText(150, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 30, "MONEY: " + game.getLevel().getPlayer().money);
-        double mx = mouseX;
-        double my = mouseY;
+        float hudTop = Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor());
+        float hudLeft = (hudPanel.getWidth() * hudPanel.getScaleFactor()) * 0.18f;
+        glTranslatef(hudLeft, hudTop, 0);
 
-        renderText(150, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 60, "X: " + mx);
-        renderText(150, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 90, "Y: " + my);
-        renderText(300, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 60, "LEVELX: " + game.getLevel().getLevelX(mx));
-        renderText(300, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 90, "LEVELY: " + game.getLevel().getLevelY(my));
-        renderText(450, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 60, "SCREENX: " + game.getLevel().getScreenX(game.getLevel().getLevelX(mx)));
-        renderText(450, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()) + 90, "SCREENY: " + game.getLevel().getScreenY(game.getLevel().getLevelY(my)));
+        renderText(0, 60, "MONEY: " + game.getLevel().getPlayer().money);
+        float levelX = game.getLevel().getLevelX(mouseX);
+        float levelY = game.getLevel().getLevelY(mouseY);
+
+        renderText(0, 90, "X: " + mouseX);
+        renderText(0, 120, "Y: " + mouseY);
+        renderText(200, 90, "LEVELX: " + levelX);
+        renderText(200, 120, "LEVELY: " + levelY);
+        renderText(400, 90, "XOFF: " + game.getLevel().xOff);
+        renderText(400, 120, "YOFF: " + game.getLevel().yOff);
+        renderText(600, 90, "ZOOM: " + game.getLevel().zoom);
 
         glPopMatrix();
 

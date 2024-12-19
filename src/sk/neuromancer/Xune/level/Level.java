@@ -27,12 +27,15 @@ public class Level implements Renderable, Tickable {
     private Tile[][] level;
     private int width, height;
 
-    private float zoom = 1.0f;
+    public float zoom = 1.0f;
 
-    public float xOff = 0.0f;
-    public float yOff = 0.0f;
+    public float xOff = Game.CENTER_X;
+    public float yOff = Game.CENTER_Y;
 
     public static final String LEVEL_1 = "newlevel.lvl";
+    public static final float ZOOM_SPEED = 0.02f;
+    public static final float SCROLL_SPEED = 0.04f;
+    public static final float MOVE_SPEED = 5f;
 
     public Level(Game game) {
         this.game = game;
@@ -42,28 +45,27 @@ public class Level implements Renderable, Tickable {
     public void tick(int tickCount) {
 
         if (this.game.getInput().PLUS.isPressed()) {
-            this.zoom *= 1.02f;
+            this.zoom *= 1 + ZOOM_SPEED;
         } else if (this.game.getInput().MINUS.isPressed()) {
-            this.zoom *= 0.98f;
+            this.zoom *= 1 - ZOOM_SPEED;
         }
 
         float dy = this.game.getInput().scroller.getDeltaY();
         if (dy > 0) {
-            this.zoom *= 1.02f;
+            this.zoom *= 1 + SCROLL_SPEED;
         } else if (dy < 0) {
-            this.zoom *= 0.98f;
+            this.zoom *= 1 - SCROLL_SPEED;
         }
 
         if (this.game.getInput().W.isPressed()) {
-            this.yOff += 5 * this.zoom;
+            this.yOff += MOVE_SPEED * (1 / zoom);
         } else if (this.game.getInput().A.isPressed()) {
-            this.xOff += 5 * this.zoom;
+            this.xOff += MOVE_SPEED * (1 / zoom);
         } else if (this.game.getInput().S.isPressed()) {
-            this.yOff -= 5 * this.zoom;
+            this.yOff -= MOVE_SPEED * (1 / zoom);
         } else if (this.game.getInput().D.isPressed()) {
-            this.xOff -= 5 * this.zoom;
+            this.xOff -= MOVE_SPEED * (1 / zoom);
         }
-
 
         player.tick(tickCount);
         enemy.tick(tickCount);
@@ -72,8 +74,10 @@ public class Level implements Renderable, Tickable {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(xOff, yOff, 0);
+        glTranslatef((float) Game.WIDTH / 2, (float) Game.HEIGHT / 2, 0);
         glScalef(zoom, zoom, 0f);
+        glTranslatef(-(float) Game.WIDTH / 2, -(float) Game.HEIGHT / 2, 0);
+        glTranslatef(xOff, yOff, 0);
 
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
@@ -147,27 +151,11 @@ public class Level implements Renderable, Tickable {
     }
 
     /**
-     * @param levelPointX
-     * @return Point sized Screen X coordinate
-     */
-    public int getScreenX(float levelPointX) {
-        return Math.round(levelPointX * this.zoom + this.xOff);
-    }
-
-    /**
-     * @param levelPointY
-     * @return Point sized Screen Y coordinate
-     */
-    public int getScreenY(float levelPointY) {
-        return Math.round(levelPointY * this.zoom + this.yOff);
-    }
-
-    /**
      * @param screenPointX
      * @return Point sized X Level coordinate
      */
     public float getLevelX(double screenPointX) {
-        return ((float) screenPointX - this.xOff) / this.zoom;
+        return (((float) screenPointX - Game.CENTER_X) / this.zoom) - this.xOff + Game.CENTER_X;
     }
 
     /**
@@ -175,6 +163,6 @@ public class Level implements Renderable, Tickable {
      * @return Point sized Y Level coordinate
      */
     public float getLevelY(double screenPointY) {
-        return ((float) screenPointY - this.yOff) / this.zoom;
+        return (((float) screenPointY - Game.CENTER_Y) / this.zoom) - this.yOff + Game.CENTER_Y;
     }
 }
