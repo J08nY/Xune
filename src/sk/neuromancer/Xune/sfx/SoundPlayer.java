@@ -1,24 +1,24 @@
 package sk.neuromancer.Xune.sfx;
 
-import java.nio.FloatBuffer;
-
 import org.lwjgl.BufferUtils;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.openal.AL10.*;
 
 public class SoundPlayer {
 
     public enum SoundPlayerState {
-        INITIAL, PLAYING, PAUSED, STOPPED;
+        INITIAL, PLAYING, PAUSED, STOPPED
     }
 
-    private Sound sound;
-    private int source;
+    private final Sound sound;
+    private final int source;
 
-    private FloatBuffer sourcePosition;
-    private FloatBuffer sourceVelocity;
-    private float pitch;
-    private float gain;
+    private final FloatBuffer sourcePosition;
+    private final FloatBuffer sourceVelocity;
+    private final float pitch;
+    private final float gain;
 
     private SoundPlayerState state;
 

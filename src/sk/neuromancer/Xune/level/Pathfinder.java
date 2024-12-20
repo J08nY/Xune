@@ -4,7 +4,7 @@ package sk.neuromancer.Xune.level;
 import sk.neuromancer.Xune.game.Tickable;
 
 public class Pathfinder implements Tickable {
-    private Level l;
+    private final Level l;
     private boolean[][] grid;
     private int gridWidth;
     private int gridHeight;
@@ -170,7 +170,7 @@ public class Pathfinder implements Tickable {
     }
 
     public static class Path {
-        private Point[] p;
+        private final Point[] p;
 
         public Path(Point[] p) {
             this.p = p;

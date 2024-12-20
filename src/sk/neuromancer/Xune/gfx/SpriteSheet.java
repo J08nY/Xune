@@ -1,12 +1,10 @@
 package sk.neuromancer.Xune.gfx;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
 import sk.neuromancer.Xune.gfx.Sprite.ScalableSprite;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class SpriteSheet {
     public static SpriteSheet ENTITY_SHEET = new SpriteSheet("entities.png", 24, 11);

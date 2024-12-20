@@ -9,14 +9,13 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 
 import static sk.neuromancer.Xune.level.Tile.*;
-import static sk.neuromancer.Xune.level.Tile.tileY;
 
 public class Enemy extends EntityOwner {
 
     public Enemy(Game game, Level level, Flag flag, int money) {
         super(flag, money);
         this.addEntity(new Worm(TILE_WIDTH * 4.5f, TILE_HEIGHT * 2.5f));
-        this.addEntity(new Heli(tileX(14, 10), tileY(14, 10), Entity.Orientation.WEST,this, this.flag));
+        this.addEntity(new Heli(tileX(14, 10), tileY(14, 10), Entity.Orientation.WEST, this, this.flag));
     }
 
     @Override

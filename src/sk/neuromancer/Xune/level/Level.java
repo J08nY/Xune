@@ -1,25 +1,21 @@
 package sk.neuromancer.Xune.level;
 
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.List;
-
 import sk.neuromancer.Xune.ai.Enemy;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.lwjgl.opengl.GL11.*;
+
 public class Level implements Renderable, Tickable {
-    private Game game;
+    private final Game game;
 
     private Pathfinder pathfinder;
 

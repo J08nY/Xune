@@ -9,10 +9,10 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class InputHandler implements Tickable {
 
-    private GLFWKeyCallback keyCallback;
-    private GLFWCursorPosCallback cursorCallback;
-    private GLFWMouseButtonCallback mouseCallback;
-    private GLFWScrollCallback scrollCallback;
+    private final GLFWKeyCallback keyCallback;
+    private final GLFWCursorPosCallback cursorCallback;
+    private final GLFWMouseButtonCallback mouseCallback;
+    private final GLFWScrollCallback scrollCallback;
 
     public class Key {
         private boolean isPressed = false;

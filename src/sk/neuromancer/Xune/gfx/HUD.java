@@ -1,22 +1,18 @@
 package sk.neuromancer.Xune.gfx;
 
-import static org.lwjgl.glfw.GLFW.glfwSetCursorPos;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_HIDDEN;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
-import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
-import static org.lwjgl.opengl.GL11.*;
-
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Sprite.ScalableSprite;
 
-public class HUD implements Tickable, Renderable {
-    private Game game;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 
-    private ScalableSprite currentCursor;
-    private ScalableSprite logo;
-    private ScalableSprite hudPanel;
+public class HUD implements Tickable, Renderable {
+    private final Game game;
+
+    private final ScalableSprite currentCursor;
+    private final ScalableSprite logo;
+    private final ScalableSprite hudPanel;
 
     private double mouseX, mouseY;
     private double fromX, fromY;

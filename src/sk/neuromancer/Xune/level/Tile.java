@@ -1,20 +1,18 @@
 package sk.neuromancer.Xune.level;
 
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
+import static org.lwjgl.opengl.GL11.*;
+
 public class Tile implements Renderable {
     public int type;
-    private int x;    //GRID coordinates
-    private int y;
+    private final int x;    //GRID coordinates
+    private final int y;
 
-    private float px;    //POINT coordinates
-    private float py;
-    private boolean[] pass;
+    private final float px;    //POINT coordinates
+    private final float py;
+    private final boolean[] pass;
 
     public static final boolean[] PASS_ALL = {true, true, true, true, true, true, true, true, true};
     public static final boolean[] PASS_NONE = {false, false, false, false, false, false, false, false, false};

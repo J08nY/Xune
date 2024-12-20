@@ -1,11 +1,11 @@
 package sk.neuromancer.Xune.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sk.neuromancer.Xune.entity.Entity.Flag;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class EntityOwner implements Tickable, Renderable {

@@ -1,11 +1,5 @@
 package sk.neuromancer.Xune.sfx;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
@@ -13,16 +7,21 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.sfx.SoundPlayer.SoundPlayerState;
 
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class SoundManager implements Tickable {
-    private Game game;
-    private long device;
-    private long context;
+    private final Game game;
+    private final long device;
+    private final long context;
 
-    private Queue<SoundPlayer> players = new LinkedList<>();
-    private Sound[] sounds;
+    private final Queue<SoundPlayer> players = new LinkedList<>();
+    private final Sound[] sounds;
 
     private static final String[] soundNames = new String[]{
             "blip_1.wav",

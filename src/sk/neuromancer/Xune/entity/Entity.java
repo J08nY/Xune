@@ -1,15 +1,13 @@
 package sk.neuromancer.Xune.entity;
 
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import sk.neuromancer.Xune.game.Tickable;
+import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.gfx.Sprite;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import sk.neuromancer.Xune.game.Tickable;
-import sk.neuromancer.Xune.gfx.Renderable;
-import sk.neuromancer.Xune.gfx.Sprite;
+import static org.lwjgl.opengl.GL11.*;
 
 public abstract class Entity implements Renderable, Tickable, Clickable {
     protected Sprite sprite;
@@ -28,13 +26,13 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
     public static final int SPRITE_ROW_LENGTH = 17;
 
-    public static final int SPRITE_OFFSET_RED = SPRITE_ROW_LENGTH * 0;
+    public static final int SPRITE_OFFSET_RED = 0;
     public static final int SPRITE_OFFSET_GREEN = SPRITE_ROW_LENGTH * 2;
     public static final int SPRITE_OFFSET_BLUE = SPRITE_ROW_LENGTH * 4;
 
 
     public enum Flag {
-        RED, BLUE, GREEN;
+        RED, BLUE, GREEN
     }
 
     public enum Orientation {

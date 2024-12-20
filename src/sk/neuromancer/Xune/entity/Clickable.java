@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL11.*;
 public interface Clickable {
 
     enum Button {
-        LEFT, RIGHT;
+        LEFT, RIGHT
     }
 
     boolean onClick(float x, float y, Button b);
@@ -39,11 +39,7 @@ public interface Clickable {
         public boolean onClick(float x, float y, Button b) {
             if (b != this.button)
                 return false;
-            if (x > fromX && x < toX && y > fromY && y < toY) {
-                return true;
-            } else {
-                return false;
-            }
+            return x > fromX && x < toX && y > fromY && y < toY;
         }
 
         @Override
@@ -138,7 +134,6 @@ public interface Clickable {
             Window.renderPoints(vertices);
             glColor3f(1f, 1f, 1f);
             glPopMatrix();
-            ;
         }
 
     }
@@ -185,9 +180,7 @@ public interface Clickable {
                 return false;
             if (y < l * x + lOffsetTop)
                 return false;
-            if (y > l * x + lOffsetBottom)
-                return false;
-            return true;
+            return !(y > l * x + lOffsetBottom);
         }
 
         public static ClickableTile getFromCoordinates(float fromX, float fromY, float toX, float toY, Button button, boolean isStatic) {

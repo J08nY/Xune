@@ -5,7 +5,7 @@ import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 public class Heli extends PlayableEntity {
-    private Orientation heading;
+    private final Orientation heading;
     private boolean wing;
 
     public Heli(float x, float y, Orientation heading, EntityOwner owner, Flag flag) {
