@@ -57,12 +57,13 @@ public class Game implements Renderable {
         input = new InputHandler(this);
 
         level = new Level(this);
-        player = new Player(this, level, Flag.RED, 0);
-        enemy = new Enemy(this, level, Flag.BLUE, 0);
+        player = new Player(this, level, Flag.RED, 100);
+        enemy = new Enemy(this, level, Flag.BLUE, 100);
 
         hud = new HUD(this);
 
         sound = new SoundManager(this);
+        sound.play(SoundManager.TRACK_DUNESHIFTER, true);
 
         level.loadLevel(Level.LEVEL_1);
         level.setPlayer(player);
@@ -91,7 +92,7 @@ public class Game implements Renderable {
                 shouldRender = true;
             }
             try {
-                Thread.sleep(2);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -99,8 +100,9 @@ public class Game implements Renderable {
                 frames++;
                 render();
             }
-            if (System.currentTimeMillis() - lastTimer1 > 1000) {
-                lastTimer1 += 1000;
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastTimer1 > 1000) {
+                lastTimer1 += currentTime;
                 System.out.println(ticks + " ticks, " + frames + " fps");
                 frames = 0;
                 ticks = 0;

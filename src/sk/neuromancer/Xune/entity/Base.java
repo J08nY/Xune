@@ -23,6 +23,4 @@ public class Base extends PlayableEntity {
     public void tick(int tickCount) {
 
     }
-
-
 }

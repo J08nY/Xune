@@ -32,10 +32,9 @@ public class Player extends EntityOwner {
 
     @Override
     public void tick(int tickCount) {
-        float mouseX = (float) game.getInput().mouse.getX();
-        float mouseY = (float) game.getInput().mouse.getY();
-
-        if (game.getInput().mouse.isLeftPressed()) {
+        if (game.getInput().mouse.isLeftReleased()) {
+            float mouseX = (float) game.getInput().mouse.getX();
+            float mouseY = (float) game.getInput().mouse.getY();
             float levelX = game.getLevel().getLevelX(mouseX);
             float levelY = game.getLevel().getLevelY(mouseY);
 
@@ -43,7 +42,7 @@ public class Player extends EntityOwner {
             if (selected != null) {
                 if (selected.onClick(levelX, levelY, Button.LEFT)) {
                     selected.unselect();
-                    game.getSound().play(SoundManager.SOUND_BLIP_1);
+                    game.getSound().play(SoundManager.SOUND_BLIP_1, false);
                     selected = null;
                     handled = true;
                 }
@@ -55,7 +54,7 @@ public class Player extends EntityOwner {
                         selected = (PlayableEntity) e;
                         selected.select();
                         System.out.println("Selected " + e.getClass().getSimpleName());
-                        game.getSound().play(SoundManager.SOUND_BLIP_1);
+                        game.getSound().play(SoundManager.SOUND_BLIP_1, false);
                         break;
                     }
                 }

@@ -35,7 +35,7 @@ public class SpriteSheet {
     public void initSheet() {
         BufferedImage img = null;
         try {
-            img = ImageIO.read(new File("res/img/" + imageName));
+            img = ImageIO.read(getClass().getResourceAsStream("/sk/neuromancer/Xune/img/" + imageName));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(-1);
@@ -115,7 +115,7 @@ public class SpriteSheet {
         public void initSheet() {
             BufferedImage img = null;
             try {
-                img = ImageIO.read(new File("res/img/" + imageName));
+                img = ImageIO.read(getClass().getResourceAsStream("/sk/neuromancer/Xune/img/" + imageName));
             } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(-1);

@@ -53,7 +53,7 @@ public class HUD implements Tickable, Renderable {
 
         glPushMatrix();
         glTranslated(0, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()), 0);
-        //hudPanel.render();
+        hudPanel.render();
         glPopMatrix();
 
         glPushMatrix();

@@ -39,7 +39,6 @@ public class InputHandler implements Tickable {
         }
 
         public void pressLeft() {
-            System.out.println("pressLeft");
             this.leftMB = true;
             this.leftX = x;
             this.leftY = y;
@@ -47,7 +46,6 @@ public class InputHandler implements Tickable {
         }
 
         public void pressRight() {
-            System.out.println("pressRight");
             this.rightMB = true;
             this.rightX = x;
             this.rightY = y;
@@ -55,13 +53,11 @@ public class InputHandler implements Tickable {
         }
 
         public void releaseLeft() {
-            System.out.println("releaseLeft");
             this.leftMB = false;
             this.releaseLeft = true;
         }
 
         public void releaseRight() {
-            System.out.println("releaseRight");
             this.rightMB = false;
             this.releaseRight = true;
         }
@@ -98,6 +94,10 @@ public class InputHandler implements Tickable {
             return this.pressLeft;
         }
 
+        public boolean isLeftReleased() {
+            return this.releaseLeft;
+        }
+
         public boolean isLeftDrag() {
             return this.leftMB && (this.leftX != this.x || this.leftY != this.y);
         }
@@ -108,6 +108,10 @@ public class InputHandler implements Tickable {
 
         public boolean isRightPressed() {
             return this.pressRight;
+        }
+
+        public boolean isRightReleased() {
+            return this.releaseRight;
         }
 
         public boolean isRightDrag() {

@@ -8,6 +8,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -98,7 +99,7 @@ public class Level implements Renderable, Tickable {
 
     public void loadLevel(String levelName) {
         try {
-            BufferedReader br = new BufferedReader(new FileReader("res/lvl/" + levelName));
+            BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/sk/neuromancer/Xune/lvl/" + levelName)));
             String line = br.readLine();
             this.width = Integer.parseInt(line.split("x")[0]);
             this.height = Integer.parseInt(line.split("x")[1]);
@@ -164,18 +165,10 @@ public class Level implements Renderable, Tickable {
         return this.height;
     }
 
-    /**
-     * @param screenPointX
-     * @return Point sized X Level coordinate
-     */
     public float getLevelX(double screenPointX) {
         return (((float) screenPointX - Game.CENTER_X) / this.zoom) - this.xOff + Game.CENTER_X;
     }
 
-    /**
-     * @param screenPointY
-     * @return Point sized Y Level coordinate
-     */
     public float getLevelY(double screenPointY) {
         return (((float) screenPointY - Game.CENTER_Y) / this.zoom) - this.yOff + Game.CENTER_Y;
     }

@@ -28,10 +28,14 @@ public class SoundPlayer {
     public static final float DEFAULT_PITCH = 1.0f;
 
     public SoundPlayer(Sound sound) {
-        this(sound, DEFAULT_PITCH, DEFAULT_GAIN, ZERO_SOURCE_POSITION, ZERO_SOURCE_VELOCITY);
+        this(sound, false);
     }
 
-    public SoundPlayer(Sound sound, float pitch, float gain, float[] position, float[] velocity) {
+    public SoundPlayer(Sound sound, boolean loop) {
+        this(sound, loop, DEFAULT_PITCH, DEFAULT_GAIN, ZERO_SOURCE_POSITION, ZERO_SOURCE_VELOCITY);
+    }
+
+    public SoundPlayer(Sound sound, boolean loop, float pitch, float gain, float[] position, float[] velocity) {
         this.sound = sound;
         this.state = SoundPlayerState.INITIAL;
 
@@ -53,6 +57,7 @@ public class SoundPlayer {
         alSourcef(this.source, AL_GAIN, this.gain);
         alSourcefv(this.source, AL_POSITION, this.sourcePosition);
         alSourcefv(this.source, AL_VELOCITY, this.sourceVelocity);
+        alSourcei(this.source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
     }
 
     public void play() {

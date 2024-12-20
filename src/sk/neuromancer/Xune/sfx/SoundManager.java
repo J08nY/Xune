@@ -35,7 +35,8 @@ public class SoundManager implements Tickable {
             "laser_1.wav",
             "long_explosion_1.wav",
             "shot_1.wav",
-            "tada_1.wav"
+            "tada_1.wav",
+            "duneshifter.wav"
     };
 
     public static final int SOUND_BLIP_1 = 0;
@@ -49,6 +50,8 @@ public class SoundManager implements Tickable {
     public static final int SOUND_LONG_EXPLOSION_1 = 8;
     public static final int SOUND_SHOT_1 = 9;
     public static final int SOUND_TADA_1 = 10;
+
+    public static final int TRACK_DUNESHIFTER = 11;
 
     public SoundManager(Game game) {//TODO nejako manazovat Gain..
         this.game = game;
@@ -72,6 +75,7 @@ public class SoundManager implements Tickable {
 
     @Override
     public void tick(int tickCount) {
+        //TODO: This is no longer valid as they can loop.
         SoundPlayer head = players.peek();
         if (head != null && head.getState() == SoundPlayerState.STOPPED) {
             players.remove();
@@ -79,10 +83,11 @@ public class SoundManager implements Tickable {
         }
     }
 
-    public void play(int soundIndex) {
-        SoundPlayer player = new SoundPlayer(this.sounds[soundIndex]);
+    public SoundPlayer play(int soundIndex, boolean loop) {
+        SoundPlayer player = new SoundPlayer(this.sounds[soundIndex], loop);
         players.add(player);
         player.play();
+        return player;
     }
 
     public void quit() {

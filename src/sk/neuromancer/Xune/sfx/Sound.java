@@ -9,7 +9,6 @@ import static org.lwjgl.openal.AL10.alDeleteBuffers;
 import static org.lwjgl.openal.AL10.alGenBuffers;
 
 import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,7 +20,8 @@ public class Sound {
 
     public Sound(String fileName) {
         try {
-            BufferedInputStream buffStream = new BufferedInputStream(new FileInputStream("res/wav/" + fileName));
+
+            BufferedInputStream buffStream = new BufferedInputStream(getClass().getResourceAsStream("/sk/neuromancer/Xune/wav/" + fileName));
 
             buffStream.skip(22); // dojdem pred numChannels(22)
             byte[] numChannelsBA = new byte[2];
