@@ -23,6 +23,8 @@ public class Player extends EntityOwner {
         this.addEntity(new Base(tileX(1, 4), tileY(1, 4), Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Refinery(tileX(2, 4), tileY(2, 4), Entity.Orientation.NORTH,this, this.flag));
         this.addEntity(new Silo(tileX(2, 3), tileY(2, 3), Entity.Orientation.NORTH,this, this.flag));
+        this.addEntity(new Helipad(tileX(3, 3), tileY(3, 3), Entity.Orientation.NORTH,this, this.flag));
+        this.addEntity(new Factory(tileX(2, 5), tileY(2, 5), Entity.Orientation.NORTH,this, this.flag));
         this.addEntity(new Harvester(tileX(1, 7), tileY(1, 7), Entity.Orientation.NORTH,this, this.flag));
         this.addEntity(new Heli(tileX(7, 7), tileY(7, 7), Entity.Orientation.EAST,this, this.flag));
         this.selected = null;
