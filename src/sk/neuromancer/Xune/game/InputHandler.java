@@ -173,7 +173,7 @@ public class InputHandler implements Tickable {
     public Scroller scroller = new Scroller();
 
     public InputHandler(Game g) {
-        long window = g.getWindow();
+        long window = g.getWindow().getHandle();
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {

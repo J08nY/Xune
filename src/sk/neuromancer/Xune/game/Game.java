@@ -27,10 +27,10 @@ public class Game implements Renderable {
 
     private SoundManager sound;
 
-    public static final int WIDTH = 1920;
-    public static final int HEIGHT = 1080;
-    public static final int CENTER_X = WIDTH / 2;
-    public static final int CENTER_Y = HEIGHT / 2;
+    public static final int DEFAULT_WIDTH = 1920;
+    public static final int DEFAULT_HEIGHT = 1080;
+    public static final int CENTER_X = DEFAULT_WIDTH / 2;
+    public static final int CENTER_Y = DEFAULT_HEIGHT / 2;
 
     public static final int TPS = 120;
 
@@ -42,7 +42,7 @@ public class Game implements Renderable {
     }
 
     private void init() {
-        window = new Window(WIDTH, HEIGHT);
+        window = new Window(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
         SpriteSheet.initSheets();
 
@@ -140,8 +140,8 @@ public class Game implements Renderable {
         glfwTerminate();
     }
 
-    public long getWindow() {
-        return window.getHandle();
+    public Window getWindow() {
+        return window;
     }
 
     public InputHandler getInput() {

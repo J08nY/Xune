@@ -10,16 +10,22 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class Window {
     private long handle;
 
-    private final int width;
-    private final int height;
+    private boolean fullscreen = false;
+    private int width = 0;
+    private int height = 0;
 
     public Window(int width, int height) {
         this.width = width;
         this.height = height;
-        init();
+        init(false);
     }
 
-    private void init() {
+    public Window() {
+        init(true);
+    }
+
+    private void init(boolean fullscreen) {
+        this.fullscreen = fullscreen;
         glfwInit();
 
         glfwDefaultWindowHints();
@@ -28,14 +34,19 @@ public class Window {
         glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
         long monitor = glfwGetPrimaryMonitor();
-        handle = glfwCreateWindow(width, height, "Xune", NULL, NULL);
-
         GLFWVidMode vidmode = glfwGetVideoMode(monitor);
-        glfwSetWindowPos(
-                handle,
-                (vidmode.width() - width) / 2,
-                (vidmode.height() - height) / 2
-        );
+        if (fullscreen) {
+            this.width = vidmode.width();
+            this.height = vidmode.height();
+            handle = glfwCreateWindow(width, height, "Xune", monitor, NULL);
+        } else {
+            handle = glfwCreateWindow(width, height, "Xune", NULL, NULL);
+            glfwSetWindowPos(
+                    handle,
+                    (vidmode.width() - width) / 2,
+                    (vidmode.height() - height) / 2
+            );
+        }
         glfwMakeContextCurrent(handle);
         //glfwSwapInterval(1);
 
@@ -60,6 +71,14 @@ public class Window {
 
     public long getHandle() {
         return handle;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public void quit() {

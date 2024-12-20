@@ -20,7 +20,7 @@ public class HUD implements Tickable, Renderable {
 
     public HUD(Game game) {
         this.game = game;
-        glfwSetInputMode(game.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(game.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
         currentCursor.setScaleFactor(2f);
 
@@ -28,7 +28,7 @@ public class HUD implements Tickable, Renderable {
         logo.setScaleFactor(1f);
 
         hudPanel = SpriteSheet.HUD_PANEL.getSprite(0);
-        hudPanel.setScaleFactor(Game.WIDTH / (float) hudPanel.getWidth());
+        hudPanel.setScaleFactor(game.getWindow().getWidth() / (float) hudPanel.getWidth());
         fromX = fromY = 0;
     }
 
@@ -46,15 +46,17 @@ public class HUD implements Tickable, Renderable {
             glColor4f(1.f, 1.f, 1.f, 1.f);
             glPopMatrix();
         }
+        float hudTop = game.getWindow().getHeight() - (hudPanel.getHeight() * hudPanel.getScaleFactor());
+        float hudLeft = (hudPanel.getWidth() * hudPanel.getScaleFactor()) * 0.18f;
 
+        // Render HUD panel
         glPushMatrix();
-        glTranslated(0, Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor()), 0);
+        glTranslated(0, hudTop, 0);
         hudPanel.render();
         glPopMatrix();
 
+        // Render HUD text
         glPushMatrix();
-        float hudTop = Game.HEIGHT - (hudPanel.getHeight() * hudPanel.getScaleFactor());
-        float hudLeft = (hudPanel.getWidth() * hudPanel.getScaleFactor()) * 0.18f;
         glTranslatef(hudLeft, hudTop, 0);
 
         renderText(0, 60, "MONEY: " + game.getLevel().getPlayer().money);
@@ -68,9 +70,9 @@ public class HUD implements Tickable, Renderable {
         renderText(400, 90, "XOFF: " + game.getLevel().xOff);
         renderText(400, 120, "YOFF: " + game.getLevel().yOff);
         renderText(600, 90, "ZOOM: " + game.getLevel().zoom);
-
         glPopMatrix();
 
+        // Render Cursor
         glPushMatrix();
         glTranslated(mouseX - (currentCursor.getWidth() * currentCursor.getScaleFactor()) / 2, mouseY - (currentCursor.getHeight() * currentCursor.getScaleFactor()) / 2, 0);
         currentCursor.render();
@@ -83,19 +85,20 @@ public class HUD implements Tickable, Renderable {
     public void tick(int tickCount) {
         mouseX = game.getInput().mouse.getX();
         mouseY = game.getInput().mouse.getY();
+        float width = game.getWindow().getWidth();
+        float height = game.getWindow().getHeight();
 
         if (mouseX < -20) {
             mouseX = -20;
-
-        } else if (mouseX > Game.WIDTH + 20) {
-            mouseX = Game.WIDTH + 20;
+        } else if (mouseX > width + 20) {
+            mouseX = width + 20;
         }
         if (mouseY < -20) {
             mouseY = -20;
-        } else if (mouseY > Game.HEIGHT + 20) {
-            mouseY = Game.HEIGHT + 20;
+        } else if (mouseY > height + 20) {
+            mouseY = height + 20;
         }
-        glfwSetCursorPos(game.getWindow(), mouseX, mouseY);
+        glfwSetCursorPos(game.getWindow().getHandle(), mouseX, mouseY);
 
         if (game.getInput().mouse.isLeftDrag()) {
             fromX = game.getInput().mouse.getLastLeftX();

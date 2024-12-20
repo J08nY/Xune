@@ -1,7 +1,6 @@
 package sk.neuromancer.Xune.sfx;
 
 import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -17,18 +16,18 @@ public class Sound {
 
             BufferedInputStream buffStream = new BufferedInputStream(getClass().getResourceAsStream("/sk/neuromancer/Xune/wav/" + fileName));
 
-            buffStream.skip(22); // dojdem pred numChannels(22)
+            buffStream.skip(22);
             byte[] numChannelsBA = new byte[2];
             buffStream.read(numChannelsBA);
 
-            byte[] sampleRateBA = new byte[4]; // sampleRate je na 24
+            byte[] sampleRateBA = new byte[4];
             buffStream.read(sampleRateBA);
 
-            buffStream.skip(6); // dojdem pred BitsPerSample(34);
+            buffStream.skip(6);
             byte[] bitsPerSampleBA = new byte[2];
             buffStream.read(bitsPerSampleBA);
 
-            buffStream.skip(4); // dojdem pred dataSize(40)
+            buffStream.skip(4);
             byte[] dataSizeBA = new byte[4];
             buffStream.read(dataSizeBA);
 
@@ -69,31 +68,30 @@ public class Sound {
             }
             dataBuffer.rewind();
 
-            int format = -1;
-            if (numChannels == 1) {
-                if (bitsPerSample == 16) {
-                    format = AL_FORMAT_MONO16;
-                } else if (bitsPerSample == 8) {
-                    format = AL_FORMAT_MONO8;
-                }
-            } else if (numChannels == 2) {
-                if (bitsPerSample == 16) {
-                    format = AL_FORMAT_STEREO16;
-                } else if (bitsPerSample == 8) {
-                    format = AL_FORMAT_STEREO8;
-                }
-            }
-
-
             this.buffer = alGenBuffers();
+            alBufferData(this.buffer, getFormat(numChannels, bitsPerSample), dataBuffer, sampleRate);
 
-            alBufferData(this.buffer, format, dataBuffer, sampleRate);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static int getFormat(int numChannels, int bitsPerSample) {
+        int format = -1;
+        if (numChannels == 1) {
+            if (bitsPerSample == 16) {
+                format = AL_FORMAT_MONO16;
+            } else if (bitsPerSample == 8) {
+                format = AL_FORMAT_MONO8;
+            }
+        } else if (numChannels == 2) {
+            if (bitsPerSample == 16) {
+                format = AL_FORMAT_STEREO16;
+            } else if (bitsPerSample == 8) {
+                format = AL_FORMAT_STEREO8;
+            }
+        }
+        return format;
     }
 
     public int getBuffer() {

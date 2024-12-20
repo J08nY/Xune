@@ -47,7 +47,7 @@ public class Level implements Renderable, Tickable {
         if (this.game.getInput().PLUS.isPressed()) {
             this.zoom *= 1 + ZOOM_SPEED;
         } else if (this.game.getInput().MINUS.isPressed()) {
-            if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(Game.HEIGHT) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(Game.WIDTH) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
+            if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
                 this.zoom *= 1 - ZOOM_SPEED;
         }
 
@@ -55,7 +55,7 @@ public class Level implements Renderable, Tickable {
         if (dy > 0) {
             this.zoom *= 1 + SCROLL_SPEED;
         } else if (dy < 0) {
-            if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(Game.HEIGHT) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(Game.WIDTH) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
+            if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
                 this.zoom *= 1 - SCROLL_SPEED;
         }
 
@@ -63,9 +63,9 @@ public class Level implements Renderable, Tickable {
             this.yOff += MOVE_SPEED * (1 / zoom);
         } else if (this.game.getInput().A.isPressed() && getLevelX(0) > -EDGE_MARGIN_X) {
             this.xOff += MOVE_SPEED * (1 / zoom);
-        } else if (this.game.getInput().S.isPressed() && getLevelY(Game.HEIGHT) < (getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
+        } else if (this.game.getInput().S.isPressed() && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
             this.yOff -= MOVE_SPEED * (1 / zoom);
-        } else if (this.game.getInput().D.isPressed() && getLevelX(Game.WIDTH) < (getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
+        } else if (this.game.getInput().D.isPressed() && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
             this.xOff -= MOVE_SPEED * (1 / zoom);
         }
 
@@ -76,9 +76,11 @@ public class Level implements Renderable, Tickable {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef((float) Game.WIDTH / 2, (float) Game.HEIGHT / 2, 0);
+        float centerX = (float) game.getWindow().getWidth() / 2;
+        float centerY = (float) game.getWindow().getHeight() / 2;
+        glTranslatef(centerX, centerY, 0);
         glScalef(zoom, zoom, 0f);
-        glTranslatef(-(float) Game.WIDTH / 2, -(float) Game.HEIGHT / 2, 0);
+        glTranslatef(-centerX, -centerY, 0);
         glTranslatef(xOff, yOff, 0);
 
         for (int x = 0; x < this.width; x++) {
