@@ -32,10 +32,10 @@ public class Heli extends PlayableEntity {
             wing = !wing;
         }
 
-        if (tickCount % 60 == 0) {
-            heading += 1;
-            heading %= 8;
-        }
+        //if (tickCount % 60 == 0) {
+        //    heading += 1;
+        //    heading %= 8;
+        //}
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(animation);
     }
 

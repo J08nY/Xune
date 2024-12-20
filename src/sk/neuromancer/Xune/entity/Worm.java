@@ -22,11 +22,6 @@ public class Worm extends Entity {
     }
 
     @Override
-    public void render() {
-        super.render();
-    }
-
-    @Override
     public boolean onClick(float x, float y, Button b) {
         return false;
     }

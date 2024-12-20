@@ -8,6 +8,8 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import sk.neuromancer.Xune.ai.Enemy;
 import sk.neuromancer.Xune.game.Game;
@@ -26,7 +28,7 @@ public class Level implements Renderable, Tickable {
     private Tile[][] level;
     private int width, height;
 
-    public float zoom = 4.0f;
+    public float zoom;
 
     public float xOff;
     public float yOff;
@@ -48,7 +50,8 @@ public class Level implements Renderable, Tickable {
         if (this.game.getInput().PLUS.isPressed()) {
             this.zoom *= 1 + ZOOM_SPEED;
         } else if (this.game.getInput().MINUS.isPressed()) {
-            this.zoom *= 1 - ZOOM_SPEED;
+            if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(Game.HEIGHT) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(Game.WIDTH) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
+                this.zoom *= 1 - ZOOM_SPEED;
         }
 
         float dy = this.game.getInput().scroller.getDeltaY();
@@ -101,19 +104,17 @@ public class Level implements Renderable, Tickable {
             this.height = Integer.parseInt(line.split("x")[1]);
             line = br.readLine();
 
-            StringBuilder sb = new StringBuilder();
+            List<String> lines = new LinkedList<>();
             while (line != null) {
-                sb.append(line);
-                sb.append("=");
+                lines.add(line);
                 line = br.readLine();
             }
             br.close();
 
-            String[] lvl = sb.toString().split("=");
             this.level = new Tile[this.width][this.height];
 
-            for (int i = 0; i < lvl.length; i++) {
-                String[] row = lvl[i].split(",");
+            for (int i = 0; i < lines.size(); i++) {
+                String[] row = lines.get(i).split(",");
                 for (int j = 0; j < row.length; j++) {
                     this.level[j][i] = new Tile(Byte.parseByte(row[j]), j, i);
                 }
@@ -122,6 +123,7 @@ public class Level implements Renderable, Tickable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.zoom = 4.0f;
         this.xOff = Game.CENTER_X - getWidth() / 2;
         this.yOff = Game.CENTER_Y - getHeight() / 2;
     }

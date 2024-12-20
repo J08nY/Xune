@@ -10,15 +10,22 @@ public class Harvester extends PlayableEntity {
     public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);
         this.orientation = orientation;
-        int spriteOffset = orientation.ordinal();
-        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(Entity.SPRITE_ID_HARVESTER + PlayableEntity.getOffsetonFlag(flag) + spriteOffset * Entity.SPRITE_ROW_LENGTH);
+        updateSprite();
         if (owner instanceof Player)
-            this.clickableAreas.add(ClickableCircle.getCentered(x, y, 13, 5, 5, Button.LEFT, false));
+            this.clickableAreas.add(ClickableCircle.getCentered(x, y, 12, 5, 5, Button.LEFT, false));
     }
 
     @Override
     public void tick(int tickCount) {
-
+        if (tickCount % 60 == 0) {
+            this.orientation = this.orientation.cw();
+            updateSprite();
+        }
     }
 
+    private void updateSprite() {
+        int spriteRow = orientation.ordinal() / 4;
+        int spriteOffset = orientation.ordinal() % 4;
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(Entity.SPRITE_ID_HARVESTER + PlayableEntity.getOffsetonFlag(flag) + spriteRow * Entity.SPRITE_ROW_LENGTH + spriteOffset);
+    }
 }
