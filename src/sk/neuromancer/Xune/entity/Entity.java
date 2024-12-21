@@ -106,9 +106,19 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
 
         @Override
-        public boolean onClick(float x, float y, Button b) {
+        public boolean intersects(float x, float y, Button b) {
             for (Clickable area : clickableAreas) {
-                if (area.onClick(x, y, b)) {
+                if (area.intersects(x, y, b)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
+            for (Clickable area : clickableAreas) {
+                if (area.intersects(fromX, fromY, toX, toY, b)) {
                     return true;
                 }
             }

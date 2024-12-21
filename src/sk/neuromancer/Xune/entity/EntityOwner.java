@@ -9,7 +9,7 @@ import java.util.List;
 
 
 public class EntityOwner implements Tickable, Renderable {
-    protected List<Entity> entities = new ArrayList<Entity>();
+    protected List<Entity.PlayableEntity> entities = new ArrayList<>();
     protected int money;
     protected Flag flag;
 
@@ -22,7 +22,7 @@ public class EntityOwner implements Tickable, Renderable {
         this.money = money;
     }
 
-    public void addEntity(Entity e) {
+    public void addEntity(Entity.PlayableEntity e) {
         entities.add(e);
     }
 
@@ -30,7 +30,7 @@ public class EntityOwner implements Tickable, Renderable {
         entities.remove(e);
     }
 
-    public List<Entity> getEntities() {
+    public List<Entity.PlayableEntity> getEntities() {
         return entities;
     }
 

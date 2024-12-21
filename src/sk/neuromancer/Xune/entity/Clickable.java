@@ -12,19 +12,17 @@ public interface Clickable {
         LEFT, RIGHT
     }
 
-    boolean onClick(float x, float y, Button b);
+    boolean intersects(float x, float y, Button b);
+
+    boolean intersects(float fromX, float fromY, float toX, float toY, Button b);
 
     void setPosition(float x, float y);
-
 
     class ClickableBox implements Clickable {
         private float fromX, fromY;
         private float toX, toY;
         private Button button;
         private boolean isStatic;
-
-        private ClickableBox() {
-        }
 
         private ClickableBox(float fromX, float fromY, float toX, float toY, Button button, boolean isStatic) {
             this.fromX = fromX;
@@ -36,10 +34,19 @@ public interface Clickable {
         }
 
         @Override
-        public boolean onClick(float x, float y, Button b) {
+        public boolean intersects(float x, float y, Button b) {
             if (b != this.button)
                 return false;
             return x > fromX && x < toX && y > fromY && y < toY;
+        }
+
+        @Override
+        public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
+            if (b != this.button)
+                return false;
+            boolean xOverlap = this.fromX < toX && this.toX < fromX;
+            boolean yOverlap = this.fromY < toY && this.toY < fromY;
+            return xOverlap && yOverlap;
         }
 
         @Override
@@ -77,9 +84,6 @@ public interface Clickable {
         private Button button;
         private boolean isStatic;
 
-        private ClickableCircle() {
-        }
-
         private ClickableCircle(float x, float y, float offsetX, float offsetY, float radius, Button button, boolean isStatic) {
             this.x = x;
             this.y = y;
@@ -91,11 +95,25 @@ public interface Clickable {
         }
 
         @Override
-        public boolean onClick(float x, float y, Button b) {
+        public boolean intersects(float x, float y, Button b) {
             if (b != this.button)
                 return false;
             float dx = (this.x + this.offsetX) - x;
             float dy = (this.y + this.offsetY) - y;
+            // TODO: Avoid sqrt, instead square the radius.
+            float dist = (float) Math.sqrt(dx * dx + dy * dy);
+            return dist <= radius;
+        }
+
+        @Override
+        public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
+            if (b != this.button)
+                return false;
+            float cx = x < fromX ? fromX : (x > toX ? toX : x);
+            float cy = y < fromY ? fromY : (y > toY ? toY : y);
+            float dx = x - cx;
+            float dy = y - cy;
+            // TODO: Avoid sqrt, instead square the radius.
             float dist = (float) Math.sqrt(dx * dx + dy * dy);
             return dist <= radius;
         }
@@ -148,9 +166,6 @@ public interface Clickable {
         private Button button;
         private boolean isStatic;
 
-        private ClickableTile() {
-        }
-
         private ClickableTile(float x, float y, float width, float height, Button button, boolean isStatic) {
             this.x = x;
             this.y = y;
@@ -171,7 +186,7 @@ public interface Clickable {
         }
 
         @Override
-        public boolean onClick(float x, float y, Button b) {
+        public boolean intersects(float x, float y, Button b) {
             if (b != button)
                 return false;
             if (y < k * x + kOffsetTop)
@@ -181,6 +196,15 @@ public interface Clickable {
             if (y < l * x + lOffsetTop)
                 return false;
             return !(y > l * x + lOffsetBottom);
+        }
+
+        @Override
+        public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
+            if (b != button)
+                return false;
+            // Intersects iff: at least one of the lines intersects the box or the box is fully inside the lines.
+
+            return false;
         }
 
         public static ClickableTile getFromCoordinates(float fromX, float fromY, float toX, float toY, Button button, boolean isStatic) {

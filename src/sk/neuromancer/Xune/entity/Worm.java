@@ -22,7 +22,12 @@ public class Worm extends Entity {
     }
 
     @Override
-    public boolean onClick(float x, float y, Button b) {
+    public boolean intersects(float x, float y, Button b) {
+        return false;
+    }
+
+    @Override
+    public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
         return false;
     }
 

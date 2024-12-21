@@ -1,11 +1,12 @@
 package sk.neuromancer.Xune.game;
 
 import sk.neuromancer.Xune.entity.*;
-import sk.neuromancer.Xune.entity.Clickable.Button;
 import sk.neuromancer.Xune.entity.Entity.Flag;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.level.Level;
-import sk.neuromancer.Xune.sfx.SoundManager;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static sk.neuromancer.Xune.level.Tile.tileX;
 import static sk.neuromancer.Xune.level.Tile.tileY;
@@ -15,7 +16,10 @@ public class Player extends EntityOwner {
     private final Level level;
     public int money;
 
-    private PlayableEntity selected;
+    private List<PlayableEntity> selected = new LinkedList<>();
+    private boolean drag;
+    private float fromX;
+    private float fromY;
 
     public Player(Game g, Level level, Flag flag, int money) {
         super(flag, money);
@@ -39,6 +43,30 @@ public class Player extends EntityOwner {
             float levelX = game.getLevel().getLevelX(mouseX);
             float levelY = game.getLevel().getLevelY(mouseY);
 
+            if (drag) {
+                // drag select
+                float fromLevelX = game.getLevel().getLevelX(fromX);
+                float fromLevelY = game.getLevel().getLevelY(fromY);
+                //TODO Make the BB such that from is always lower than to
+                System.out.printf("drag! %f %f %f %f\n", fromLevelX, fromLevelY, levelX, levelY);
+                for (PlayableEntity e : entities) {
+                    if (e.intersects(fromLevelX, fromLevelY, levelX, levelY, Clickable.Button.LEFT)) {
+                        e.select();
+                    }
+                }
+
+            } else {
+                // click
+            }
+        }
+        if (game.getInput().mouse.isLeftDrag()) {
+            fromX = (float) game.getInput().mouse.getLastLeftX();
+            fromY = (float) game.getInput().mouse.getLastLeftY();
+            drag = true;
+        } else {
+            drag = false;
+        }
+            /*
             boolean handled = false;
             if (selected != null) {
                 if (selected.onClick(levelX, levelY, Button.LEFT)) {
@@ -60,7 +88,7 @@ public class Player extends EntityOwner {
                     }
                 }
             }
-        }
+             */
 
         super.tick(tickCount);
     }
