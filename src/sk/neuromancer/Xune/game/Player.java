@@ -32,7 +32,6 @@ public class Player extends EntityOwner {
         this.addEntity(new Factory(tileX(2, 5), tileY(2, 5), Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Harvester(tileX(1, 7), tileY(1, 7), Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Heli(tileX(7, 7), tileY(7, 7), Entity.Orientation.EAST, this, this.flag));
-        this.selected = null;
     }
 
     @Override
@@ -47,16 +46,41 @@ public class Player extends EntityOwner {
                 // drag select
                 float fromLevelX = game.getLevel().getLevelX(fromX);
                 float fromLevelY = game.getLevel().getLevelY(fromY);
-                //TODO Make the BB such that from is always lower than to
-                System.out.printf("drag! %f %f %f %f\n", fromLevelX, fromLevelY, levelX, levelY);
                 for (PlayableEntity e : entities) {
-                    if (e.intersects(fromLevelX, fromLevelY, levelX, levelY, Clickable.Button.LEFT)) {
+                    if (e.intersects(Math.min(fromLevelX, levelX), Math.min(fromLevelY, levelY),
+                            Math.max(fromLevelX, levelX), Math.max(fromLevelY, levelY), Clickable.Button.LEFT)) {
+                        selected.add(e);
                         e.select();
+                    } else {
+                        selected.remove(e);
+                        e.unselect();
                     }
                 }
-
             } else {
                 // click
+                PlayableEntity only = selected.isEmpty() ? null : selected.getFirst();
+                for (PlayableEntity e : entities) {
+                    if (e.intersects(levelX, levelY, Clickable.Button.LEFT)) {
+                        selected.add(e);
+                        e.select();
+                    } else {
+                        selected.remove(e);
+                        e.unselect();
+                    }
+                }
+                if (selected.isEmpty() && only != null) {
+                    // handle action
+                    if (only instanceof Entity.Unit) {
+                        Command move = new Command.MoveCommand(only.x, only.y, levelX, levelY);
+                        only.sendCommand(move);
+                    }
+                    System.out.println(only);
+                }
+            }
+        }
+        if (game.getInput().mouse.isRightReleased()) {
+            for (PlayableEntity e : entities) {
+                e.unselect();
             }
         }
         if (game.getInput().mouse.isLeftDrag()) {
@@ -66,29 +90,6 @@ public class Player extends EntityOwner {
         } else {
             drag = false;
         }
-            /*
-            boolean handled = false;
-            if (selected != null) {
-                if (selected.onClick(levelX, levelY, Button.LEFT)) {
-                    selected.unselect();
-                    game.getSound().play(SoundManager.SOUND_BLIP_1, false);
-                    selected = null;
-                    handled = true;
-                }
-            }
-            if (!handled) {
-                for (Entity e : entities) {
-                    boolean clicked = e.onClick(levelX, levelY, Button.LEFT);
-                    if (clicked) {
-                        selected = (PlayableEntity) e;
-                        selected.select();
-                        System.out.println("Selected " + e.getClass().getSimpleName());
-                        game.getSound().play(SoundManager.SOUND_BLIP_1, false);
-                        break;
-                    }
-                }
-            }
-             */
 
         super.tick(tickCount);
     }

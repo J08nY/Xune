@@ -1,10 +1,9 @@
 package sk.neuromancer.Xune.entity;
 
-import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
-public class Silo extends PlayableEntity {
+public class Silo extends Entity.Building {
 
     public Silo(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);

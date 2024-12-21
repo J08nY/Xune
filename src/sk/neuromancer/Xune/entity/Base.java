@@ -1,10 +1,9 @@
 package sk.neuromancer.Xune.entity;
 
-import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
-public class Base extends PlayableEntity {
+public class Base extends Entity.Building {
 
     public Base(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);

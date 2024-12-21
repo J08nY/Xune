@@ -109,6 +109,8 @@ public interface Clickable {
         public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
             if (b != this.button)
                 return false;
+            float x = this.x + this.offsetX;
+            float y = this.y + this.offsetY;
             float cx = x < fromX ? fromX : (x > toX ? toX : x);
             float cy = y < fromY ? fromY : (y > toY ? toY : y);
             float dx = x - cx;

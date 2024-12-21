@@ -34,6 +34,8 @@ public class Tile implements Renderable {
 
     public static final int TILE_WIDTH = 24;
     public static final int TILE_HEIGHT = 11;
+    public static final float TILE_CENTER_X = (float) TILE_WIDTH / 2;
+    public static final float TILE_CENTER_Y = (float) TILE_HEIGHT / 2;
 
     public Tile(int type, int x, int y) {
         this.x = x;
@@ -56,6 +58,30 @@ public class Tile implements Renderable {
 
     public boolean isPassable(int point) {
         return pass[point];
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public float getLevelX() {
+        return px;
+    }
+
+    public float getCenterX() {
+        return px + TILE_CENTER_X;
+    }
+
+    public float getLevelY() {
+        return py;
+    }
+
+    public float getCenterY() {
+        return py + TILE_CENTER_Y;
     }
 
     public static float tileX(float x, float y) {

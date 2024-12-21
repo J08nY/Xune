@@ -5,6 +5,7 @@ import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.Sprite;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -37,9 +38,22 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
     public enum Orientation {
         //0		1		 2		3		4		5		6		7
-        NORTH, NORTHWEST, WEST, SOUTHWEST, SOUTH, SOUTHEAST, EAST, NORTHEAST;
+        NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST;
 
         public Orientation cw() {
+            return switch (this) {
+                case NORTH -> NORTHEAST;
+                case NORTHEAST -> EAST;
+                case EAST -> SOUTHEAST;
+                case SOUTHEAST -> SOUTH;
+                case SOUTH -> SOUTHWEST;
+                case SOUTHWEST -> WEST;
+                case WEST -> NORTHWEST;
+                case NORTHWEST -> NORTH;
+            };
+        }
+
+        public Orientation ccw() {
             return switch (this) {
                 case NORTH -> NORTHWEST;
                 case NORTHWEST -> WEST;
@@ -52,22 +66,25 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             };
         }
 
-        public Orientation ccw() {
-            return switch (this) {
-                case NORTH -> NORTHEAST;
-                case NORTHWEST -> NORTH;
-                case WEST -> NORTHWEST;
-                case SOUTHWEST -> WEST;
-                case SOUTH -> SOUTHWEST;
-                case SOUTHEAST -> SOUTH;
-                case EAST -> SOUTHEAST;
-                case NORTHEAST -> EAST;
+        public static Orientation fromAngle(float radians) {
+            double degrees = Math.toDegrees(radians);
+            if (degrees < 0) {
+                degrees += 360;
+            }
+            degrees %= 360;
+            int index = (int) Math.round(degrees / 45) % 8;
+            return switch (index) {
+                case 0 -> NORTH;
+                case 1 -> NORTHEAST;
+                case 2 -> EAST;
+                case 3 -> SOUTHEAST;
+                case 4 -> SOUTH;
+                case 5 -> SOUTHWEST;
+                case 6 -> WEST;
+                case 7 -> NORTHWEST;
+                default -> throw new IllegalStateException("Unexpected value: " + index);
             };
         }
-    }
-
-    public Entity() {
-
     }
 
     public Entity(float x, float y) {
@@ -128,12 +145,14 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
     public static abstract class PlayableEntity extends ClickableEntity {
         protected EntityOwner owner;
+        protected List<Command> commands;
         protected Flag flag;
         protected boolean isSelected;
 
         public PlayableEntity(float x, float y, EntityOwner owner, Flag flag) {
             super(x, y);
             this.owner = owner;
+            this.commands = new LinkedList<>();
             this.flag = flag;
         }
 
@@ -168,5 +187,24 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             glPopMatrix();
         }
 
+        public Command currentCommand() {
+            return this.commands.isEmpty() ? null : this.commands.getFirst();
+        }
+
+        public void sendCommand(Command c) {
+            this.commands.add(c);
+        }
+    }
+
+    public static abstract class Building extends PlayableEntity {
+        public Building(float x, float y, EntityOwner owner, Flag flag) {
+            super(x, y, owner, flag);
+        }
+    }
+
+    public static abstract class Unit extends PlayableEntity {
+        public Unit(float x, float y, EntityOwner owner, Flag flag) {
+            super(x, y, owner, flag);
+        }
     }
 }

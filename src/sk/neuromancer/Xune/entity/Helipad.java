@@ -1,10 +1,9 @@
 package sk.neuromancer.Xune.entity;
 
-import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
-public class Helipad extends PlayableEntity {
+public class Helipad extends Entity.Building {
 
     public Helipad(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);

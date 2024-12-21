@@ -13,10 +13,6 @@ public class EntityOwner implements Tickable, Renderable {
     protected int money;
     protected Flag flag;
 
-    public EntityOwner() {
-
-    }
-
     public EntityOwner(Flag flag, int money) {
         this.flag = flag;
         this.money = money;
@@ -26,7 +22,7 @@ public class EntityOwner implements Tickable, Renderable {
         entities.add(e);
     }
 
-    public void removeEntity(Entity e) {
+    public void removeEntity(Entity.PlayableEntity e) {
         entities.remove(e);
     }
 
