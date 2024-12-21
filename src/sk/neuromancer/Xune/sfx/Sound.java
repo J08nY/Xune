@@ -15,8 +15,19 @@ public class Sound {
         try {
 
             BufferedInputStream buffStream = new BufferedInputStream(getClass().getResourceAsStream("/sk/neuromancer/Xune/wav/" + fileName));
+            byte[] fileType = new byte[4];
+            buffStream.read(fileType);
+            if (fileType[0] != 'R' || fileType[1] != 'I' || fileType[2] != 'F' || fileType[3] != 'F') {
+                throw new IOException("Not a valid WAV file.");
+            }
+            buffStream.skip(4);
+            byte[] format = new byte[4];
+            buffStream.read(format);
+            if (format[0] != 'W' || format[1] != 'A' || format[2] != 'V' || format[3] != 'E') {
+                throw new IOException("Not a valid WAV file.");
+            }
 
-            buffStream.skip(22);
+            buffStream.skip(10);
             byte[] numChannelsBA = new byte[2];
             buffStream.read(numChannelsBA);
 
@@ -27,50 +38,47 @@ public class Sound {
             byte[] bitsPerSampleBA = new byte[2];
             buffStream.read(bitsPerSampleBA);
 
-            buffStream.skip(4);
-            byte[] dataSizeBA = new byte[4];
-            buffStream.read(dataSizeBA);
+            while (true) {
+                byte[] chunkID = new byte[4];
+                buffStream.read(chunkID);
+                byte[] chunkSizeBA = new byte[4];
+                buffStream.read(chunkSizeBA);
 
-            ByteBuffer convertor = ByteBuffer.wrap(numChannelsBA);
-            convertor.order(ByteOrder.LITTLE_ENDIAN);
-            int numChannels = convertor.getShort();
+                ByteBuffer convertor = ByteBuffer.wrap(chunkSizeBA);
+                convertor.order(ByteOrder.LITTLE_ENDIAN);
+                int chunkSize = convertor.getInt();
 
-            convertor = ByteBuffer.wrap(sampleRateBA);
-            convertor.order(ByteOrder.LITTLE_ENDIAN);
-            int sampleRate = convertor.getInt();
+                if (chunkID[0] == 'd' && chunkID[1] == 'a' && chunkID[2] == 't' && chunkID[3] == 'a') {
+                    byte[] data = new byte[chunkSize];
+                    buffStream.read(data);
 
-            convertor = ByteBuffer.wrap(bitsPerSampleBA);
-            convertor.order(ByteOrder.LITTLE_ENDIAN);
-            int bitsPerSample = convertor.getShort();
+                    ByteBuffer dataBuffer = ByteBuffer.allocateDirect(chunkSize);
+                    dataBuffer.order(ByteOrder.nativeOrder());
+                    ByteBuffer srcDataBuffer = ByteBuffer.wrap(data);
+                    srcDataBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
-            convertor = ByteBuffer.wrap(dataSizeBA);
-            convertor.order(ByteOrder.LITTLE_ENDIAN);
-            int dataSize = convertor.getInt();
+                    int numChannels = ByteBuffer.wrap(numChannelsBA).order(ByteOrder.LITTLE_ENDIAN).getShort();
+                    int sampleRate = ByteBuffer.wrap(sampleRateBA).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                    int bitsPerSample = ByteBuffer.wrap(bitsPerSampleBA).order(ByteOrder.LITTLE_ENDIAN).getShort();
 
-            byte[] data = new byte[dataSize];
-            buffStream.read(data);
+                    if (bitsPerSample == 16) {
+                        ShortBuffer dataShort = dataBuffer.asShortBuffer();
+                        ShortBuffer srcShort = srcDataBuffer.asShortBuffer();
+                        while (srcShort.hasRemaining())
+                            dataShort.put(srcShort.get());
+                    } else if (bitsPerSample == 8) {
+                        while (srcDataBuffer.hasRemaining())
+                            dataBuffer.put(srcDataBuffer.get());
+                    }
+                    dataBuffer.rewind();
 
-            buffStream.close();
-
-            ByteBuffer dataBuffer = ByteBuffer.allocateDirect(dataSize);
-            dataBuffer.order(ByteOrder.nativeOrder());
-            ByteBuffer srcDataBuffer = ByteBuffer.wrap(data);
-            srcDataBuffer.order(ByteOrder.LITTLE_ENDIAN);
-
-            if (bitsPerSample == 16) {
-                ShortBuffer dataShort = dataBuffer.asShortBuffer();
-                ShortBuffer srcShort = srcDataBuffer.asShortBuffer();
-                while (srcShort.hasRemaining())
-                    dataShort.put(srcShort.get());
-            } else if (bitsPerSample == 8) {
-                while (srcDataBuffer.hasRemaining())
-                    dataBuffer.put(srcDataBuffer.get());
+                    this.buffer = alGenBuffers();
+                    alBufferData(this.buffer, getFormat(numChannels, bitsPerSample), dataBuffer, sampleRate);
+                    break;
+                } else {
+                    buffStream.skip(chunkSize);
+                }
             }
-            dataBuffer.rewind();
-
-            this.buffer = alGenBuffers();
-            alBufferData(this.buffer, getFormat(numChannels, bitsPerSample), dataBuffer, sampleRate);
-
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -28,7 +28,9 @@ public class InputHandler implements Tickable {
 
     public class Mouse {
         private double x, y;
+        private double fromX, fromY;
         private boolean pressLeft, releaseLeft, pressRight, releaseRight;
+        private boolean dragLeft;
         private boolean leftMB = false, rightMB = false;
         private double leftX, leftY;
         private double rightX, rightY;
@@ -102,6 +104,10 @@ public class InputHandler implements Tickable {
             return this.leftMB && (this.leftX != this.x || this.leftY != this.y);
         }
 
+        public boolean wasLeftDrag() {
+            return dragLeft;
+        }
+
         public boolean isRightDown() {
             return this.rightMB;
         }
@@ -123,6 +129,16 @@ public class InputHandler implements Tickable {
             this.pressRight = false;
             this.releaseLeft = false;
             this.releaseRight = false;
+        }
+
+        public void computeDrag() {
+            if (isLeftDrag()) {
+                fromX = leftX;
+                fromY = leftY;
+                dragLeft = true;
+            } else {
+                dragLeft = false;
+            }
         }
     }
 
@@ -237,6 +253,7 @@ public class InputHandler implements Tickable {
     @Override
     public void tick(int tickCount) {
         //This needs to be the last call during a tick.
+        mouse.computeDrag();
         mouse.resetPress();
         scroller.resetDelta();
     }
