@@ -13,7 +13,7 @@ public class Harvester extends Entity.Unit {
         this.orientation = orientation;
         updateSprite();
         if (owner instanceof Player)
-            this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 12, 5, 5, Button.LEFT, false));
+            this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, Button.LEFT, false));
     }
 
     @Override

@@ -3,8 +3,6 @@ package sk.neuromancer.Xune.entity;
 import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
-import static sk.neuromancer.Xune.level.Tile.TILE_CENTER_X;
-import static sk.neuromancer.Xune.level.Tile.TILE_CENTER_Y;
 
 public class Heli extends Entity.Unit {
     private boolean wing;
@@ -16,7 +14,7 @@ public class Heli extends Entity.Unit {
         this.orientation = orientation;
         updateSprite();
         if (owner instanceof Player)
-            this.clickableAreas.add(ClickableCircle.getCentered(x, y, TILE_CENTER_X - 1, TILE_CENTER_Y, 7, Button.LEFT, false));
+            this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, Button.LEFT, false));
     }
 
     @Override

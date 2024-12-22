@@ -9,8 +9,7 @@ import sk.neuromancer.Xune.level.Level;
 import java.util.LinkedList;
 import java.util.List;
 
-import static sk.neuromancer.Xune.level.Level.tileX;
-import static sk.neuromancer.Xune.level.Level.tileY;
+import static sk.neuromancer.Xune.level.Level.*;
 
 public class Player extends EntityOwner {
     private final Game game;
@@ -23,13 +22,13 @@ public class Player extends EntityOwner {
         super(flag, money);
         this.game = g;
         this.level = level;
-        this.addEntity(new Base(tileX(1, 4), tileY(1, 4), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Refinery(tileX(2, 4), tileY(2, 4), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Silo(tileX(2, 3), tileY(2, 3), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Helipad(tileX(3, 3), tileY(3, 3), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Factory(tileX(2, 5), tileY(2, 5), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Harvester(tileX(1, 7), tileY(1, 7), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Heli(tileX(7, 7), tileY(7, 7), Entity.Orientation.EAST, this, this.flag));
+        this.addEntity(new Base(tileCenterX(1, 4), tileCenterY(1, 4), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Refinery(tileCenterX(2, 4), tileCenterY(2, 4), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Silo(tileCenterX(2, 3), tileCenterY(2, 3), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Helipad(tileCenterX(3, 3), tileCenterY(3, 3), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Factory(tileCenterX(2, 5), tileCenterY(2, 5), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Harvester(tileCenterX(1, 7), tileCenterY(1, 7), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Heli(tileCenterX(7, 7), tileCenterY(7, 7), Entity.Orientation.EAST, this, this.flag));
         this.effects.add(new Effect.Explosion());
     }
 

@@ -101,7 +101,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(x, y, 0);
+        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
         this.sprite.render();
         glPopMatrix();
     }
@@ -175,16 +175,20 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         @Override
         public void render() {
             glPushMatrix();
-            glTranslatef(x, y, 0);
+            glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
             this.sprite.render();
+            glPopMatrix();
             if (isSelected) {
+                glPushMatrix();
+                glTranslatef(x, y, 0);
                 for (Clickable area : clickableAreas) {
                     if (area instanceof Renderable) {
                         ((Renderable) area).render();
                     }
                 }
+                glPopMatrix();
             }
-            glPopMatrix();
+
         }
 
         public Command currentCommand() {

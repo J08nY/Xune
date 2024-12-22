@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.gfx.Sprite;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.gfx.Window;
 
@@ -79,27 +80,24 @@ public interface Clickable {
 
     class ClickableCircle implements Clickable, Renderable {
         private float x, y;
-        private float offsetX, offsetY;
         private float radius;
         private Button button;
         private boolean isStatic;
 
-        private ClickableCircle(float x, float y, float offsetX, float offsetY, float radius, Button button, boolean isStatic) {
+        private ClickableCircle(float x, float y, float radius, Button button, boolean isStatic) {
             this.x = x;
             this.y = y;
             this.radius = radius;
             this.button = button;
             this.isStatic = isStatic;
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
         }
 
         @Override
         public boolean intersects(float x, float y, Button b) {
             if (b != this.button)
                 return false;
-            float dx = (this.x + this.offsetX) - x;
-            float dy = (this.y + this.offsetY) - y;
+            float dx = this.x - x;
+            float dy = this.y - y;
             // TODO: Avoid sqrt, instead square the radius.
             float dist = (float) Math.sqrt(dx * dx + dy * dy);
             return dist <= radius;
@@ -109,8 +107,6 @@ public interface Clickable {
         public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
             if (b != this.button)
                 return false;
-            float x = this.x + this.offsetX;
-            float y = this.y + this.offsetY;
             float cx = x < fromX ? fromX : (x > toX ? toX : x);
             float cy = y < fromY ? fromY : (y > toY ? toY : y);
             float dx = x - cx;
@@ -128,8 +124,8 @@ public interface Clickable {
             this.y = y;
         }
 
-        public static ClickableCircle getCentered(float x, float y, float offsetX, float offsetY, float radius, Button button, boolean isStatic) {
-            return new ClickableCircle(x, y, offsetX, offsetY, radius, button, isStatic);
+        public static ClickableCircle getCentered(float x, float y, float radius, Button button, boolean isStatic) {
+            return new ClickableCircle(x, y, radius, button, isStatic);
         }
 
         public static ClickableCircle getFromDimensions(float x, float y, float width, float height, Button button, boolean isStatic) {
@@ -137,13 +133,11 @@ public interface Clickable {
                 return null;
             float centerX = x + (width / 2);
             float centerY = y + (height / 2);
-            return new ClickableCircle(centerX, centerY, 0, 0, width / 2, button, isStatic);
+            return new ClickableCircle(centerX, centerY, width / 2, button, isStatic);
         }
 
         @Override
         public void render() {
-            glPushMatrix();
-            glTranslatef(offsetX, offsetY, 0);
             float[] vertices = new float[60];
             for (int i = 0; i < 30; i++) {
                 float angle = (float) Math.toRadians(((float) 360 / 30) * i);
@@ -153,7 +147,6 @@ public interface Clickable {
             glColor3f(1f, 0f, 0f);
             Window.renderPoints(vertices);
             glColor3f(1f, 1f, 1f);
-            glPopMatrix();
         }
 
     }
@@ -204,7 +197,8 @@ public interface Clickable {
         public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
             if (b != button)
                 return false;
-            // Intersects iff: at least one of the lines intersects the box or the box is fully inside the lines.
+            // TODO: Intersects iff: at least one of the lines intersects the box or the box is fully inside the lines.
+            // Implement Liang-Barsky
 
             return false;
         }
@@ -217,9 +211,19 @@ public interface Clickable {
             return new ClickableTile(x, y, width, height, button, isStatic);
         }
 
+        public static ClickableTile getCentered(float x, float y, float width, float height, Button button, boolean isStatic) {
+            float halfWidth = width / 2;
+            float halfHeight = height / 2;
+            return new ClickableTile(x - halfWidth, y - halfHeight, width, height, button, isStatic);
+        }
+
         @Override
         public void render() {
-            SpriteSheet.TILE_SHEET.getSprite(17).render();
+            glPushMatrix();
+            Sprite sprite = SpriteSheet.TILE_SHEET.getSprite(17);
+            glTranslatef(-(float) sprite.getWidth() / 2, -(float) sprite.getHeight() / 2, 0);
+            sprite.render();
+            glPopMatrix();
             /*
             float[] vertices = new float[60];
             for (int i = 0; i < 30; i++) {

@@ -48,7 +48,7 @@ public class Tile implements Renderable {
     };
 
     public static final boolean[][] PASS_OPEN = {
-           //0     1      2     3     4     5      6     7     8
+            //0     1      2     3     4     5      6     7     8
             {true, false, true, true, true, false, true, true, true}, //33
             {true, true, true, false, true, false, true, true, true}, //34
             {true, true, true, false, true, true, true, false, true}, //35
@@ -62,7 +62,7 @@ public class Tile implements Renderable {
             {true, false, true, true, true, true, true, false, true}, //43
             {true, false, true, false, true, true, true, true, true}, //44
             {true, true, true, true, true, false, true, false, true}, //45
-            {true, true, true, true, true, true, true, true,  false}, //46
+            {true, true, true, true, true, true, true, true, false}, //46
             PASS_ALL                                                  //47
     };
 
@@ -97,35 +97,12 @@ public class Tile implements Renderable {
         return pass[point];
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public float getLevelX() {
-        return px;
-    }
-
-    public float getCenterX() {
-        return px + TILE_CENTER_X;
-    }
-
-    public float getLevelY() {
-        return py;
-    }
-
-    public float getCenterY() {
-        return py + TILE_CENTER_Y;
-    }
-
     @Override
     public void render() {
         glPushMatrix();
         glTranslatef(px, py, 0.0f);
         SpriteSheet.TILE_SHEET.getSprite(type).render();
+        SpriteSheet.TILE_SHEET.getSprite(2, 15).render();
         glPopMatrix();
     }
 }
