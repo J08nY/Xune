@@ -6,7 +6,7 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 public class Harvester extends Entity.Unit {
     private float spice;
 
-    public static final float SPEED = 0.2f;
+    public static final float SPEED = 0.5f;
 
     public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);
@@ -27,6 +27,15 @@ public class Harvester extends Entity.Unit {
                 move(move.getNext().getLevelX(), move.getNext().getLevelY(), SPEED);
                 move.update(x, y);
             }
+        }
+    }
+
+    @Override
+    public void render() {
+        super.render();
+        Command current = currentCommand();
+        if (current instanceof Command.MoveCommand move) {
+            //move.getPath().render();
         }
     }
 

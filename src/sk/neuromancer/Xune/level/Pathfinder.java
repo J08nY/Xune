@@ -1,11 +1,14 @@
 package sk.neuromancer.Xune.level;
 
+import sk.neuromancer.Xune.gfx.Renderable;
+
 import java.util.*;
 
+import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.level.Tile.TILE_HEIGHT;
 import static sk.neuromancer.Xune.level.Tile.TILE_WIDTH;
 
-public class Pathfinder {
+public class Pathfinder implements Renderable {
     private final Level l;
     private boolean[][] pass;
 
@@ -21,11 +24,15 @@ public class Pathfinder {
                 int baseY = row * 2;
 
                 /*
-                 *      / 0 \
-                 *     /7   1\
-                 *    (6  8  2)
-                 *     \5   3/
-                 *      \ 4 /
+                 *        / 0 \
+                 *       /     \
+                 *      /7  9  1\
+                 *     /         \
+                 *    (6 12 8 10 2)
+                 *     \         /
+                 *      \5 11  3/
+                 *       \     /
+                 *        \ 4 /
                  */
                 // Fill base on passable
                 pass[baseY][baseX + 2] = passable[0];
@@ -37,12 +44,17 @@ public class Pathfinder {
                 pass[baseY + 2][baseX] = passable[6];
                 pass[baseY + 1][baseX + 1] = passable[7];
                 pass[baseY + 2][baseX + 2] = passable[8];
+                pass[baseY + 1][baseX + 2] = passable[9];
+                pass[baseY + 2][baseX + 3] = passable[10];
+                pass[baseY + 3][baseX + 2] = passable[11];
+                pass[baseY + 2][baseX + 1] = passable[12];
+
 
                 //Fill remaining
-                pass[baseY + 1][baseX + 2] = true;
-                pass[baseY + 2][baseX + 3] = true;
-                pass[baseY + 3][baseX + 2] = true;
-                pass[baseY + 2][baseX + 1] = true;
+                //pass[baseY + 1][baseX + 2] = true;
+                //pass[baseY + 2][baseX + 3] = true;
+                //pass[baseY + 3][baseX + 2] = true;
+                //pass[baseY + 2][baseX + 1] = true;
             }
         }
     }
@@ -65,7 +77,7 @@ public class Pathfinder {
 
             if (current.point.equals(dest)) {
                 Path path = reconstructPath(current);
-                //printPass(path);
+                printPass(path);
                 return path;
             }
 
@@ -162,11 +174,27 @@ public class Pathfinder {
     }
 
     public static int levelYToGrid(float y) {
-        return Math.round(y / ((float) TILE_HEIGHT / 4));
+        return Math.round(((4 * y + 2) / (TILE_HEIGHT + 1)));
     }
 
     public static float gridYToLevel(int y) {
-        return y * ((float) TILE_HEIGHT / 4);
+        return y * ((float) (TILE_HEIGHT + 1) / 4) - 0.5f;
+    }
+
+    @Override
+    public void render() {
+        glPointSize(5);
+        glBegin(GL_POINTS);
+        glColor4f(1, 1, 1, 0.9f);
+        for (int i = 0; i < pass.length; i++) {
+            for (int j = 0; j < pass[i].length; j++) {
+                if (pass[i][j]) {
+                    glVertex3f(gridXToLevel(j), gridYToLevel(i), 0);
+                }
+            }
+        }
+        glColor4f(1, 1, 1, 1);
+        glEnd();
     }
 
     private static class Node {
@@ -223,7 +251,7 @@ public class Pathfinder {
         }
     }
 
-    public static class Path {
+    public static class Path implements Renderable {
         private final Point[] p;
 
         public Path(Point[] p) {
@@ -232,6 +260,19 @@ public class Pathfinder {
 
         public Point[] getPoints() {
             return p;
+        }
+
+        @Override
+        public void render() {
+            for (Point point : p) {
+                float x = point.getLevelX();
+                float y = point.getLevelY();
+
+                glPointSize(10);
+                glBegin(GL_POINTS);
+                glVertex3f(x, y, 0);
+                glEnd();
+            }
         }
     }
 

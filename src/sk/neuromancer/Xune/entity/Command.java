@@ -63,6 +63,10 @@ public abstract class Command {
             return path.getPoints()[next];
         }
 
+        public Pathfinder.Path getPath() {
+            return path;
+        }
+
         public void update(float x, float y) {
             if (this.next == path.getPoints().length - 1) {
                 return;
@@ -76,6 +80,8 @@ public abstract class Command {
         public boolean isFinished(float x, float y) {
             return Math.abs(x - toX) <= 1.5 && Math.abs(y - toY) <= 1.5;
         }
+
+
     }
 }
 

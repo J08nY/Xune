@@ -93,6 +93,7 @@ public class Level implements Renderable, Tickable {
         }
         enemy.render();
         player.render();
+        //pathfinder.render();
 
         glPopMatrix();
     }
