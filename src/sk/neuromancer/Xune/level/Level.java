@@ -121,7 +121,6 @@ public class Level implements Renderable, Tickable {
                 }
             }
             this.pathfinder = new Pathfinder(this);
-            pathfinder.find(new Pathfinder.Point(5, 5), new Pathfinder.Point(26, 20));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -144,6 +143,10 @@ public class Level implements Renderable, Tickable {
 
     public Enemy getEnemy() {
         return this.enemy;
+    }
+
+    public Pathfinder getPathfinder() {
+        return this.pathfinder;
     }
 
     public Tile[][] getTiles() {

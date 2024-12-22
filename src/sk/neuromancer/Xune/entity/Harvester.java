@@ -6,6 +6,8 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 public class Harvester extends Entity.Unit {
     private float spice;
 
+    public static final float SPEED = 0.2f;
+
     public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);
         this.orientation = orientation;
@@ -16,13 +18,20 @@ public class Harvester extends Entity.Unit {
 
     @Override
     public void tick(int tickCount) {
-        if (tickCount % 60 == 0) {
-            this.orientation = this.orientation.cw();
-            updateSprite();
+        Command current = currentCommand();
+        if (current instanceof Command.MoveCommand move) {
+            if (move.isFinished(x, y)) {
+                setPosition(move.getToX(), move.getToY());
+                this.commands.removeFirst();
+            } else {
+                move(move.getNext().getLevelX(), move.getNext().getLevelY(), SPEED);
+                move.update(x, y);
+            }
         }
     }
 
-    private void updateSprite() {
+    @Override
+    protected void updateSprite() {
         int spriteRow = orientation.ordinal() / 4;
         int spriteOffset = orientation.ordinal() % 4;
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(Entity.SPRITE_ID_HARVESTER + PlayableEntity.getOffsetonFlag(flag) + spriteRow * Entity.SPRITE_ROW_LENGTH + spriteOffset);

@@ -1,11 +1,11 @@
 package sk.neuromancer.Xune.level;
 
-
-import sk.neuromancer.Xune.game.Tickable;
-
 import java.util.*;
 
-public class Pathfinder implements Tickable {
+import static sk.neuromancer.Xune.level.Tile.TILE_HEIGHT;
+import static sk.neuromancer.Xune.level.Tile.TILE_WIDTH;
+
+public class Pathfinder {
     private final Level l;
     private boolean[][] pass;
 
@@ -58,12 +58,14 @@ public class Pathfinder implements Tickable {
         openSet.add(startNode);
         allNodes.put(src, startNode);
 
+        long searched = 0;
         while (!openSet.isEmpty()) {
             Node current = openSet.poll();
+            searched++;
 
             if (current.point.equals(dest)) {
                 Path path = reconstructPath(current);
-                printPass(path);
+                //printPass(path);
                 return path;
             }
 
@@ -124,20 +126,20 @@ public class Pathfinder implements Tickable {
 
     private Point[] getNeighbors(Point p) {
         if ((p.x + p.y) % 2 == 0) {
-            return new Point[] {
+            return new Point[]{
                     new Point(p.x - 1, p.y - 1),
                     new Point(p.x - 1, p.y),
                     new Point(p.x - 1, p.y + 1),
-                    new Point(p.x , p.y - 1),
+                    new Point(p.x, p.y - 1),
                     new Point(p.x, p.y + 1),
                     new Point(p.x + 1, p.y - 1),
                     new Point(p.x + 1, p.y),
                     new Point(p.x + 1, p.y + 1),
             };
         } else {
-            return new Point[] {
+            return new Point[]{
                     new Point(p.x - 1, p.y),
-                    new Point(p.x , p.y - 1),
+                    new Point(p.x, p.y - 1),
                     new Point(p.x, p.y + 1),
                     new Point(p.x + 1, p.y),
             };
@@ -149,6 +151,22 @@ public class Pathfinder implements Tickable {
             return false;
         }
         return pass[p.y][p.x];
+    }
+
+    public static int levelXToGrid(float x) {
+        return Math.round(x / ((float) TILE_WIDTH / 4));
+    }
+
+    public static float gridXToLevel(int x) {
+        return x * ((float) TILE_WIDTH / 4);
+    }
+
+    public static int levelYToGrid(float y) {
+        return Math.round(y / ((float) TILE_HEIGHT / 4));
+    }
+
+    public static float gridYToLevel(int y) {
+        return y * ((float) TILE_HEIGHT / 4);
     }
 
     private static class Node {
@@ -171,11 +189,6 @@ public class Pathfinder implements Tickable {
         }
     }
 
-    @Override
-    public void tick(int tickCount) {
-
-    }
-
     public static class Point {
         public int x, y;
 
@@ -187,9 +200,26 @@ public class Pathfinder implements Tickable {
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-            Point point = (Point) obj;
+            if (!(obj instanceof Point point)) return false;
             return x == point.x && y == point.y;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y);
+        }
+
+        public float getLevelX() {
+            return Pathfinder.gridXToLevel(x);
+        }
+
+        public float getLevelY() {
+            return Pathfinder.gridYToLevel(y);
+        }
+
+        @Override
+        public String toString() {
+            return "Point{" + "x=" + x + ", y=" + y + '}';
         }
     }
 
@@ -198,6 +228,10 @@ public class Pathfinder implements Tickable {
 
         public Path(Point[] p) {
             this.p = p;
+        }
+
+        public Point[] getPoints() {
+            return p;
         }
     }
 

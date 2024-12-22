@@ -26,23 +26,18 @@ public class Heli extends Entity.Unit {
             updateSprite();
         }
         Command current = currentCommand();
-        if (current instanceof Command.MoveCommand move) {
-            if (move.isFinished(x, y)) {
-                setPosition(move.getToX(), move.getToY());
+        if (current instanceof Command.FlyCommand fly) {
+            if (fly.isFinished(x, y)) {
+                setPosition(fly.getToX(), fly.getToY());
                 this.commands.removeFirst();
             } else {
-                float dx = move.getToX() - x;
-                float dy = move.getToY() - y;
-                float angle = (float) Math.atan2(dy, dx);
-                float azimuth = (float) ((angle < 0 ? angle + 2 * (float) Math.PI : angle) + (Math.PI / 2));
-                this.orientation = Orientation.fromAngle(azimuth);
-                updateSprite();
-                setPosition(x + (float) (SPEED * Math.cos(angle)), y + (float) (SPEED * Math.sin(angle)));
+                move(fly.getToX(), fly.getToY(), SPEED);
             }
         }
     }
 
-    private void updateSprite() {
+    @Override
+    protected void updateSprite() {
         int i = orientation.ordinal();
         int animation;
         if (i < 4) {

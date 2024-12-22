@@ -206,5 +206,17 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         public Unit(float x, float y, EntityOwner owner, Flag flag) {
             super(x, y, owner, flag);
         }
+
+        protected void move(float toX, float toY, float speed) {
+            float dx = toX - x;
+            float dy = toY - y;
+            float angle = (float) Math.atan2(dy, dx);
+            float azimuth = (float) ((angle < 0 ? angle + 2 * (float) Math.PI : angle) + (Math.PI / 2));
+            this.orientation = Orientation.fromAngle(azimuth);
+            updateSprite();
+            setPosition(x + (float) (speed * Math.cos(angle)), y + (float) (speed * Math.sin(angle)));
+        }
+
+        protected abstract void updateSprite();
     }
 }

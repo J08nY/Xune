@@ -33,6 +33,7 @@ public class Player extends EntityOwner {
         this.effects.add(new Effect.Explosion());
     }
 
+
     @Override
     public void tick(int tickCount) {
         InputHandler.Mouse mouse = game.getInput().mouse;
@@ -80,7 +81,7 @@ public class Player extends EntityOwner {
     }
 
     private void handleClick(float levelX, float levelY) {
-        PlayableEntity only = selected.isEmpty() ? null : selected.getFirst();
+        PlayableEntity only = selected.size() == 1 ? selected.getFirst() : null;
         for (PlayableEntity e : entities) {
             if (e.intersects(levelX, levelY, Clickable.Button.LEFT)) {
                 selected.add(e);
@@ -92,9 +93,16 @@ public class Player extends EntityOwner {
         }
 
         if (selected.isEmpty() && only != null) {
-            if (only instanceof Entity.Unit) {
-                Command move = new Command.MoveCommand(only.x, only.y, levelX, levelY);
-                only.sendCommand(move);
+            if (only instanceof Heli) {
+                Command fly = new Command.FlyCommand(only.x, only.y, levelX, levelY);
+                only.sendCommand(fly);
+            } else if (only instanceof Harvester) {
+                try {
+                    Command move = new Command.MoveCommand(only.x, only.y, levelX, levelY, level.getPathfinder());
+                    only.sendCommand(move);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("No path found");
+                }
             }
         }
     }
