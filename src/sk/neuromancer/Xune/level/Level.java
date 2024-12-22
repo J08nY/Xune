@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.ai.Enemy;
 import sk.neuromancer.Xune.game.Game;
+import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
@@ -17,10 +18,9 @@ import static org.lwjgl.opengl.GL11.*;
 public class Level implements Renderable, Tickable {
     private final Game game;
 
-    private Pathfinder pathfinder;
-
     private Player player;
     private Enemy enemy;
+    private Pathfinder pathfinder;
 
     private Tile[][] level;
     private int width, height;
@@ -37,21 +37,23 @@ public class Level implements Renderable, Tickable {
     public static final float EDGE_MARGIN_X = Tile.TILE_WIDTH * 2;
     public static final float EDGE_MARGIN_Y = Tile.TILE_HEIGHT * 4;
 
+
     public Level(Game game) {
         this.game = game;
     }
 
     @Override
     public void tick(int tickCount) {
+        InputHandler input = this.game.getInput();
 
-        if (this.game.getInput().PLUS.isPressed()) {
+        if (input.PLUS.isPressed()) {
             this.zoom *= 1 + ZOOM_SPEED;
-        } else if (this.game.getInput().MINUS.isPressed()) {
+        } else if (input.MINUS.isPressed()) {
             if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
                 this.zoom *= 1 - ZOOM_SPEED;
         }
 
-        float dy = this.game.getInput().scroller.getDeltaY();
+        float dy = input.scroller.getDeltaY();
         if (dy > 0) {
             this.zoom *= 1 + SCROLL_SPEED;
         } else if (dy < 0) {
@@ -59,13 +61,13 @@ public class Level implements Renderable, Tickable {
                 this.zoom *= 1 - SCROLL_SPEED;
         }
 
-        if (this.game.getInput().W.isPressed() && getLevelY(0) > -EDGE_MARGIN_Y) {
+        if (input.W.isPressed() && getLevelY(0) > -EDGE_MARGIN_Y) {
             this.yOff += MOVE_SPEED * (1 / zoom);
-        } else if (this.game.getInput().A.isPressed() && getLevelX(0) > -EDGE_MARGIN_X) {
+        } else if (input.A.isPressed() && getLevelX(0) > -EDGE_MARGIN_X) {
             this.xOff += MOVE_SPEED * (1 / zoom);
-        } else if (this.game.getInput().S.isPressed() && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
+        } else if (input.S.isPressed() && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
             this.yOff -= MOVE_SPEED * (1 / zoom);
-        } else if (this.game.getInput().D.isPressed() && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
+        } else if (input.D.isPressed() && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
             this.xOff -= MOVE_SPEED * (1 / zoom);
         }
 
@@ -118,7 +120,8 @@ public class Level implements Renderable, Tickable {
                     this.level[j][i] = new Tile(Byte.parseByte(row[j]), j, i);
                 }
             }
-            //this.pathfinder = new Pathfinder(this);
+            this.pathfinder = new Pathfinder(this);
+            pathfinder.find(new Pathfinder.Point(5, 5), new Pathfinder.Point(26, 20));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -147,6 +150,10 @@ public class Level implements Renderable, Tickable {
         return this.level;
     }
 
+    public Tile getTile(int row, int column) {
+        return this.level[column][row];
+    }
+
     public float getWidth() {
         return this.width * Tile.TILE_WIDTH;
     }
@@ -169,5 +176,13 @@ public class Level implements Renderable, Tickable {
 
     public float getLevelY(double screenPointY) {
         return (((float) screenPointY - Game.CENTER_Y) / this.zoom) - this.yOff + Game.CENTER_Y;
+    }
+
+    public static float tileX(float x, float y) {
+        return (x + 0.5f * (y % 2)) * Tile.TILE_WIDTH;
+    }
+
+    public static float tileY(float x, float y) {
+        return 0.5f * y * Tile.TILE_HEIGHT;
     }
 }

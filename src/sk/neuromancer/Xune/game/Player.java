@@ -9,8 +9,8 @@ import sk.neuromancer.Xune.level.Level;
 import java.util.LinkedList;
 import java.util.List;
 
-import static sk.neuromancer.Xune.level.Tile.tileX;
-import static sk.neuromancer.Xune.level.Tile.tileY;
+import static sk.neuromancer.Xune.level.Level.tileX;
+import static sk.neuromancer.Xune.level.Level.tileY;
 
 public class Player extends EntityOwner {
     private final Game game;

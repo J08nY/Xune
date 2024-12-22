@@ -4,6 +4,8 @@ import sk.neuromancer.Xune.game.Tickable;
 
 import java.util.function.DoubleUnaryOperator;
 
+import static org.lwjgl.opengl.GL11.*;
+
 public class Effect implements Tickable, Renderable {
     private int type;
     private int length;
@@ -15,7 +17,6 @@ public class Effect implements Tickable, Renderable {
 
     public static int EXPLOSION = 0;
 
-
     Effect(int type, int length, int duration, DoubleUnaryOperator ease) {
         this.type = type;
         this.length = length;
@@ -26,7 +27,10 @@ public class Effect implements Tickable, Renderable {
 
     @Override
     public void render() {
+        glPushMatrix();
+        glTranslatef(x, y, 0);
         this.sprite.render();
+        glPopMatrix();
     }
 
     @Override

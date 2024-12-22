@@ -10,6 +10,7 @@ public class SpriteSheet {
     public static SpriteSheet ENTITY_SHEET = new SpriteSheet("entities.png", 24, 11);
     public static SpriteSheet TILE_SHEET = new SpriteSheet("tiles.png", 24, 11);
     public static SpriteSheet EFFECTS_SHEET = new SpriteSheet("effects.png", 24, 11);
+    public static SpriteSheet PASS_SHEET = new SpriteSheet("passmap.png", 10, 10);
     public static ScalableSpriteSheet CURSOR_SHEET = new ScalableSpriteSheet("cursors.png", 19, 19);
     public static ScalableSpriteSheet LOGO = new ScalableSpriteSheet("logo.png", 160, 61);
     public static ScalableSpriteSheet HUD_PANEL = new ScalableSpriteSheet("gamepanel.png", 384, 60);
@@ -88,6 +89,7 @@ public class SpriteSheet {
         SpriteSheet.ENTITY_SHEET.initSheet();
         SpriteSheet.TILE_SHEET.initSheet();
         SpriteSheet.EFFECTS_SHEET.initSheet();
+        SpriteSheet.PASS_SHEET.initSheet();
         SpriteSheet.CURSOR_SHEET.initSheet();
         SpriteSheet.LOGO.initSheet();
         SpriteSheet.HUD_PANEL.initSheet();
@@ -99,6 +101,7 @@ public class SpriteSheet {
         SpriteSheet.ENTITY_SHEET.destroySheet();
         SpriteSheet.TILE_SHEET.destroySheet();
         SpriteSheet.EFFECTS_SHEET.destroySheet();
+        SpriteSheet.PASS_SHEET.destroySheet();
         SpriteSheet.CURSOR_SHEET.destroySheet();
         SpriteSheet.LOGO.destroySheet();
         SpriteSheet.HUD_PANEL.destroySheet();
