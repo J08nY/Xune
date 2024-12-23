@@ -111,6 +111,13 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         return false;
     }
 
+    public void takeDamage(int damage) {
+        this.health -= damage;
+        if (this.health <= 0) {
+            this.health = 0;
+        }
+    }
+
     @Override
     public void render() {
         glPushMatrix();

@@ -104,11 +104,13 @@ public abstract class Command {
         private final Entity target;
         private final float range;
         private final int rate;
+        private final int damage;
 
-        public AttackCommand(Entity target, float range, int rate) {
+        public AttackCommand(Entity target, float range, int rate, int damage) {
             this.target = target;
             this.range = range;
             this.rate = rate;
+            this.damage = damage;
         }
 
         public boolean inRange(float x, float y) {
@@ -124,10 +126,48 @@ public abstract class Command {
 
         @Override
         public void execute(Entity entity, int tickCount) {
-            if (inRange(entity.x, entity.y) && tickCount % rate == 0) {
-                target.health -= 10;
+            if (inRange(entity.x, entity.y)) {
+                if (tickCount % rate == 0) {
+                    target.takeDamage(damage);
+                }
+                //TODO: Make the entity face the target
+                //TODO: Play a sound
+
+            }
+        }
+    }
+
+    public static class MoveAndAttackCommand extends Command {
+        private MoveCommand move;
+        private AttackCommand attack;
+        private Pathfinder pathfinder;
+        private Entity target;
+        private float targetX, targetY;
+
+        public MoveAndAttackCommand(float fromX, float fromY, Pathfinder pathFinder, Entity target, float range, int rate, int damage) {
+            this.move = new MoveCommand(fromX, fromY, target.x, target.y, pathFinder);
+            this.attack = new AttackCommand(target, range, rate, damage);
+            this.pathfinder = pathFinder;
+            this.target = target;
+            this.targetX = target.x;
+            this.targetY = target.y;
+        }
+
+        @Override
+        public boolean isFinished(Entity entity) {
+            return attack.isFinished(entity);
+        }
+
+        @Override
+        public void execute(Entity entity, int tickCount) {
+            if (attack.inRange(entity.x, entity.y)) {
+                attack.execute(entity, tickCount);
             } else {
-                //just wait
+                if ((target.x != targetX || target.y != targetY) && tickCount % 30 == 0) {
+                    // Target moved, update
+                    move = new MoveCommand(entity.x, entity.y, target.x, target.y, pathfinder);
+                }
+                move.execute(entity, tickCount);
             }
         }
     }

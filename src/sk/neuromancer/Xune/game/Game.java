@@ -49,17 +49,16 @@ public class Game implements Renderable {
         input = new InputHandler(this);
 
         level = new Level(this);
+        level.loadLevel(Level.LEVEL_1);
         player = new Player(this, level, Flag.RED, 100);
+        level.setPlayer(player);
         enemy = new Enemy(this, level, Flag.BLUE, 100);
+        level.setEnemy(enemy);
 
         hud = new HUD(this);
 
         sound = new SoundManager(this);
-        sound.play(SoundManager.TRACK_DUNESHIFTER, true);
-
-        level.loadLevel(Level.LEVEL_1);
-        level.setPlayer(player);
-        level.setEnemy(enemy);
+        sound.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
 
         window.show();
     }

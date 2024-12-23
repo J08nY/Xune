@@ -16,13 +16,14 @@ public class Player extends EntityOwner {
 
     public Player(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
-        this.addEntity(new Base(1, 4, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Refinery(2, 4, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Silo(2, 3, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Helipad(3, 3, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Factory(2, 5, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Buggy(tileCenterX(1, 7), tileCenterY(1, 7), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Buggy(tileCenterX(2, 7), tileCenterY(2, 7), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Base(7, 2, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Refinery(5, 4, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Silo(5, 5, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Silo(5, 6, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Helipad(4, 5, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Factory(6, 5, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Buggy(tileCenterX(6, 8), tileCenterY(6, 8), Entity.Orientation.SOUTHEAST, this, this.flag));
+        this.addEntity(new Buggy(tileCenterX(8, 4), tileCenterY(8, 4), Entity.Orientation.EAST, this, this.flag));
         this.addEntity(new Heli(tileCenterX(7, 7), tileCenterY(7, 7), Entity.Orientation.EAST, this, this.flag));
     }
 
@@ -103,9 +104,15 @@ public class Player extends EntityOwner {
                 Command fly = new Command.FlyCommand(only.x, only.y, levelX, levelY);
                 only.pushCommand(fly);
             } else if (only instanceof Buggy) {
+                Entity other = level.entityAt(levelX, levelY);
                 try {
-                    Command move = new Command.MoveCommand(only.x, only.y, levelX, levelY, level.getPathfinder());
-                    only.pushCommand(move);
+                    if (other != null) {
+                        Command attack = new Command.MoveAndAttackCommand(only.x, only.y, level.getPathfinder(), other, 35f, 60, 10);
+                        only.pushCommand(attack);
+                    } else {
+                        Command move = new Command.MoveCommand(only.x, only.y, levelX, levelY, level.getPathfinder());
+                        only.pushCommand(move);
+                    }
                 } catch (IllegalArgumentException e) {
                     System.out.println("No path found");
                 }

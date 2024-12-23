@@ -74,7 +74,7 @@ public class EntityOwner implements Tickable, Renderable {
             if (e.health == 0) {
                 toRemove.add(e);
                 this.effects.add(new Effect.Explosion(e.x, e.y));
-                game.getSound().play(SoundManager.SOUND_EXPLOSION_1, false);
+                game.getSound().play(SoundManager.SOUND_EXPLOSION_1, false, 1.0f);
             }
         }
         toRemove.forEach(this::removeEntity);

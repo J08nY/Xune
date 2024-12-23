@@ -79,8 +79,8 @@ public class SoundManager implements Tickable {
         players.removeAll(stopped);
     }
 
-    public SoundPlayer play(int soundIndex, boolean loop) {
-        SoundPlayer player = new SoundPlayer(this.sounds[soundIndex], loop);
+    public SoundPlayer play(int soundIndex, boolean loop, float gain) {
+        SoundPlayer player = new SoundPlayer(this.sounds[soundIndex], loop, gain);
         players.add(player);
         player.play();
         return player;

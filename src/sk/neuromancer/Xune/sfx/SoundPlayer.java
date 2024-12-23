@@ -35,6 +35,10 @@ public class SoundPlayer {
         this(sound, loop, DEFAULT_PITCH, DEFAULT_GAIN, ZERO_SOURCE_POSITION, ZERO_SOURCE_VELOCITY);
     }
 
+    public SoundPlayer(Sound sound, boolean loop, float gain) {
+        this(sound, loop, DEFAULT_PITCH, gain, ZERO_SOURCE_POSITION, ZERO_SOURCE_VELOCITY);
+    }
+
     public SoundPlayer(Sound sound, boolean loop, float pitch, float gain, float[] position, float[] velocity) {
         this.sound = sound;
         this.state = SoundPlayerState.INITIAL;
