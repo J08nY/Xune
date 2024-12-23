@@ -13,38 +13,32 @@ public interface Clickable {
         LEFT, RIGHT
     }
 
-    boolean intersects(float x, float y, Button b);
+    boolean intersects(float x, float y);
 
-    boolean intersects(float fromX, float fromY, float toX, float toY, Button b);
+    boolean intersects(float fromX, float fromY, float toX, float toY);
 
     void setPosition(float x, float y);
 
     class ClickableBox implements Clickable {
         private float fromX, fromY;
         private float toX, toY;
-        private Button button;
         private boolean isStatic;
 
-        private ClickableBox(float fromX, float fromY, float toX, float toY, Button button, boolean isStatic) {
+        private ClickableBox(float fromX, float fromY, float toX, float toY, boolean isStatic) {
             this.fromX = fromX;
             this.fromY = fromY;
             this.toX = toX;
             this.toY = toY;
-            this.button = button;
             this.isStatic = isStatic;
         }
 
         @Override
-        public boolean intersects(float x, float y, Button b) {
-            if (b != this.button)
-                return false;
+        public boolean intersects(float x, float y) {
             return x > fromX && x < toX && y > fromY && y < toY;
         }
 
         @Override
-        public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
-            if (b != this.button)
-                return false;
+        public boolean intersects(float fromX, float fromY, float toX, float toY) {
             boolean xOverlap = this.fromX < toX && this.toX < fromX;
             boolean yOverlap = this.fromY < toY && this.toY < fromY;
             return xOverlap && yOverlap;
@@ -62,18 +56,18 @@ public interface Clickable {
             toY = y + height;
         }
 
-        public static ClickableBox getFromCoordinates(float fromX, float fromY, float toX, float toY, Button button, boolean isStatic) {
-            return new ClickableBox(fromX, fromY, toX, toY, button, isStatic);
+        public static ClickableBox getFromCoordinates(float fromX, float fromY, float toX, float toY, boolean isStatic) {
+            return new ClickableBox(fromX, fromY, toX, toY, isStatic);
         }
 
-        public static ClickableBox getFromDimensions(float x, float y, float width, float height, Button button, boolean isStatic) {
-            return new ClickableBox(x, y, x + width, y + height, button, isStatic);
+        public static ClickableBox getFromDimensions(float x, float y, float width, float height, boolean isStatic) {
+            return new ClickableBox(x, y, x + width, y + height, isStatic);
         }
 
-        public static ClickableBox getCentered(float x, float y, float width, float height, Button button, boolean isStatic) {
+        public static ClickableBox getCentered(float x, float y, float width, float height, boolean isStatic) {
             float halfWidth = width / 2;
             float halfHeight = height / 2;
-            return new ClickableBox(x - halfWidth, y - halfHeight, x + halfWidth, y + halfHeight, button, isStatic);
+            return new ClickableBox(x - halfWidth, y - halfHeight, x + halfWidth, y + halfHeight, isStatic);
         }
 
     }
@@ -81,21 +75,17 @@ public interface Clickable {
     class ClickableCircle implements Clickable, Renderable {
         private float x, y;
         private float radius;
-        private Button button;
         private boolean isStatic;
 
-        private ClickableCircle(float x, float y, float radius, Button button, boolean isStatic) {
+        private ClickableCircle(float x, float y, float radius,  boolean isStatic) {
             this.x = x;
             this.y = y;
             this.radius = radius;
-            this.button = button;
             this.isStatic = isStatic;
         }
 
         @Override
-        public boolean intersects(float x, float y, Button b) {
-            if (b != this.button)
-                return false;
+        public boolean intersects(float x, float y) {
             float dx = this.x - x;
             float dy = this.y - y;
             // TODO: Avoid sqrt, instead square the radius.
@@ -104,9 +94,7 @@ public interface Clickable {
         }
 
         @Override
-        public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
-            if (b != this.button)
-                return false;
+        public boolean intersects(float fromX, float fromY, float toX, float toY) {
             float cx = x < fromX ? fromX : (x > toX ? toX : x);
             float cy = y < fromY ? fromY : (y > toY ? toY : y);
             float dx = x - cx;
@@ -124,16 +112,16 @@ public interface Clickable {
             this.y = y;
         }
 
-        public static ClickableCircle getCentered(float x, float y, float radius, Button button, boolean isStatic) {
-            return new ClickableCircle(x, y, radius, button, isStatic);
+        public static ClickableCircle getCentered(float x, float y, float radius, boolean isStatic) {
+            return new ClickableCircle(x, y, radius, isStatic);
         }
 
-        public static ClickableCircle getFromDimensions(float x, float y, float width, float height, Button button, boolean isStatic) {
+        public static ClickableCircle getFromDimensions(float x, float y, float width, float height, boolean isStatic) {
             if (width != height)
                 return null;
             float centerX = x + (width / 2);
             float centerY = y + (height / 2);
-            return new ClickableCircle(centerX, centerY, width / 2, button, isStatic);
+            return new ClickableCircle(centerX, centerY, width / 2, isStatic);
         }
 
         @Override
@@ -158,10 +146,9 @@ public interface Clickable {
         private float kOffsetTop, kOffsetBottom;
         private float lOffsetTop, lOffsetBottom;
         private float halfWidth, halfHeight;
-        private Button button;
         private boolean isStatic;
 
-        private ClickableTile(float x, float y, float width, float height, Button button, boolean isStatic) {
+        private ClickableTile(float x, float y, float width, float height, boolean isStatic) {
             this.x = x;
             this.y = y;
             this.width = width;
@@ -176,14 +163,11 @@ public interface Clickable {
             this.kOffsetBottom = y + height - k * (x + halfWidth);
             this.lOffsetTop = (y - l * (x + halfWidth));
             this.lOffsetBottom = y - l * (x - halfWidth);
-            this.button = button;
             this.isStatic = isStatic;
         }
 
         @Override
-        public boolean intersects(float x, float y, Button b) {
-            if (b != button)
-                return false;
+        public boolean intersects(float x, float y) {
             if (y < k * x + kOffsetTop)
                 return false;
             if (y > k * x + kOffsetBottom)
@@ -194,27 +178,25 @@ public interface Clickable {
         }
 
         @Override
-        public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
-            if (b != button)
-                return false;
+        public boolean intersects(float fromX, float fromY, float toX, float toY) {
             // TODO: Intersects iff: at least one of the lines intersects the box or the box is fully inside the lines.
             // Implement Liang-Barsky
 
             return false;
         }
 
-        public static ClickableTile getFromCoordinates(float fromX, float fromY, float toX, float toY, Button button, boolean isStatic) {
-            return new ClickableTile(fromX, fromY, toX - fromX, toY - fromY, button, isStatic);
+        public static ClickableTile getFromCoordinates(float fromX, float fromY, float toX, float toY, boolean isStatic) {
+            return new ClickableTile(fromX, fromY, toX - fromX, toY - fromY, isStatic);
         }
 
-        public static ClickableTile getFromDimensions(float x, float y, float width, float height, Button button, boolean isStatic) {
-            return new ClickableTile(x, y, width, height, button, isStatic);
+        public static ClickableTile getFromDimensions(float x, float y, float width, float height, boolean isStatic) {
+            return new ClickableTile(x, y, width, height, isStatic);
         }
 
-        public static ClickableTile getCentered(float x, float y, float width, float height, Button button, boolean isStatic) {
+        public static ClickableTile getCentered(float x, float y, float width, float height, boolean isStatic) {
             float halfWidth = width / 2;
             float halfHeight = height / 2;
-            return new ClickableTile(x - halfWidth, y - halfHeight, width, height, button, isStatic);
+            return new ClickableTile(x - halfWidth, y - halfHeight, width, height, isStatic);
         }
 
         @Override

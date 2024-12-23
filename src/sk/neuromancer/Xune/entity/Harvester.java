@@ -1,6 +1,5 @@
 package sk.neuromancer.Xune.entity;
 
-import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 public class Harvester extends Entity.Unit {
@@ -13,8 +12,7 @@ public class Harvester extends Entity.Unit {
         this.orientation = orientation;
         this.health = 100;
         updateSprite();
-        if (owner instanceof Player)
-            this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, Button.LEFT, false));
+        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, false));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.ai.Enemy;
+import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Player;
@@ -149,6 +150,20 @@ public class Level implements Renderable, Tickable {
 
     public Pathfinder getPathfinder() {
         return this.pathfinder;
+    }
+
+    public Entity entityAt(float levelX, float levelY) {
+        for (Entity.PlayableEntity entity : player.getEntities()) {
+            if (entity.intersects(levelX, levelY)) {
+                return entity;
+            }
+        }
+        for (Entity.PlayableEntity entity : enemy.getEntities()) {
+            if (entity.intersects(levelX, levelY)) {
+                return entity;
+            }
+        }
+        return null;
     }
 
     public Tile[][] getTiles() {

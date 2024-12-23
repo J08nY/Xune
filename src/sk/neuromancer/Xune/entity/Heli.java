@@ -1,6 +1,5 @@
 package sk.neuromancer.Xune.entity;
 
-import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 
@@ -14,8 +13,7 @@ public class Heli extends Entity.Unit {
         this.orientation = orientation;
         this.health = 100;
         updateSprite();
-        if (owner instanceof Player)
-            this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, Button.LEFT, false));
+        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
     }
 
     @Override

@@ -125,9 +125,9 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
 
         @Override
-        public boolean intersects(float x, float y, Button b) {
+        public boolean intersects(float x, float y) {
             for (Clickable area : clickableAreas) {
-                if (area.intersects(x, y, b)) {
+                if (area.intersects(x, y)) {
                     return true;
                 }
             }
@@ -135,9 +135,9 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
 
         @Override
-        public boolean intersects(float fromX, float fromY, float toX, float toY, Button b) {
+        public boolean intersects(float fromX, float fromY, float toX, float toY) {
             for (Clickable area : clickableAreas) {
-                if (area.intersects(fromX, fromY, toX, toY, b)) {
+                if (area.intersects(fromX, fromY, toX, toY)) {
                     return true;
                 }
             }
@@ -198,6 +198,11 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
 
         public void sendCommand(Command c) {
+            this.commands.add(c);
+        }
+
+        public void pushCommand(Command c) {
+            this.commands.clear();
             this.commands.add(c);
         }
     }

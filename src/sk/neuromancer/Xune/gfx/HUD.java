@@ -1,6 +1,8 @@
 package sk.neuromancer.Xune.gfx;
 
+import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.game.Game;
+import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Sprite.ScalableSprite;
 
@@ -9,8 +11,10 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class HUD implements Tickable, Renderable {
     private final Game game;
+    private final float width;
+    private final float height;
 
-    private final ScalableSprite currentCursor;
+    private ScalableSprite currentCursor;
     private final ScalableSprite logo;
     private final ScalableSprite hudPanel;
 
@@ -20,16 +24,16 @@ public class HUD implements Tickable, Renderable {
 
     public HUD(Game game) {
         this.game = game;
+        this.width = game.getWindow().getWidth();
+        this.height = game.getWindow().getHeight();
         glfwSetInputMode(game.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
-        currentCursor.setScaleFactor(2f);
 
         logo = SpriteSheet.LOGO.getSprite(0);
-        logo.setScaleFactor(1f);
+        logo.setScaleFactor(1);
 
         hudPanel = SpriteSheet.HUD_PANEL.getSprite(0);
-        hudPanel.setScaleFactor(game.getWindow().getWidth() / (float) hudPanel.getWidth());
-        fromX = fromY = 0;
+        hudPanel.setScaleFactor(width / (float) hudPanel.getWidth());
     }
 
     @Override
@@ -46,7 +50,7 @@ public class HUD implements Tickable, Renderable {
             glColor4f(1.f, 1.f, 1.f, 1.f);
             glPopMatrix();
         }
-        float hudTop = game.getWindow().getHeight() - (hudPanel.getHeight() * hudPanel.getScaleFactor());
+        float hudTop = height - (hudPanel.getHeight() * hudPanel.getScaleFactor());
         float hudLeft = (hudPanel.getWidth() * hudPanel.getScaleFactor()) * 0.18f;
 
         // Render HUD panel
@@ -83,10 +87,9 @@ public class HUD implements Tickable, Renderable {
 
     @Override
     public void tick(int tickCount) {
-        mouseX = game.getInput().mouse.getX();
-        mouseY = game.getInput().mouse.getY();
-        float width = game.getWindow().getWidth();
-        float height = game.getWindow().getHeight();
+        InputHandler.Mouse mouse = game.getInput().mouse;
+        mouseX = mouse.getX();
+        mouseY = mouse.getY();
 
         if (mouseX < -20) {
             mouseX = -20;
@@ -100,12 +103,19 @@ public class HUD implements Tickable, Renderable {
         }
         glfwSetCursorPos(game.getWindow().getHandle(), mouseX, mouseY);
 
-        if (game.getInput().mouse.isLeftDrag()) {
-            fromX = game.getInput().mouse.getLastLeftX();
-            fromY = game.getInput().mouse.getLastLeftY();
-            drag = true;
+        drag = mouse.wasLeftDrag();
+        fromX = mouse.getLastLeftX();
+        fromY = mouse.getLastLeftY();
+
+        if (game.getLevel().getPlayer().getSelected().isEmpty()) {
+            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
         } else {
-            drag = false;
+            Entity entity = game.getLevel().entityAt(game.getLevel().getLevelX(mouseX), game.getLevel().getLevelY(mouseY));
+            if (entity != null) {
+                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
+            } else {
+                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
+            }
         }
     }
 

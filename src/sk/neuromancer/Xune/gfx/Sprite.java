@@ -90,6 +90,11 @@ public class Sprite implements Renderable {
             super(pixels, width, height);
         }
 
+        public ScalableSprite(int[] pixels, int width, int height, float scaleFactor) {
+            super(pixels, width, height);
+            this.scaleFactor = scaleFactor;
+        }
+
         @Override
         public void render() {
             glEnable(GL_TEXTURE_2D);

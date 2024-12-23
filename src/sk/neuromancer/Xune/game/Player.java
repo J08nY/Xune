@@ -36,16 +36,12 @@ public class Player extends EntityOwner {
 
     @Override
     public void tick(int tickCount) {
-        List<PlayableEntity> toRemove = new LinkedList<>();
-        for (PlayableEntity e : entities) {
-            if (e.health == 0) {
-                toRemove.add(e);
-                this.effects.add(new Effect.Explosion(e.x, e.y));
-            }
-        }
-        entities.removeAll(toRemove);
-        effects.removeIf(Effect::isFinished);
+        handleDead();
+        handleInput();
+        super.tick(tickCount);
+    }
 
+    private void handleInput() {
         InputHandler.Mouse mouse = game.getInput().mouse;
         float mouseX = (float) mouse.getX();
         float mouseY = (float) mouse.getY();
@@ -73,14 +69,24 @@ public class Player extends EntityOwner {
                 e.unselect();
             }
         }
+    }
 
-        super.tick(tickCount);
+    private void handleDead() {
+        List<PlayableEntity> toRemove = new LinkedList<>();
+        for (PlayableEntity e : entities) {
+            if (e.health == 0) {
+                toRemove.add(e);
+                this.effects.add(new Effect.Explosion(e.x, e.y));
+            }
+        }
+        entities.removeAll(toRemove);
+        effects.removeIf(Effect::isFinished);
     }
 
     private void handleDrag(float fromLevelX, float fromLevelY, float levelX, float levelY) {
         for (PlayableEntity e : entities) {
             if (e.intersects(Math.min(fromLevelX, levelX), Math.min(fromLevelY, levelY),
-                    Math.max(fromLevelX, levelX), Math.max(fromLevelY, levelY), Clickable.Button.LEFT)) {
+                    Math.max(fromLevelX, levelX), Math.max(fromLevelY, levelY))) {
                 if (e instanceof Entity.Building) {
                     continue;
                 }
@@ -96,7 +102,7 @@ public class Player extends EntityOwner {
     private void handleClick(float levelX, float levelY) {
         PlayableEntity only = selected.size() == 1 ? selected.getFirst() : null;
         for (PlayableEntity e : entities) {
-            if (e.intersects(levelX, levelY, Clickable.Button.LEFT)) {
+            if (e.intersects(levelX, levelY)) {
                 selected.add(e);
                 e.select();
             } else {
@@ -108,11 +114,11 @@ public class Player extends EntityOwner {
         if (selected.isEmpty() && only != null) {
             if (only instanceof Heli) {
                 Command fly = new Command.FlyCommand(only.x, only.y, levelX, levelY);
-                only.sendCommand(fly);
+                only.pushCommand(fly);
             } else if (only instanceof Harvester) {
                 try {
                     Command move = new Command.MoveCommand(only.x, only.y, levelX, levelY, level.getPathfinder());
-                    only.sendCommand(move);
+                    only.pushCommand(move);
                 } catch (IllegalArgumentException e) {
                     System.out.println("No path found");
                 }
@@ -120,5 +126,7 @@ public class Player extends EntityOwner {
         }
     }
 
-
+    public List<PlayableEntity> getSelected() {
+        return selected;
+    }
 }
