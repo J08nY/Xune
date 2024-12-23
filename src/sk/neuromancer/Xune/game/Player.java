@@ -21,8 +21,8 @@ public class Player extends EntityOwner {
         this.addEntity(new Silo(2, 3, Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Helipad(3, 3, Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Factory(2, 5, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Harvester(tileCenterX(1, 7), tileCenterY(1, 7), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Harvester(tileCenterX(2, 7), tileCenterY(2, 7), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Buggy(tileCenterX(1, 7), tileCenterY(1, 7), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Buggy(tileCenterX(2, 7), tileCenterY(2, 7), Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Heli(tileCenterX(7, 7), tileCenterY(7, 7), Entity.Orientation.EAST, this, this.flag));
     }
 
@@ -102,7 +102,7 @@ public class Player extends EntityOwner {
             if (only instanceof Heli) {
                 Command fly = new Command.FlyCommand(only.x, only.y, levelX, levelY);
                 only.pushCommand(fly);
-            } else if (only instanceof Harvester) {
+            } else if (only instanceof Buggy) {
                 try {
                     Command move = new Command.MoveCommand(only.x, only.y, levelX, levelY, level.getPathfinder());
                     only.pushCommand(move);

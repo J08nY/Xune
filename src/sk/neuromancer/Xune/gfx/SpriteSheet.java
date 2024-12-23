@@ -1,5 +1,6 @@
 package sk.neuromancer.Xune.gfx;
 
+import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.gfx.Sprite.ScalableSprite;
 
 import javax.imageio.ImageIO;
@@ -19,14 +20,26 @@ public class SpriteSheet {
     public static ScalableSpriteSheet TEXT_SHEET = new ScalableSpriteSheet("text.png", 8, 8);
     public static SpriteSheet WORM_SHEET = new SpriteSheet("worm.png", 24, 11);
 
-    protected int width, height; // Spritoch, nie pixeloch..
-
+    protected int width, height;
     protected String imageName;
     protected int spriteWidth, spriteHeight;
-
     protected Sprite[] sprites;
-
     protected boolean isInitiated = false;
+
+    public static final int SPRITE_ID_BASE = 0;
+    public static final int SPRITE_ID_FACTORY = 1;
+    public static final int SPRITE_ID_REFINERY = 2;
+    public static final int SPRITE_ID_SILO = 3;
+    public static final int SPRITE_ID_HELIPAD = 4;
+    public static final int SPRITE_ID_BUGGY = 5;
+    public static final int SPRITE_ID_HELI = 9;
+
+    public static final int SPRITE_ROW_LENGTH = 17;
+
+    public static final int SPRITE_OFFSET_RED = 0;
+    public static final int SPRITE_OFFSET_GREEN = SPRITE_ROW_LENGTH * 2;
+    public static final int SPRITE_OFFSET_BLUE = SPRITE_ROW_LENGTH * 4;
+
 
     public SpriteSheet(String imageName, int spriteWidth, int spriteHeight) {
         this.imageName = imageName;
@@ -85,6 +98,14 @@ public class SpriteSheet {
         for (Sprite s : sprites) {
             s.destroy();
         }
+    }
+
+    public static int flagToOffset(Entity.Flag f) {
+        return switch (f) {
+            case RED -> SPRITE_OFFSET_RED;
+            case GREEN -> SPRITE_OFFSET_GREEN;
+            case BLUE -> SPRITE_OFFSET_BLUE;
+        };
     }
 
     public static void initSheets() {

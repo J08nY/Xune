@@ -88,6 +88,23 @@ public abstract class Command {
             return Math.abs(x - toX) <= 1.5 && Math.abs(y - toY) <= 1.5;
         }
 
+    }
+
+    public static class AttackCommand extends Command {
+        private final Entity target;
+        private final float range;
+
+        public AttackCommand(Entity target, float range) {
+            // Handle range and rate of fire
+            this.target = target;
+            this.range = range;
+        }
+
+        public boolean inRange(float x, float y) {
+            float dx = x - target.x;
+            float dy = y - target.y;
+            return dx * dx + dy * dy <= range * range;
+        }
 
     }
 }

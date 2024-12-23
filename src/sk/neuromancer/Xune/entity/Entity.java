@@ -19,22 +19,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     public int health;
     protected int maxHealth;
     protected Orientation orientation;
-    protected boolean isStatic;
-
-    public static final int SPRITE_ID_BASE = 0;
-    public static final int SPRITE_ID_FACTORY = 1;
-    public static final int SPRITE_ID_REFINERY = 2;
-    public static final int SPRITE_ID_SILO = 3;
-    public static final int SPRITE_ID_HELIPAD = 4;
-    public static final int SPRITE_ID_HARVESTER = 5;
-    public static final int SPRITE_ID_HELI = 9;
-
-    public static final int SPRITE_ROW_LENGTH = 17;
-
-    public static final int SPRITE_OFFSET_RED = 0;
-    public static final int SPRITE_OFFSET_GREEN = SPRITE_ROW_LENGTH * 2;
-    public static final int SPRITE_OFFSET_BLUE = SPRITE_ROW_LENGTH * 4;
-
+    protected List<Clickable> clickableAreas = new ArrayList<>();
 
     public enum Flag {
         RED, BLUE, GREEN
@@ -98,10 +83,32 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         this.maxHealth = maxHealth;
     }
 
-
     public void setPosition(float x, float y) {
         this.x = x;
         this.y = y;
+        for (Clickable area : clickableAreas) {
+            area.setPosition(x, y);
+        }
+    }
+
+    @Override
+    public boolean intersects(float x, float y) {
+        for (Clickable area : clickableAreas) {
+            if (area.intersects(x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean intersects(float fromX, float fromY, float toX, float toY) {
+        for (Clickable area : clickableAreas) {
+            if (area.intersects(fromX, fromY, toX, toY)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -112,44 +119,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         glPopMatrix();
     }
 
-    public static abstract class ClickableEntity extends Entity implements Clickable {
-        protected List<Clickable> clickableAreas = new ArrayList<>();
-
-        public ClickableEntity(float x, float y, int maxHealth) {
-            super(x, y, maxHealth);
-        }
-
-        @Override
-        public void setPosition(float x, float y) {
-            this.x = x;
-            this.y = y;
-            for (Clickable area : clickableAreas) {
-                area.setPosition(x, y);
-            }
-        }
-
-        @Override
-        public boolean intersects(float x, float y) {
-            for (Clickable area : clickableAreas) {
-                if (area.intersects(x, y)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public boolean intersects(float fromX, float fromY, float toX, float toY) {
-            for (Clickable area : clickableAreas) {
-                if (area.intersects(fromX, fromY, toX, toY)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    public static abstract class PlayableEntity extends ClickableEntity {
+    public static abstract class PlayableEntity extends Entity {
         protected EntityOwner owner;
         protected List<Command> commands;
         protected Flag flag;
@@ -160,14 +130,6 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             this.owner = owner;
             this.commands = new LinkedList<>();
             this.flag = flag;
-        }
-
-        public static int getOffsetonFlag(Flag f) {
-            return switch (f) {
-                case RED -> SPRITE_OFFSET_RED;
-                case GREEN -> SPRITE_OFFSET_GREEN;
-                case BLUE -> SPRITE_OFFSET_BLUE;
-            };
         }
 
         public void select() {
@@ -217,10 +179,14 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     public static abstract class Building extends PlayableEntity {
         public int tileX, tileY;
 
-        public Building(int tileX, int tileY, EntityOwner owner, Flag flag, int maxHealth) {
+        public Building(int tileX, int tileY, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, int baseSpriteId) {
             super(tileCenterX(tileX, tileY), tileCenterY(tileX, tileY), owner, flag, maxHealth);
             this.tileX = tileX;
             this.tileY = tileY;
+            this.orientation = orientation;
+            int spriteRow = this.orientation.ordinal() % 2 == 0 ? 1 : 0;
+            this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(baseSpriteId + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH);
+            this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), true));
         }
 
         @Override
@@ -236,8 +202,9 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     }
 
     public static abstract class Unit extends PlayableEntity {
-        public Unit(float x, float y, EntityOwner owner, Flag flag, int maxHealth) {
+        public Unit(float x, float y, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth) {
             super(x, y, owner, flag, maxHealth);
+            this.orientation = orientation;
         }
 
         protected void move(float toX, float toY, float speed) {

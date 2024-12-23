@@ -9,8 +9,7 @@ public class Heli extends Entity.Unit {
     public static final float SPEED = 1.5f;
 
     public Heli(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, owner, flag, 100);
-        this.orientation = orientation;
+        super(x, y, orientation, owner, flag, 100);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
     }
@@ -39,8 +38,8 @@ public class Heli extends Entity.Unit {
         if (i < 4) {
             animation = i * 2;
         } else {
-            animation = (i % 4) * 2 + Entity.SPRITE_ROW_LENGTH;
+            animation = (i % 4) * 2 + SpriteSheet.SPRITE_ROW_LENGTH;
         }
-        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(Entity.SPRITE_ID_HELI + PlayableEntity.getOffsetonFlag(flag) + (wing ? 1 : 0) + animation);
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_HELI + SpriteSheet.flagToOffset(flag) + (wing ? 1 : 0) + animation);
     }
 }
