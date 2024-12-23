@@ -8,6 +8,7 @@ import sk.neuromancer.Xune.level.Level;
 import java.util.LinkedList;
 import java.util.List;
 
+import static sk.neuromancer.Xune.game.Game.TPS;
 import static sk.neuromancer.Xune.level.Level.tileCenterX;
 import static sk.neuromancer.Xune.level.Level.tileCenterY;
 
@@ -21,10 +22,15 @@ public class Player extends EntityOwner {
         this.addEntity(new Silo(5, 5, Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Silo(5, 6, Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Helipad(4, 5, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Factory(6, 5, Entity.Orientation.NORTH, this, this.flag));
+        Factory factory = new Factory(6, 5, Entity.Orientation.NORTH, this, this.flag);
+        this.addEntity(factory);
         this.addEntity(new Buggy(tileCenterX(6, 8), tileCenterY(6, 8), Entity.Orientation.SOUTHEAST, this, this.flag));
         this.addEntity(new Buggy(tileCenterX(8, 4), tileCenterY(8, 4), Entity.Orientation.EAST, this, this.flag));
         this.addEntity(new Heli(tileCenterX(7, 7), tileCenterY(7, 7), Entity.Orientation.EAST, this, this.flag));
+
+        Buggy buggy = new Buggy(tileCenterX(6, 6), tileCenterY(6, 6), Entity.Orientation.EAST, this, this.flag);
+        Command produceBuggy = new Command.ProduceCommand(TPS * 5, buggy);
+        factory.pushCommand(produceBuggy);
     }
 
     @Override
@@ -36,7 +42,6 @@ public class Player extends EntityOwner {
 
     @Override
     public void tick(int tickCount) {
-        handleDead();
         handleInput();
         super.tick(tickCount);
     }
@@ -98,6 +103,8 @@ public class Player extends EntityOwner {
                 e.unselect();
             }
         }
+
+        System.out.println("Selected: " + selected.size());
 
         if (selected.isEmpty() && only != null) {
             if (only instanceof Heli) {

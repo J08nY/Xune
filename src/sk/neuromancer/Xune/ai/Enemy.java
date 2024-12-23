@@ -1,7 +1,10 @@
 package sk.neuromancer.Xune.ai;
 
-import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.Buggy;
+import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Entity.Flag;
+import sk.neuromancer.Xune.entity.EntityOwner;
+import sk.neuromancer.Xune.entity.Heli;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 
@@ -15,12 +18,13 @@ public class Enemy extends EntityOwner {
 
     @Override
     public void tick(int tickCount) {
-        handleDead();
-        Entity first = entities.getFirst();
-        if (tickCount % 120 == 0) {
-            first.setPosition(first.x + 5f, first.y);
-        }
         super.tick(tickCount);
+        if (!entities.isEmpty()) {
+            Entity first = entities.getFirst();
+            if (tickCount % 120 == 0) {
+                first.setPosition(first.x + 5f, first.y);
+            }
+        }
     }
 
 }

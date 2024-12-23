@@ -1,8 +1,10 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.level.Pathfinder;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public abstract class Command {
 
@@ -105,12 +107,15 @@ public abstract class Command {
         private final float range;
         private final int rate;
         private final int damage;
+        private final int offset;
 
         public AttackCommand(Entity target, float range, int rate, int damage) {
+            //TODO: Move range, rate and damage to the entity
             this.target = target;
             this.range = range;
             this.rate = rate;
             this.damage = damage;
+            this.offset = new Random().nextInt(rate);
         }
 
         public boolean inRange(float x, float y) {
@@ -126,13 +131,16 @@ public abstract class Command {
 
         @Override
         public void execute(Entity entity, int tickCount) {
-            if (inRange(entity.x, entity.y)) {
-                if (tickCount % rate == 0) {
-                    target.takeDamage(damage);
+            if (entity instanceof Entity.Unit unit) {
+                if (inRange(unit.x, unit.y)) {
+                    if ((tickCount + offset) % rate == 0) {
+                        unit.owner.getGame().getSound().play(SoundManager.SOUND_SHOT_1, false, 1.0f);
+                        target.takeDamage(damage);
+                    }
+                    unit.face(target.x, target.y);
                 }
-                //TODO: Make the entity face the target
-                //TODO: Play a sound
-
+            } else {
+                throw new IllegalArgumentException("Entity must be a unit.");
             }
         }
     }
@@ -145,6 +153,7 @@ public abstract class Command {
         private float targetX, targetY;
 
         public MoveAndAttackCommand(float fromX, float fromY, Pathfinder pathFinder, Entity target, float range, int rate, int damage) {
+            //TODO: Move range, rate and damage to the entity
             this.move = new MoveCommand(fromX, fromY, target.x, target.y, pathFinder);
             this.attack = new AttackCommand(target, range, rate, damage);
             this.pathfinder = pathFinder;
@@ -160,15 +169,54 @@ public abstract class Command {
 
         @Override
         public void execute(Entity entity, int tickCount) {
-            if (attack.inRange(entity.x, entity.y)) {
-                attack.execute(entity, tickCount);
-            } else {
-                if ((target.x != targetX || target.y != targetY) && tickCount % 30 == 0) {
-                    // Target moved, update
-                    move = new MoveCommand(entity.x, entity.y, target.x, target.y, pathfinder);
+            if (entity instanceof Entity.Unit) {
+                if (attack.inRange(entity.x, entity.y)) {
+                    attack.execute(entity, tickCount);
+                } else {
+                    if ((target.x != targetX || target.y != targetY) && tickCount % 30 == 0) {
+                        // Target moved, update
+                        move = new MoveCommand(entity.x, entity.y, target.x, target.y, pathfinder);
+                    }
+                    move.execute(entity, tickCount);
                 }
-                move.execute(entity, tickCount);
+            } else {
+                throw new IllegalArgumentException("Entity must be a unit.");
             }
+        }
+    }
+
+    public static class ProduceCommand extends Command {
+        private int start;
+        private boolean started;
+        private boolean finished;
+        private int duration;
+
+        private Entity.PlayableEntity result;
+
+        public ProduceCommand(int duration, Entity.PlayableEntity result) {
+            this.duration = duration;
+            this.result = result;
+        }
+
+        @Override
+        public void execute(Entity entity, int tickCount) {
+            if (entity instanceof Entity.Building building) {
+                if (!started) {
+                    start = tickCount;
+                    started = true;
+                }
+                if (tickCount - start >= duration) {
+                    building.owner.addEntity(result);
+                    finished = true;
+                }
+            } else {
+                throw new IllegalArgumentException("Entity must be a building.");
+            }
+        }
+
+        @Override
+        public boolean isFinished(Entity entity) {
+            return finished;
         }
     }
 }

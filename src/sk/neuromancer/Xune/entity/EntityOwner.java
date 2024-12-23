@@ -16,6 +16,8 @@ public class EntityOwner implements Tickable, Renderable {
     protected final Game game;
     protected final Level level;
     protected List<Entity.PlayableEntity> entities = new LinkedList<>();
+    protected List<Entity.PlayableEntity> toAdd = new LinkedList<>();
+    protected List<Entity.PlayableEntity> toRemove = new LinkedList<>();
     protected List<Effect> effects = new LinkedList<>();
     protected int money;
     protected Flag flag;
@@ -28,16 +30,24 @@ public class EntityOwner implements Tickable, Renderable {
     }
 
     public void addEntity(Entity.PlayableEntity e) {
-        entities.add(e);
+        toAdd.add(e);
         //TODO: Hook this and let Level know about the entity, it can then avoid handling buildings during a tick
     }
 
     public void removeEntity(Entity.PlayableEntity e) {
-        entities.remove(e);
+        toRemove.add(e);
     }
 
     public List<Entity.PlayableEntity> getEntities() {
         return entities;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public Level getLevel() {
+        return level;
     }
 
     public Flag getFlag() {
@@ -60,16 +70,20 @@ public class EntityOwner implements Tickable, Renderable {
 
     @Override
     public void tick(int tickCount) {
+        entities.addAll(toAdd);
+        toAdd.clear();
         for (Entity e : entities) {
             e.tick(tickCount);
         }
         for (Effect e : effects) {
             e.tick(tickCount);
         }
+        handleDead();
+        entities.removeAll(toRemove);
+        toRemove.clear();
     }
 
     protected void handleDead() {
-        List<Entity.PlayableEntity> toRemove = new LinkedList<>();
         for (Entity.PlayableEntity e : entities) {
             if (e.health == 0) {
                 toRemove.add(e);
@@ -77,7 +91,6 @@ public class EntityOwner implements Tickable, Renderable {
                 game.getSound().play(SoundManager.SOUND_EXPLOSION_1, false, 1.0f);
             }
         }
-        toRemove.forEach(this::removeEntity);
         effects.removeIf(Effect::isFinished);
     }
 }

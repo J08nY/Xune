@@ -7,9 +7,4 @@ public class Helipad extends Entity.Building {
     public Helipad(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_HELIPAD);
     }
-
-    @Override
-    public void tick(int tickCount) {
-
-    }
 }
