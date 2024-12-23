@@ -10,7 +10,7 @@ import sk.neuromancer.Xune.sfx.SoundPlayer.SoundPlayerState;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
 
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -20,7 +20,7 @@ public class SoundManager implements Tickable {
     private final long device;
     private final long context;
 
-    private final Queue<SoundPlayer> players = new LinkedList<>();
+    private final List<SoundPlayer> players = new LinkedList<>();
     private final Sound[] sounds;
 
     private static final String[] soundNames = new String[]{
@@ -52,7 +52,7 @@ public class SoundManager implements Tickable {
 
     public static final int TRACK_DUNESHIFTER = 11;
 
-    public SoundManager(Game game) {//TODO nejako manazovat Gain..
+    public SoundManager(Game game) {
         this.game = game;
         this.device = alcOpenDevice((ByteBuffer) null);
         if (device == NULL) {
@@ -74,12 +74,9 @@ public class SoundManager implements Tickable {
 
     @Override
     public void tick(int tickCount) {
-        //TODO: This is no longer valid as they can loop.
-        SoundPlayer head = players.peek();
-        if (head != null && head.getState() == SoundPlayerState.STOPPED) {
-            players.remove();
-            head.destroy();
-        }
+        List<SoundPlayer> stopped = players.stream().filter(p -> p.getState() == SoundPlayerState.STOPPED).toList();
+        stopped.forEach(SoundPlayer::destroy);
+        players.removeAll(stopped);
     }
 
     public SoundPlayer play(int soundIndex, boolean loop) {

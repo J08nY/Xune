@@ -19,6 +19,9 @@ public class Harvester extends Entity.Unit {
     public void tick(int tickCount) {
         Command current = currentCommand();
         if (current instanceof Command.MoveCommand move) {
+            if (tickCount % 5 == 0) {
+                this.health--;
+            }
             if (move.isFinished(x, y)) {
                 setPosition(move.getToX(), move.getToY());
                 this.commands.removeFirst();

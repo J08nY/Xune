@@ -5,6 +5,7 @@ import sk.neuromancer.Xune.entity.Entity.Flag;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -77,6 +78,7 @@ public class Player extends EntityOwner {
             if (e.health == 0) {
                 toRemove.add(e);
                 this.effects.add(new Effect.Explosion(e.x, e.y));
+                game.getSound().play(SoundManager.SOUND_EXPLOSION_1, false);
             }
         }
         entities.removeAll(toRemove);
