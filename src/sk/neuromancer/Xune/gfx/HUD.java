@@ -112,7 +112,13 @@ public class HUD implements Tickable, Renderable {
         } else {
             Entity entity = game.getLevel().entityAt(game.getLevel().getLevelX(mouseX), game.getLevel().getLevelY(mouseY));
             if (entity != null) {
-                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
+                if (entity instanceof Entity.PlayableEntity playable) {
+                    if (playable.getOwner() == game.getLevel().getPlayer()) {
+                        currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
+                    } else {
+                        currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
+                    }
+                }
             } else {
                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
             }

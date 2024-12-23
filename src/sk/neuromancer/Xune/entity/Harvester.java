@@ -8,9 +8,8 @@ public class Harvester extends Entity.Unit {
     public static final float SPEED = 0.5f;
 
     public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, owner, flag);
+        super(x, y, owner, flag, 100);
         this.orientation = orientation;
-        this.health = 100;
         updateSprite();
         this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, false));
     }

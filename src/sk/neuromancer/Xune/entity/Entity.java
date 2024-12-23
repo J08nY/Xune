@@ -3,6 +3,7 @@ package sk.neuromancer.Xune.entity;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.Sprite;
+import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -16,6 +17,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected Sprite sprite;
     public float x, y;
     public int health;
+    protected int maxHealth;
     protected Orientation orientation;
     protected boolean isStatic;
 
@@ -89,9 +91,11 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
     }
 
-    public Entity(float x, float y) {
+    public Entity(float x, float y, int maxHealth) {
         this.x = x;
         this.y = y;
+        this.health = maxHealth;
+        this.maxHealth = maxHealth;
     }
 
 
@@ -109,10 +113,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     }
 
     public static abstract class ClickableEntity extends Entity implements Clickable {
-        protected List<Clickable> clickableAreas = new ArrayList<Clickable>();
+        protected List<Clickable> clickableAreas = new ArrayList<>();
 
-        public ClickableEntity(float x, float y) {
-            super(x, y);
+        public ClickableEntity(float x, float y, int maxHealth) {
+            super(x, y, maxHealth);
         }
 
         @Override
@@ -151,8 +155,8 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         protected Flag flag;
         protected boolean isSelected;
 
-        public PlayableEntity(float x, float y, EntityOwner owner, Flag flag) {
-            super(x, y);
+        public PlayableEntity(float x, float y, EntityOwner owner, Flag flag, int maxHealth) {
+            super(x, y, maxHealth);
             this.owner = owner;
             this.commands = new LinkedList<>();
             this.flag = flag;
@@ -190,7 +194,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
                 }
                 glPopMatrix();
             }
+        }
 
+        public EntityOwner getOwner() {
+            return owner;
         }
 
         public Command currentCommand() {
@@ -210,16 +217,27 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     public static abstract class Building extends PlayableEntity {
         public int tileX, tileY;
 
-        public Building(int tileX, int tileY, EntityOwner owner, Flag flag) {
-            super(tileCenterX(tileX, tileY), tileCenterY(tileX, tileY), owner, flag);
+        public Building(int tileX, int tileY, EntityOwner owner, Flag flag, int maxHealth) {
+            super(tileCenterX(tileX, tileY), tileCenterY(tileX, tileY), owner, flag, maxHealth);
             this.tileX = tileX;
             this.tileY = tileY;
+        }
+
+        @Override
+        public void render() {
+            glPushMatrix();
+            glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
+            this.sprite.render();
+            if (isSelected) {
+                SpriteSheet.MISC_SHEET.getSprite(1, 0).render();
+            }
+            glPopMatrix();
         }
     }
 
     public static abstract class Unit extends PlayableEntity {
-        public Unit(float x, float y, EntityOwner owner, Flag flag) {
-            super(x, y, owner, flag);
+        public Unit(float x, float y, EntityOwner owner, Flag flag, int maxHealth) {
+            super(x, y, owner, flag, maxHealth);
         }
 
         protected void move(float toX, float toY, float speed) {
@@ -233,5 +251,35 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
 
         protected abstract void updateSprite();
+
+        @Override
+        public void render() {
+            glPushMatrix();
+            glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
+            this.sprite.render();
+            if (isSelected) {
+                SpriteSheet.MISC_SHEET.getSprite(0, 0).render();
+                glPushMatrix();
+                glTranslatef(0, sprite.getHeight(), 0);
+                glBegin(GL_QUADS);
+                glColor3f(0, 1, 0);
+                float healthPercentage = (float) health / maxHealth;
+                for (int i = 0; i < 12; i++) {
+                    if (i < healthPercentage * 12) {
+                        glColor3f(0, 1, 0);
+                    } else {
+                        glColor3f(1, 0, 0);
+                    }
+                    glVertex2f(((float) 25 / 12) * i, 0);
+                    glVertex2f(((float) 25 / 12) * i + 1, 0);
+                    glVertex2f(((float) 25 / 12) * i + 1, 1);
+                    glVertex2f(((float) 25 / 12) * i, 1);
+                }
+                glEnd();
+                glColor3f(1, 1, 1);
+                glPopMatrix();
+            }
+            glPopMatrix();
+        }
     }
 }

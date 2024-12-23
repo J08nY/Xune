@@ -6,7 +6,7 @@ public class Worm extends Entity {
     private int animation = 0;
 
     public Worm(float x, float y) {
-        super(x, y);
+        super(x, y, 1000);
         this.sprite = SpriteSheet.WORM_SHEET.getSprite(animation);
     }
 

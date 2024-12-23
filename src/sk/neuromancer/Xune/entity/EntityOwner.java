@@ -77,7 +77,7 @@ public class EntityOwner implements Tickable, Renderable {
                 game.getSound().play(SoundManager.SOUND_EXPLOSION_1, false);
             }
         }
-        entities.removeAll(toRemove);
+        toRemove.forEach(this::removeEntity);
         effects.removeIf(Effect::isFinished);
     }
 }

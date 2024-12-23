@@ -1,17 +1,10 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.gfx.Renderable;
-import sk.neuromancer.Xune.gfx.Sprite;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
-import sk.neuromancer.Xune.gfx.Window;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public interface Clickable {
-
-    enum Button {
-        LEFT, RIGHT
-    }
 
     boolean intersects(float x, float y);
 
@@ -19,7 +12,7 @@ public interface Clickable {
 
     void setPosition(float x, float y);
 
-    class ClickableBox implements Clickable {
+    class ClickableBox implements Clickable, Renderable {
         private float fromX, fromY;
         private float toX, toY;
         private boolean isStatic;
@@ -70,6 +63,17 @@ public interface Clickable {
             return new ClickableBox(x - halfWidth, y - halfHeight, x + halfWidth, y + halfHeight, isStatic);
         }
 
+        @Override
+        public void render() {
+            glColor3f(1f, 0f, 0f);
+            glBegin(GL_LINE_LOOP);
+            glVertex2f(fromX, fromY);
+            glVertex2f(toX, fromY);
+            glVertex2f(toX, toY);
+            glVertex2f(fromX, toY);
+            glEnd();
+            glColor3f(1f, 1f, 1f);
+        }
     }
 
     class ClickableCircle implements Clickable, Renderable {
@@ -77,7 +81,7 @@ public interface Clickable {
         private float radius;
         private boolean isStatic;
 
-        private ClickableCircle(float x, float y, float radius,  boolean isStatic) {
+        private ClickableCircle(float x, float y, float radius, boolean isStatic) {
             this.x = x;
             this.y = y;
             this.radius = radius;
@@ -88,9 +92,8 @@ public interface Clickable {
         public boolean intersects(float x, float y) {
             float dx = this.x - x;
             float dy = this.y - y;
-            // TODO: Avoid sqrt, instead square the radius.
-            float dist = (float) Math.sqrt(dx * dx + dy * dy);
-            return dist <= radius;
+            float dist = dx * dx + dy * dy;
+            return dist <= radius * radius;
         }
 
         @Override
@@ -99,9 +102,8 @@ public interface Clickable {
             float cy = y < fromY ? fromY : (y > toY ? toY : y);
             float dx = x - cx;
             float dy = y - cy;
-            // TODO: Avoid sqrt, instead square the radius.
-            float dist = (float) Math.sqrt(dx * dx + dy * dy);
-            return dist <= radius;
+            float dist = dx * dx + dy * dy;
+            return dist <= radius * radius;
         }
 
         @Override
@@ -126,17 +128,20 @@ public interface Clickable {
 
         @Override
         public void render() {
-            float[] vertices = new float[60];
-            for (int i = 0; i < 30; i++) {
-                float angle = (float) Math.toRadians(((float) 360 / 30) * i);
-                vertices[2 * i] = (float) (Math.cos(angle) * radius);//x;
-                vertices[2 * i + 1] = (float) (Math.sin(angle) * radius);//y;
-            }
             glColor3f(1f, 0f, 0f);
-            Window.renderPoints(vertices);
+            glLineWidth(4.0f);
+            glEnable(GL_LINE_SMOOTH);
+            glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+            glBegin(GL_LINE_LOOP);
+            int edges = 15;
+            for (int i = 0; i < edges; i++) {
+                double angle = Math.toRadians(((double) 360 / edges) * i);
+                glVertex2d(Math.cos(angle) * radius, Math.sin(angle) * radius);
+            }
+            glEnd();
+            glDisable(GL_LINE_SMOOTH);
             glColor3f(1f, 1f, 1f);
         }
-
     }
 
     class ClickableTile implements Clickable, Renderable {
@@ -201,40 +206,28 @@ public interface Clickable {
 
         @Override
         public void render() {
-            glPushMatrix();
-            Sprite sprite = SpriteSheet.TILE_SHEET.getSprite(17);
-            glTranslatef(-(float) sprite.getWidth() / 2, -(float) sprite.getHeight() / 2, 0);
-            sprite.render();
-            glPopMatrix();
-            /*
-            float[] vertices = new float[60];
+            glColor3f(1f, 0f, 0f);
+            glBegin(GL_LINE_STRIP);
             for (int i = 0; i < 30; i++) {
-                vertices[2 * i] = 2 * i;
-                vertices[2 * i + 1] = k * (2 * i) + kOffsetTop;
+                glVertex2f(2 * i, k * (2 * i) + kOffsetTop);
             }
-            float[] verticesTwo = new float[60];
+            glEnd();
+            glBegin(GL_LINE_STRIP);
             for (int i = 0; i < 30; i++) {
-                verticesTwo[2 * i] = 2 * i;
-                verticesTwo[2 * i + 1] = k * (2 * i) + kOffsetBottom;
+                glVertex2f(2 * i, k * (2 * i) + kOffsetBottom);
             }
-            float[] verticesThree = new float[60];
+            glEnd();
+            glBegin(GL_LINE_STRIP);
             for (int i = 0; i < 30; i++) {
-                verticesThree[2 * i] = 2 * i;
-                verticesThree[2 * i + 1] = l * (2 * i) + lOffsetTop;
+                glVertex2f(2 * i, l * (2 * i) + lOffsetTop);
             }
-            float[] verticesFour = new float[60];
+            glEnd();
+            glBegin(GL_LINE_STRIP);
             for (int i = 0; i < 30; i++) {
-                verticesFour[2 * i] = 2 * i;
-                verticesFour[2 * i + 1] = l * (2 * i) + lOffsetBottom;
+                glVertex2f(2 * i, l * (2 * i) + lOffsetBottom);
             }
-            glColor3f(1f, 0f, 0f);//koffsettop
-            Window.renderPoints(vertices);
-            glColor3f(0f, 1f, 0f);//koffsetbottom
-            Window.renderPoints(verticesTwo);
-            glColor3f(0f, 0f, 1f);//loffsetbottom
-            Window.renderPoints(verticesThree);
-            glColor3f(1f, 1f, 1f);//loffsettop
-            Window.renderPoints(verticesFour);*/
+            glEnd();
+            glColor3f(1f, 1f, 1f);
         }
 
         @Override

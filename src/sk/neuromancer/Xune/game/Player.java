@@ -26,6 +26,12 @@ public class Player extends EntityOwner {
         this.addEntity(new Heli(tileCenterX(7, 7), tileCenterY(7, 7), Entity.Orientation.EAST, this, this.flag));
     }
 
+    @Override
+    public void removeEntity(PlayableEntity e) {
+        super.removeEntity(e);
+        selected.remove(e);
+    }
+
 
     @Override
     public void tick(int tickCount) {
