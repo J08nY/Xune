@@ -5,13 +5,14 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 public class Base extends Entity.Building {
 
-    public Base(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
+    public Base(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);
+        this.health = 1000;
         this.orientation = orientation;
         int spriteOffset = this.orientation.ordinal() % 2 == 0 ? 1 : 0;
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(Entity.SPRITE_ID_BASE + PlayableEntity.getOffsetonFlag(flag) + spriteOffset * Entity.SPRITE_ROW_LENGTH);
         if (owner instanceof Player)
-            this.clickableAreas.add(ClickableTile.getCentered(x, y, this.sprite.getWidth(), this.sprite.getHeight(), Button.LEFT, true));
+            this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), Button.LEFT, true));
     }
 
     @Override

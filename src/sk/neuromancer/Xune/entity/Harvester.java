@@ -11,6 +11,7 @@ public class Harvester extends Entity.Unit {
     public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);
         this.orientation = orientation;
+        this.health = 100;
         updateSprite();
         if (owner instanceof Player)
             this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, Button.LEFT, false));
@@ -32,11 +33,11 @@ public class Harvester extends Entity.Unit {
 
     @Override
     public void render() {
-        super.render();
         Command current = currentCommand();
         if (current instanceof Command.MoveCommand move) {
-            //move.getPath().render();
+            move.getNextPath().render();
         }
+        super.render();
     }
 
     @Override

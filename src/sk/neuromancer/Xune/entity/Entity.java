@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
+import static sk.neuromancer.Xune.level.Level.tileCenterX;
+import static sk.neuromancer.Xune.level.Level.tileCenterY;
 
 public abstract class Entity implements Renderable, Tickable, Clickable {
     protected Sprite sprite;
@@ -201,8 +203,12 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     }
 
     public static abstract class Building extends PlayableEntity {
-        public Building(float x, float y, EntityOwner owner, Flag flag) {
-            super(x, y, owner, flag);
+        public int tileX, tileY;
+
+        public Building(int tileX, int tileY, EntityOwner owner, Flag flag) {
+            super(tileCenterX(tileX, tileY), tileCenterY(tileX, tileY), owner, flag);
+            this.tileX = tileX;
+            this.tileY = tileY;
         }
     }
 

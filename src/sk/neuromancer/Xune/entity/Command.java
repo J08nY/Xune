@@ -2,6 +2,8 @@ package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.level.Pathfinder;
 
+import java.util.Arrays;
+
 public abstract class Command {
 
     public static class FlyCommand extends Command {
@@ -65,6 +67,11 @@ public abstract class Command {
 
         public Pathfinder.Path getPath() {
             return path;
+        }
+
+        public Pathfinder.Path getNextPath() {
+            Pathfinder.Point[] points = path.getPoints();
+            return new Pathfinder.Path(Arrays.copyOfRange(points, next, points.length));
         }
 
         public void update(float x, float y) {

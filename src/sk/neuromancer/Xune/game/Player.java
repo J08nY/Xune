@@ -9,7 +9,8 @@ import sk.neuromancer.Xune.level.Level;
 import java.util.LinkedList;
 import java.util.List;
 
-import static sk.neuromancer.Xune.level.Level.*;
+import static sk.neuromancer.Xune.level.Level.tileCenterX;
+import static sk.neuromancer.Xune.level.Level.tileCenterY;
 
 public class Player extends EntityOwner {
     private final Game game;
@@ -22,19 +23,29 @@ public class Player extends EntityOwner {
         super(flag, money);
         this.game = g;
         this.level = level;
-        this.addEntity(new Base(tileCenterX(1, 4), tileCenterY(1, 4), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Refinery(tileCenterX(2, 4), tileCenterY(2, 4), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Silo(tileCenterX(2, 3), tileCenterY(2, 3), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Helipad(tileCenterX(3, 3), tileCenterY(3, 3), Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Factory(tileCenterX(2, 5), tileCenterY(2, 5), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Base(1, 4, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Refinery(2, 4, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Silo(2, 3, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Helipad(3, 3, Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Factory(2, 5, Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Harvester(tileCenterX(1, 7), tileCenterY(1, 7), Entity.Orientation.NORTH, this, this.flag));
+        this.addEntity(new Harvester(tileCenterX(2, 7), tileCenterY(2, 7), Entity.Orientation.NORTH, this, this.flag));
         this.addEntity(new Heli(tileCenterX(7, 7), tileCenterY(7, 7), Entity.Orientation.EAST, this, this.flag));
-        this.effects.add(new Effect.Explosion());
     }
 
 
     @Override
     public void tick(int tickCount) {
+        List<PlayableEntity> toRemove = new LinkedList<>();
+        for (PlayableEntity e : entities) {
+            if (e.health == 0) {
+                toRemove.add(e);
+                this.effects.add(new Effect.Explosion(e.x, e.y));
+            }
+        }
+        entities.removeAll(toRemove);
+        effects.removeIf(Effect::isFinished);
+
         InputHandler.Mouse mouse = game.getInput().mouse;
         float mouseX = (float) mouse.getX();
         float mouseY = (float) mouse.getY();
@@ -70,6 +81,9 @@ public class Player extends EntityOwner {
         for (PlayableEntity e : entities) {
             if (e.intersects(Math.min(fromLevelX, levelX), Math.min(fromLevelY, levelY),
                     Math.max(fromLevelX, levelX), Math.max(fromLevelY, levelY), Clickable.Button.LEFT)) {
+                if (e instanceof Entity.Building) {
+                    continue;
+                }
                 selected.add(e);
                 e.select();
             } else {

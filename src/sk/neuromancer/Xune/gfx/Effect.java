@@ -17,7 +17,9 @@ public class Effect implements Tickable, Renderable {
 
     public static int EXPLOSION = 0;
 
-    Effect(int type, int length, int duration, DoubleUnaryOperator ease) {
+    Effect(float x, float y, int type, int length, int duration, DoubleUnaryOperator ease) {
+        this.x = x;
+        this.y = y;
         this.type = type;
         this.length = length;
         this.duration = duration;
@@ -28,7 +30,7 @@ public class Effect implements Tickable, Renderable {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(x, y, 0);
+        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
         this.sprite.render();
         glPopMatrix();
     }
@@ -36,17 +38,21 @@ public class Effect implements Tickable, Renderable {
     @Override
     public void tick(int tickCount) {
         step++;
-        if (step > duration) {
-            step = 0;
+        if (isFinished()) {
+            return;
         }
         float p = (float) step / duration;
         int t = Math.round((float) ease.applyAsDouble(p) * length);
         sprite = SpriteSheet.EFFECTS_SHEET.getSprite(type + t);
     }
 
+    public boolean isFinished() {
+        return step == duration;
+    }
+
     public static class Explosion extends Effect {
-        public Explosion() {
-            super(EXPLOSION, 8, 200, Ease::easeOutSine);
+        public Explosion(float x, float y) {
+            super(x, y, EXPLOSION, 8, 200, Ease::easeOutSine);
         }
     }
 }

@@ -1,62 +1,67 @@
 package sk.neuromancer.Xune.level;
 
+import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 
 import java.util.*;
 
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.level.Tile.TILE_HEIGHT;
-import static sk.neuromancer.Xune.level.Tile.TILE_WIDTH;
+import static sk.neuromancer.Xune.level.Tile.*;
 
-public class Pathfinder implements Renderable {
+public class Pathfinder implements Tickable, Renderable {
     private final Level l;
-    private boolean[][] pass;
+    private final boolean[][] levelMap;
+    private boolean[][] buildingMap;
+    private Set<Entity.Building> buildings = new HashSet<>();
 
     public Pathfinder(Level l) {
         this.l = l;
-        this.pass = new boolean[5 + (l.getHeightInTiles() - 1) * 2][5 + (l.getWidthInTiles() - 1) * 4 + 2];
+        this.levelMap = new boolean[5 + (l.getHeightInTiles() - 1) * 2][5 + (l.getWidthInTiles() - 1) * 4 + 2];
+        this.buildingMap = new boolean[5 + (l.getHeightInTiles() - 1) * 2][5 + (l.getWidthInTiles() - 1) * 4 + 2];
 
+        fillLevelMap(l);
+    }
+
+    private void fillLevelMap(Level l) {
         for (int row = 0; row < l.getHeightInTiles(); row++) {
             for (int col = 0; col < l.getWidthInTiles(); col++) {
                 Tile tile = l.getTile(row, col);
                 boolean[] passable = tile.getPassable();
-                int baseX = col * 4 + (row % 2 == 0 ? 0 : 2);
-                int baseY = row * 2;
-
-                /*
-                 *        / 0 \
-                 *       /     \
-                 *      /7  9  1\
-                 *     /         \
-                 *    (6 12 8 10 2)
-                 *     \         /
-                 *      \5 11  3/
-                 *       \     /
-                 *        \ 4 /
-                 */
-                // Fill base on passable
-                pass[baseY][baseX + 2] = passable[0];
-                pass[baseY + 1][baseX + 3] = passable[1];
-                pass[baseY + 2][baseX + 4] = passable[2];
-                pass[baseY + 3][baseX + 3] = passable[3];
-                pass[baseY + 4][baseX + 2] = passable[4];
-                pass[baseY + 3][baseX + 1] = passable[5];
-                pass[baseY + 2][baseX] = passable[6];
-                pass[baseY + 1][baseX + 1] = passable[7];
-                pass[baseY + 2][baseX + 2] = passable[8];
-                pass[baseY + 1][baseX + 2] = passable[9];
-                pass[baseY + 2][baseX + 3] = passable[10];
-                pass[baseY + 3][baseX + 2] = passable[11];
-                pass[baseY + 2][baseX + 1] = passable[12];
-
-
-                //Fill remaining
-                //pass[baseY + 1][baseX + 2] = true;
-                //pass[baseY + 2][baseX + 3] = true;
-                //pass[baseY + 3][baseX + 2] = true;
-                //pass[baseY + 2][baseX + 1] = true;
+                fillTile(levelMap, col, row, passable);
             }
         }
+    }
+
+    private void fillTile(boolean[][] map, int col, int row, boolean[] passable) {
+        int baseX = col * 4 + (row % 2 == 0 ? 0 : 2);
+        int baseY = row * 2;
+
+        /*
+         *        / 0 \
+         *       /     \
+         *      /7  9  1\
+         *     /         \
+         *    (6 12 8 10 2)
+         *     \         /
+         *      \5 11  3/
+         *       \     /
+         *        \ 4 /
+         */
+        // Fill base on passable
+        map[baseY][baseX + 2] = passable[0];
+        map[baseY + 1][baseX + 3] = passable[1];
+        map[baseY + 2][baseX + 4] = passable[2];
+        map[baseY + 3][baseX + 3] = passable[3];
+        map[baseY + 4][baseX + 2] = passable[4];
+        map[baseY + 3][baseX + 1] = passable[5];
+        map[baseY + 2][baseX] = passable[6];
+        map[baseY + 1][baseX + 1] = passable[7];
+        map[baseY + 2][baseX + 2] = passable[8];
+        map[baseY + 1][baseX + 2] = passable[9];
+        map[baseY + 2][baseX + 3] = passable[10];
+        map[baseY + 3][baseX + 2] = passable[11];
+        map[baseY + 2][baseX + 1] = passable[12];
     }
 
     public Path find(Point src, Point dest) {
@@ -78,6 +83,8 @@ public class Pathfinder implements Renderable {
             if (current.point.equals(dest)) {
                 Path path = reconstructPath(current);
                 printPass(path);
+                System.out.println("Searched: " + searched);
+                System.out.println("Path length: " + path.p.length);
                 return path;
             }
 
@@ -101,13 +108,13 @@ public class Pathfinder implements Renderable {
     }
 
     private void printPass(Path path) {
-        for (int i = 0; i < pass.length; i++) {
-            for (int j = 0; j < pass[i].length; j++) {
-                char v = pass[i][j] ? '#' : '-';
+        for (int i = 0; i < levelMap.length; i++) {
+            for (int j = 0; j < levelMap[i].length; j++) {
+                char v = buildingMap[i][j] ? '░' : (levelMap[i][j] ? '#' : '-');
                 if (path != null) {
                     for (Point p : path.p) {
                         if (p.x == j && p.y == i) {
-                            v = 'O';
+                            v = '█';
                             break;
                         }
                     }
@@ -129,7 +136,7 @@ public class Pathfinder implements Renderable {
     }
 
     private double heuristic(Point a, Point b) {
-        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+        return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
     }
 
     private double distance(Point a, Point b) {
@@ -159,10 +166,10 @@ public class Pathfinder implements Renderable {
     }
 
     private boolean isPassable(Point p) {
-        if (p.y < 0 || p.y >= pass.length || p.x < 0 || p.x >= pass[0].length) {
+        if (p.y < 0 || p.y >= levelMap.length || p.x < 0 || p.x >= levelMap[0].length) {
             return false;
         }
-        return pass[p.y][p.x];
+        return levelMap[p.y][p.x] && !buildingMap[p.y][p.x];
     }
 
     public static int levelXToGrid(float x) {
@@ -186,15 +193,34 @@ public class Pathfinder implements Renderable {
         glPointSize(5);
         glBegin(GL_POINTS);
         glColor4f(1, 1, 1, 0.9f);
-        for (int i = 0; i < pass.length; i++) {
-            for (int j = 0; j < pass[i].length; j++) {
-                if (pass[i][j]) {
+        for (int i = 0; i < levelMap.length; i++) {
+            for (int j = 0; j < levelMap[i].length; j++) {
+                if (levelMap[i][j] && !buildingMap[i][j]) {
                     glVertex3f(gridXToLevel(j), gridYToLevel(i), 0);
                 }
             }
         }
         glColor4f(1, 1, 1, 1);
         glEnd();
+    }
+
+    @Override
+    public void tick(int tickCount) {
+        Set<Entity.Building> notFound = new HashSet<>(buildings);
+        for (Entity.PlayableEntity e : l.getPlayer().getEntities()) {
+            if (e instanceof Entity.Building building) {
+                if (buildings.contains(building)) {
+                    notFound.remove(building);
+                    continue;
+                }
+                fillTile(buildingMap, building.tileX, building.tileY, PASS_ALL);
+                buildings.add(building);
+            }
+        }
+        for (Entity.Building b : notFound) {
+            fillTile(buildingMap, b.tileX, b.tileY, PASS_NONE);
+        }
+        buildings.removeAll(notFound);
     }
 
     private static class Node {
@@ -268,10 +294,14 @@ public class Pathfinder implements Renderable {
                 float x = point.getLevelX();
                 float y = point.getLevelY();
 
+                glEnable(GL_POINT_SMOOTH);
                 glPointSize(10);
                 glBegin(GL_POINTS);
+                glColor4f(0, 0, 0, 0.4f);
                 glVertex3f(x, y, 0);
+                glColor4f(1, 1, 1, 1);
                 glEnd();
+                glDisable(GL_POINT_SMOOTH);
             }
         }
     }

@@ -105,7 +105,7 @@ public class Tile implements Renderable {
         if (type < 3) {
             this.pass = PASS_START[type];
         } else if (type < 18) {
-            this.pass = PASS_LOW[type - 3];
+            this.pass = PASS_ALL; //PASS_LOW[type - 3];
         } else if (type < 33) {
             this.pass = PASS_HIGH[type - 18];
         } else if (type < 48) {

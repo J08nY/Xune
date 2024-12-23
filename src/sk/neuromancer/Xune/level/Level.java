@@ -73,6 +73,7 @@ public class Level implements Renderable, Tickable {
 
         player.tick(tickCount);
         enemy.tick(tickCount);
+        pathfinder.tick(tickCount);
     }
 
     @Override

@@ -12,6 +12,7 @@ public class Heli extends Entity.Unit {
     public Heli(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, owner, flag);
         this.orientation = orientation;
+        this.health = 100;
         updateSprite();
         if (owner instanceof Player)
             this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, Button.LEFT, false));
