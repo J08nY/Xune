@@ -27,7 +27,7 @@ public class HUD implements Tickable, Renderable {
         this.width = game.getWindow().getWidth();
         this.height = game.getWindow().getHeight();
         glfwSetInputMode(game.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
+        currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
 
         logo = SpriteSheet.LOGO.getSprite(0);
         logo.setScaleFactor(1);
@@ -63,7 +63,7 @@ public class HUD implements Tickable, Renderable {
         glPushMatrix();
         glTranslatef(hudLeft, hudTop, 0);
 
-        renderText(0, 60, "MONEY: " + game.getLevel().getPlayer().money);
+        renderText(0, 60, "MONEY: " + game.getLevel().getPlayer().getMoney());
         float levelX = game.getLevel().getLevelX(mouseX);
         float levelY = game.getLevel().getLevelY(mouseY);
 
@@ -108,13 +108,13 @@ public class HUD implements Tickable, Renderable {
         fromY = mouse.getLastLeftY();
 
         if (game.getLevel().getPlayer().getSelected().isEmpty()) {
-            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
+            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
         } else {
             Entity entity = game.getLevel().entityAt(game.getLevel().getLevelX(mouseX), game.getLevel().getLevelY(mouseY));
             if (entity != null) {
                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
             } else {
-                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
+                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
             }
         }
     }
