@@ -141,6 +141,17 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
 
         @Override
+        public void tick(int tickCount) {
+            if (!commands.isEmpty()) {
+                Command current = commands.getFirst();
+                current.execute(this, tickCount);
+                if (current.isFinished(this)) {
+                    commands.removeFirst();
+                }
+            }
+        }
+
+        @Override
         public void render() {
             glPushMatrix();
             glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
@@ -202,12 +213,15 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     }
 
     public static abstract class Unit extends PlayableEntity {
-        public Unit(float x, float y, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth) {
+        private float speed;
+
+        public Unit(float x, float y, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, float speed) {
             super(x, y, owner, flag, maxHealth);
             this.orientation = orientation;
+            this.speed = speed;
         }
 
-        protected void move(float toX, float toY, float speed) {
+        protected void move(float toX, float toY) {
             float dx = toX - x;
             float dy = toY - y;
             float angle = (float) Math.atan2(dy, dx);

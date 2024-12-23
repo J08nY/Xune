@@ -6,10 +6,8 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 public class Heli extends Entity.Unit {
     private boolean wing;
 
-    public static final float SPEED = 1.5f;
-
     public Heli(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 100);
+        super(x, y, orientation, owner, flag, 100, 1.5f);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
     }
@@ -20,15 +18,7 @@ public class Heli extends Entity.Unit {
             wing = !wing;
             updateSprite();
         }
-        Command current = currentCommand();
-        if (current instanceof Command.FlyCommand fly) {
-            if (fly.isFinished(x, y)) {
-                setPosition(fly.getToX(), fly.getToY());
-                this.commands.removeFirst();
-            } else {
-                move(fly.getToX(), fly.getToY(), SPEED);
-            }
-        }
+        super.tick(tickCount);
     }
 
     @Override

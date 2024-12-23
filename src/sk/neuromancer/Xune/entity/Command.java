@@ -6,6 +6,10 @@ import java.util.Arrays;
 
 public abstract class Command {
 
+    public abstract void execute(Entity entity, int tickCount);
+
+    public abstract boolean isFinished(Entity entity);
+
     public static class FlyCommand extends Command {
         private final float fromX, fromY, toX, toY;
 
@@ -16,16 +20,19 @@ public abstract class Command {
             this.toY = toY;
         }
 
-        public float getToX() {
-            return toX;
+        public boolean isFinished(Entity entity) {
+            return Math.abs(entity.x - toX) <= 1.5 && Math.abs(entity.y - toY) <= 1.5;
         }
 
-        public float getToY() {
-            return toY;
-        }
-
-        public boolean isFinished(float x, float y) {
-            return Math.abs(x - toX) <= 1.5 && Math.abs(y - toY) <= 1.5;
+        @Override
+        public void execute(Entity entity, int tickCount) {
+            if (entity instanceof Entity.Unit unit) {
+                if (isFinished(unit)) {
+                    unit.setPosition(toX, toY);
+                } else {
+                    unit.move(toX, toY);
+                }
+            }
         }
     }
 
@@ -53,14 +60,6 @@ public abstract class Command {
             this.next = 0;
         }
 
-        public float getToX() {
-            return toX;
-        }
-
-        public float getToY() {
-            return toY;
-        }
-
         public Pathfinder.Point getNext() {
             return path.getPoints()[next];
         }
@@ -74,7 +73,7 @@ public abstract class Command {
             return new Pathfinder.Path(Arrays.copyOfRange(points, next, points.length));
         }
 
-        public void update(float x, float y) {
+        private void update(float x, float y) {
             if (this.next == path.getPoints().length - 1) {
                 return;
             }
@@ -84,20 +83,32 @@ public abstract class Command {
             }
         }
 
-        public boolean isFinished(float x, float y) {
-            return Math.abs(x - toX) <= 1.5 && Math.abs(y - toY) <= 1.5;
+        public boolean isFinished(Entity entity) {
+            return Math.abs(entity.x - toX) <= 1.5 && Math.abs(entity.y - toY) <= 1.5;
         }
 
+        @Override
+        public void execute(Entity entity, int tickCount) {
+            if (entity instanceof Entity.Unit unit) {
+                if (isFinished(unit)) {
+                    unit.setPosition(toX, toY);
+                } else {
+                    unit.move(getNext().getLevelX(), getNext().getLevelY());
+                    update(unit.x, unit.y);
+                }
+            }
+        }
     }
 
     public static class AttackCommand extends Command {
         private final Entity target;
         private final float range;
+        private final int rate;
 
-        public AttackCommand(Entity target, float range) {
-            // Handle range and rate of fire
+        public AttackCommand(Entity target, float range, int rate) {
             this.target = target;
             this.range = range;
+            this.rate = rate;
         }
 
         public boolean inRange(float x, float y) {
@@ -106,6 +117,19 @@ public abstract class Command {
             return dx * dx + dy * dy <= range * range;
         }
 
+        @Override
+        public boolean isFinished(Entity entity) {
+            return target.health == 0;
+        }
+
+        @Override
+        public void execute(Entity entity, int tickCount) {
+            if (inRange(entity.x, entity.y) && tickCount % rate == 0) {
+                target.health -= 10;
+            } else {
+                //just wait
+            }
+        }
     }
 }
 
