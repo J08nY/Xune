@@ -1,7 +1,6 @@
 package sk.neuromancer.Xune.game;
 
 import sk.neuromancer.Xune.entity.*;
-import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.Buggy;
@@ -64,18 +63,22 @@ public class Player extends EntityOwner {
         if (game.getInput().mouse.isLeftReleased()) {
             if (game.getInput().mouse.wasLeftDrag()) {
                 if (Math.abs(fromX - mouseX) < 5 && Math.abs(fromY - mouseY) < 5) {
-                    handleClick(levelX, levelY);
+                    handleLeftClick(levelX, levelY);
                 } else {
                     handleDrag(fromLevelX, fromLevelY, levelX, levelY);
                 }
             } else {
-                handleClick(levelX, levelY);
+                handleLeftClick(levelX, levelY);
             }
         }
         if (game.getInput().mouse.isRightReleased()) {
-            for (PlayableEntity e : entities) {
-                e.unselect();
-            }
+            handleRightClick();
+        }
+    }
+
+    private void handleRightClick() {
+        for (PlayableEntity e : entities) {
+            e.unselect();
         }
     }
 
@@ -95,7 +98,7 @@ public class Player extends EntityOwner {
         }
     }
 
-    private void handleClick(float levelX, float levelY) {
+    private void handleLeftClick(float levelX, float levelY) {
         PlayableEntity only = selected.size() == 1 ? selected.getFirst() : null;
         for (PlayableEntity e : entities) {
             if (e.intersects(levelX, levelY)) {
@@ -108,13 +111,13 @@ public class Player extends EntityOwner {
         }
 
         System.out.println("Selected: " + selected.size());
+        Entity other = level.entityAt(levelX, levelY);
 
         if (selected.isEmpty() && only != null) {
             if (only instanceof Heli) {
                 Command fly = new Command.FlyCommand(only.x, only.y, levelX, levelY);
                 only.pushCommand(fly);
             } else if (only instanceof Buggy) {
-                Entity other = level.entityAt(levelX, levelY);
                 try {
                     if (other != null) {
                         Command attack = new Command.MoveAndAttackCommand(only.x, only.y, level.getPathfinder(), other);

@@ -179,15 +179,54 @@ public interface Clickable {
                 return false;
             if (y < l * x + lOffsetTop)
                 return false;
-            return !(y > l * x + lOffsetBottom);
+            if (y > l * x + lOffsetBottom)
+                return false;
+            return true;
         }
 
         @Override
         public boolean intersects(float fromX, float fromY, float toX, float toY) {
-            // TODO: Intersects iff: at least one of the lines intersects the box or the box is fully inside the lines.
-            // Implement Liang-Barsky
-
+            //line 0 -> (x, y + halfHeight) to (x + halfWidth, y)
+            if (liangBarsky(x, y + halfHeight, x + halfWidth, y, fromX, fromY, toX, toY))
+                return true;
+            //line 1 -> (x + halfWidth, y) to (x + width, y + halfHeight)
+            if (liangBarsky(x + halfWidth, y, x + width, y + halfHeight, fromX, fromY, toX, toY))
+                return true;
+            //line 2 -> (x + width, y + halfHeight) to (x + halfWidth, y + height)
+            if (liangBarsky(x + width, y + halfHeight, x + halfWidth, y + height, fromX, fromY, toX, toY))
+                return true;
+            //line 3 -> (x + halfWidth, y + height) to (x, y + halfHeight)
+            if (liangBarsky(x + halfWidth, y + height, x, y + halfHeight, fromX, fromY, toX, toY))
+                return true;
             return false;
+        }
+
+        private boolean liangBarsky(float lineFromX, float lineFromY, float lineToX, float lineToY,
+                                    float boxFromX, float boxFromY, float boxToX, float boxToY) {
+            float dx = lineToX - lineFromX;
+            float dy = lineToY - lineFromY;
+            float[] p = {-dx, dx, -dy, dy};
+            float[] q = {lineFromX - boxFromX, boxToX - lineFromX, lineFromY - boxFromY, boxToY - lineFromY};
+            float u1 = 0;
+            float u2 = 1;
+            for (int i = 0; i < 4; i++) {
+                if (p[i] == 0) {
+                    if (q[i] < 0) {
+                        return false;
+                    }
+                } else {
+                    float r = q[i] / p[i];
+                    if (p[i] < 0) {
+                        u1 = Math.max(u1, r);
+                    } else {
+                        u2 = Math.min(u2, r);
+                    }
+                }
+            }
+            if (u1 > u2) {
+                return false;
+            }
+            return true;
         }
 
         public static ClickableTile getFromCoordinates(float fromX, float fromY, float toX, float toY, boolean isStatic) {
@@ -207,26 +246,16 @@ public interface Clickable {
         @Override
         public void render() {
             glColor3f(1f, 0f, 0f);
-            glBegin(GL_LINE_STRIP);
-            for (int i = 0; i < 30; i++) {
-                glVertex2f(2 * i, k * (2 * i) + kOffsetTop);
-            }
+            glPushMatrix();
+            glLineWidth(4.0f);
+            glTranslatef(-halfWidth, -halfHeight, 0);
+            glBegin(GL_LINE_LOOP);
+            glVertex2f(0, halfHeight);
+            glVertex2f(halfWidth, 0);
+            glVertex2f(width, halfHeight);
+            glVertex2f(halfWidth, height);
             glEnd();
-            glBegin(GL_LINE_STRIP);
-            for (int i = 0; i < 30; i++) {
-                glVertex2f(2 * i, k * (2 * i) + kOffsetBottom);
-            }
-            glEnd();
-            glBegin(GL_LINE_STRIP);
-            for (int i = 0; i < 30; i++) {
-                glVertex2f(2 * i, l * (2 * i) + lOffsetTop);
-            }
-            glEnd();
-            glBegin(GL_LINE_STRIP);
-            for (int i = 0; i < 30; i++) {
-                glVertex2f(2 * i, l * (2 * i) + lOffsetBottom);
-            }
-            glEnd();
+            glPopMatrix();
             glColor3f(1f, 1f, 1f);
         }
 

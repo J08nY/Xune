@@ -128,8 +128,8 @@ public class Level implements Renderable, Tickable {
             e.printStackTrace();
         }
         this.zoom = 4.0f;
-        this.xOff = Game.CENTER_X - getWidth() / 2;
-        this.yOff = Game.CENTER_Y - getHeight() / 2;
+        this.xOff = Game.CENTER_X - Game.CENTER_X / this.zoom;
+        this.yOff = Game.CENTER_Y - Game.CENTER_Y / this.zoom;
     }
 
     public void setPlayer(Player player) {
