@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.gfx;
 
-import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.gfx.Sprite.ScalableSprite;
 
 import javax.imageio.ImageIO;
@@ -100,7 +100,7 @@ public class SpriteSheet {
         }
     }
 
-    public static int flagToOffset(Entity.Flag f) {
+    public static int flagToOffset(Flag f) {
         return switch (f) {
             case RED -> SPRITE_OFFSET_RED;
             case GREEN -> SPRITE_OFFSET_GREEN;

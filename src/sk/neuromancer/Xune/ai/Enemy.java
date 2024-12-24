@@ -1,8 +1,9 @@
 package sk.neuromancer.Xune.ai;
 
+import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.Entity.Flag;
+import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.game.Game;
@@ -12,8 +13,8 @@ public class Enemy extends EntityOwner {
 
     public Enemy(Game game, Level level, Flag flag, int money) {
         super(game, level, flag, money);
-        this.addEntity(new Heli(Level.tileCenterX(14, 10), Level.tileCenterY(14, 10), Entity.Orientation.WEST, this, this.flag));
-        this.addEntity(new Buggy(Level.tileCenterX(13, 6), Level.tileCenterY(13, 6), Entity.Orientation.WEST, this, this.flag));
+        this.addEntity(new Heli(Level.tileCenterX(14, 10), Level.tileCenterY(14, 10), Orientation.WEST, this, this.flag));
+        this.addEntity(new Buggy(Level.tileCenterX(13, 6), Level.tileCenterY(13, 6), Orientation.WEST, this, this.flag));
     }
 
     @Override

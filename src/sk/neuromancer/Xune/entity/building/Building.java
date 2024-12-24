@@ -2,6 +2,8 @@ package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.EntityOwner;
+import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 import static org.lwjgl.opengl.GL11.*;

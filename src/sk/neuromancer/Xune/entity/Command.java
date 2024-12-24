@@ -36,6 +36,8 @@ public abstract class Command {
                 } else {
                     unit.move(toX, toY);
                 }
+            } else {
+                throw new IllegalArgumentException("Entity must be a unit.");
             }
         }
     }
@@ -100,30 +102,17 @@ public abstract class Command {
                     unit.move(getNext().getLevelX(), getNext().getLevelY());
                     update(unit.x, unit.y);
                 }
+            } else {
+                throw new IllegalArgumentException("Entity must be a unit.");
             }
         }
     }
 
     public static class AttackCommand extends Command {
         private final Entity target;
-        private final float range;
-        private final int rate;
-        private final int damage;
-        private final int offset;
 
-        public AttackCommand(Entity target, float range, int rate, int damage) {
-            //TODO: Move range, rate and damage to the entity
+        public AttackCommand(Entity target) {
             this.target = target;
-            this.range = range;
-            this.rate = rate;
-            this.damage = damage;
-            this.offset = new Random().nextInt(rate);
-        }
-
-        public boolean inRange(float x, float y) {
-            float dx = x - target.x;
-            float dy = y - target.y;
-            return dx * dx + dy * dy <= range * range;
         }
 
         @Override
@@ -134,13 +123,8 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (inRange(unit.x, unit.y)) {
-                    if ((tickCount + offset) % rate == 0) {
-                        unit.owner.getGame().getSound().play(SoundManager.SOUND_SHOT_1, false, 1.0f);
-                        target.takeDamage(damage);
-                    }
-                    unit.face(target.x, target.y);
-                }
+                unit.face(target.x, target.y);
+                unit.attack(target);
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
@@ -154,10 +138,9 @@ public abstract class Command {
         private Entity target;
         private float targetX, targetY;
 
-        public MoveAndAttackCommand(float fromX, float fromY, Pathfinder pathFinder, Entity target, float range, int rate, int damage) {
-            //TODO: Move range, rate and damage to the entity
+        public MoveAndAttackCommand(float fromX, float fromY, Pathfinder pathFinder, Entity target) {
             this.move = new MoveCommand(fromX, fromY, target.x, target.y, pathFinder);
-            this.attack = new AttackCommand(target, range, rate, damage);
+            this.attack = new AttackCommand(target);
             this.pathfinder = pathFinder;
             this.target = target;
             this.targetX = target.x;
@@ -171,12 +154,14 @@ public abstract class Command {
 
         @Override
         public void execute(Entity entity, int tickCount) {
-            if (entity instanceof Unit) {
-                if (attack.inRange(entity.x, entity.y)) {
+            if (entity instanceof Unit unit) {
+                if (unit.inRange(target)) {
                     attack.execute(entity, tickCount);
                 } else {
                     if ((target.x != targetX || target.y != targetY) && tickCount % 30 == 0) {
                         // Target moved, update
+                        targetX = target.x;
+                        targetY = target.y;
                         move = new MoveCommand(entity.x, entity.y, target.x, target.y, pathfinder);
                     }
                     move.execute(entity, tickCount);

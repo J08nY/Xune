@@ -1,7 +1,7 @@
 package sk.neuromancer.Xune.game;
 
 import sk.neuromancer.Xune.entity.*;
-import sk.neuromancer.Xune.entity.Entity.Flag;
+import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.Buggy;
@@ -20,18 +20,18 @@ public class Player extends EntityOwner {
 
     public Player(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
-        this.addEntity(new Base(7, 2, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Refinery(5, 4, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Silo(5, 5, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Silo(5, 6, Entity.Orientation.NORTH, this, this.flag));
-        this.addEntity(new Helipad(4, 5, Entity.Orientation.NORTH, this, this.flag));
-        Factory factory = new Factory(6, 5, Entity.Orientation.NORTH, this, this.flag);
+        this.addEntity(new Base(7, 2, Orientation.NORTH, this, this.flag));
+        this.addEntity(new Refinery(5, 4, Orientation.NORTH, this, this.flag));
+        this.addEntity(new Silo(5, 5, Orientation.NORTH, this, this.flag));
+        this.addEntity(new Silo(5, 6, Orientation.NORTH, this, this.flag));
+        this.addEntity(new Helipad(4, 5, Orientation.NORTH, this, this.flag));
+        Factory factory = new Factory(6, 5, Orientation.NORTH, this, this.flag);
         this.addEntity(factory);
-        this.addEntity(new Buggy(tileCenterX(6, 8), tileCenterY(6, 8), Entity.Orientation.SOUTHEAST, this, this.flag));
-        this.addEntity(new Buggy(tileCenterX(8, 4), tileCenterY(8, 4), Entity.Orientation.EAST, this, this.flag));
-        this.addEntity(new Heli(tileCenterX(7, 7), tileCenterY(7, 7), Entity.Orientation.EAST, this, this.flag));
+        this.addEntity(new Buggy(tileCenterX(6, 8), tileCenterY(6, 8), Orientation.SOUTHEAST, this, this.flag));
+        this.addEntity(new Buggy(tileCenterX(8, 4), tileCenterY(8, 4), Orientation.EAST, this, this.flag));
+        this.addEntity(new Heli(tileCenterX(7, 7), tileCenterY(7, 7), Orientation.EAST, this, this.flag));
 
-        Buggy buggy = new Buggy(tileCenterX(6, 6), tileCenterY(6, 6), Entity.Orientation.EAST, this, this.flag);
+        Buggy buggy = new Buggy(tileCenterX(6, 6), tileCenterY(6, 6), Orientation.EAST, this, this.flag);
         Command produceBuggy = new Command.ProduceCommand(TPS * 5, buggy);
         factory.pushCommand(produceBuggy);
     }
@@ -117,7 +117,7 @@ public class Player extends EntityOwner {
                 Entity other = level.entityAt(levelX, levelY);
                 try {
                     if (other != null) {
-                        Command attack = new Command.MoveAndAttackCommand(only.x, only.y, level.getPathfinder(), other, 35f, 60, 10);
+                        Command attack = new Command.MoveAndAttackCommand(only.x, only.y, level.getPathfinder(), other);
                         only.pushCommand(attack);
                     } else {
                         Command move = new Command.MoveCommand(only.x, only.y, levelX, levelY, level.getPathfinder());

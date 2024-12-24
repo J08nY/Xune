@@ -1,7 +1,7 @@
 package sk.neuromancer.Xune.game;
 
 import sk.neuromancer.Xune.ai.Enemy;
-import sk.neuromancer.Xune.entity.Entity.Flag;
+import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
