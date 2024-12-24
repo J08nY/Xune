@@ -1,5 +1,7 @@
 package sk.neuromancer.Xune.entity;
 
+import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.level.Pathfinder;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
@@ -28,7 +30,7 @@ public abstract class Command {
 
         @Override
         public void execute(Entity entity, int tickCount) {
-            if (entity instanceof Entity.Unit unit) {
+            if (entity instanceof Unit unit) {
                 if (isFinished(unit)) {
                     unit.setPosition(toX, toY);
                 } else {
@@ -91,7 +93,7 @@ public abstract class Command {
 
         @Override
         public void execute(Entity entity, int tickCount) {
-            if (entity instanceof Entity.Unit unit) {
+            if (entity instanceof Unit unit) {
                 if (isFinished(unit)) {
                     unit.setPosition(toX, toY);
                 } else {
@@ -131,7 +133,7 @@ public abstract class Command {
 
         @Override
         public void execute(Entity entity, int tickCount) {
-            if (entity instanceof Entity.Unit unit) {
+            if (entity instanceof Unit unit) {
                 if (inRange(unit.x, unit.y)) {
                     if ((tickCount + offset) % rate == 0) {
                         unit.owner.getGame().getSound().play(SoundManager.SOUND_SHOT_1, false, 1.0f);
@@ -169,7 +171,7 @@ public abstract class Command {
 
         @Override
         public void execute(Entity entity, int tickCount) {
-            if (entity instanceof Entity.Unit) {
+            if (entity instanceof Unit) {
                 if (attack.inRange(entity.x, entity.y)) {
                     attack.execute(entity, tickCount);
                 } else {
@@ -200,7 +202,7 @@ public abstract class Command {
 
         @Override
         public void execute(Entity entity, int tickCount) {
-            if (entity instanceof Entity.Building building) {
+            if (entity instanceof Building building) {
                 if (!started) {
                     start = tickCount;
                     started = true;

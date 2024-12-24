@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 
@@ -13,7 +14,7 @@ public class Pathfinder implements Tickable, Renderable {
     private final Level l;
     private final boolean[][] levelMap;
     private boolean[][] buildingMap;
-    private Set<Entity.Building> buildings = new HashSet<>();
+    private Set<Building> buildings = new HashSet<>();
 
     public Pathfinder(Level l) {
         this.l = l;
@@ -206,9 +207,9 @@ public class Pathfinder implements Tickable, Renderable {
 
     @Override
     public void tick(int tickCount) {
-        Set<Entity.Building> notFound = new HashSet<>(buildings);
+        Set<Building> notFound = new HashSet<>(buildings);
         for (Entity.PlayableEntity e : l.getPlayer().getEntities()) {
-            if (e instanceof Entity.Building building) {
+            if (e instanceof Building building) {
                 if (buildings.contains(building)) {
                     notFound.remove(building);
                     continue;
@@ -217,7 +218,7 @@ public class Pathfinder implements Tickable, Renderable {
                 buildings.add(building);
             }
         }
-        for (Entity.Building b : notFound) {
+        for (Building b : notFound) {
             fillTile(buildingMap, b.tileX, b.tileY, PASS_NONE);
         }
         buildings.removeAll(notFound);

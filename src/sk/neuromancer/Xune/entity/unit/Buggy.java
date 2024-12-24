@@ -1,8 +1,11 @@
-package sk.neuromancer.Xune.entity;
+package sk.neuromancer.Xune.entity.unit;
 
+import sk.neuromancer.Xune.entity.Clickable;
+import sk.neuromancer.Xune.entity.Command;
+import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
-public class Buggy extends Entity.Unit {
+public class Buggy extends Unit {
     public Buggy(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, orientation, owner, flag, 100, 0.5f);
         updateSprite();

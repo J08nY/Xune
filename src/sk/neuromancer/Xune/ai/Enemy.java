@@ -1,10 +1,10 @@
 package sk.neuromancer.Xune.ai;
 
-import sk.neuromancer.Xune.entity.Buggy;
+import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Entity.Flag;
 import sk.neuromancer.Xune.entity.EntityOwner;
-import sk.neuromancer.Xune.entity.Heli;
+import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 

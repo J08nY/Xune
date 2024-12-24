@@ -1,9 +1,10 @@
-package sk.neuromancer.Xune.entity;
+package sk.neuromancer.Xune.entity.unit;
 
+import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 
-public class Heli extends Entity.Unit {
+public class Heli extends Unit {
     private boolean wing;
 
     public Heli(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {

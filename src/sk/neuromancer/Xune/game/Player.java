@@ -3,6 +3,9 @@ package sk.neuromancer.Xune.game;
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.Entity.Flag;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
+import sk.neuromancer.Xune.entity.building.*;
+import sk.neuromancer.Xune.entity.unit.Buggy;
+import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.level.Level;
 
 import java.util.LinkedList;
@@ -80,7 +83,7 @@ public class Player extends EntityOwner {
         for (PlayableEntity e : entities) {
             if (e.intersects(Math.min(fromLevelX, levelX), Math.min(fromLevelY, levelY),
                     Math.max(fromLevelX, levelX), Math.max(fromLevelY, levelY))) {
-                if (e instanceof Entity.Building) {
+                if (e instanceof Building) {
                     continue;
                 }
                 selected.add(e);
