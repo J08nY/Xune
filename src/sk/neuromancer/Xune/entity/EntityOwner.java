@@ -30,11 +30,12 @@ public class EntityOwner implements Tickable, Renderable {
 
     public void addEntity(Entity.PlayableEntity e) {
         toAdd.add(e);
-        //TODO: Hook this and let Level know about the entity, it can then avoid handling buildings during a tick
+        level.addEntity(e);
     }
 
     public void removeEntity(Entity.PlayableEntity e) {
         toRemove.add(e);
+        level.removeEntity(e);
     }
 
     public List<Entity.PlayableEntity> getEntities() {

@@ -74,7 +74,6 @@ public class Level implements Renderable, Tickable {
 
         player.tick(tickCount);
         enemy.tick(tickCount);
-        pathfinder.tick(tickCount);
     }
 
     @Override
@@ -95,7 +94,7 @@ public class Level implements Renderable, Tickable {
         }
         enemy.render();
         player.render();
-        //pathfinder.render();
+        pathfinder.render();
 
         glPopMatrix();
     }
@@ -150,6 +149,14 @@ public class Level implements Renderable, Tickable {
 
     public Pathfinder getPathfinder() {
         return this.pathfinder;
+    }
+
+    public void addEntity(Entity.PlayableEntity e) {
+        pathfinder.addEntity(e);
+    }
+
+    public void removeEntity(Entity.PlayableEntity e) {
+        pathfinder.removeEntity(e);
     }
 
     public Entity entityAt(float levelX, float levelY) {

@@ -29,6 +29,8 @@ public class Tile implements Renderable {
             {true, true, true, true, true, true, true, true, true, true, true, true, true};
     public static final boolean[] PASS_NONE =
             {false, false, false, false, false, false, false, false, false, false, false, false, false};
+    public static final boolean[] PASS_EDGES =
+            {false, false, true, false, false, false, true, false, false, false, false, false, false};
     public static final boolean[][] PASS_START = {
             PASS_ALL, //0
             PASS_ALL, //1
@@ -66,7 +68,7 @@ public class Tile implements Renderable {
             {true, true, true, false, true, false, true, true, false, true, true, false, true}, //27
             {true, false, true, true, true, true, true, false, false, true, true, true, true}, //28
             {true, false, true, false, true, true, true, true, false, false, true, true, true}, //29
-            {true, true, true, true, true, false, true, false, false, true, true, true, false}, //30
+            {true, true, true, true, true, false, true, false, true, true, true, true, false}, //30
             {true, true, true, true, true, true, true, true, false, false, false, false, false},//31
             PASS_ALL                                                                            //32
     };
