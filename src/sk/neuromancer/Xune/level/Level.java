@@ -201,8 +201,16 @@ public class Level implements Renderable, Tickable {
         return (((float) screenPointX - Game.CENTER_X) / this.zoom) - this.xOff + Game.CENTER_X;
     }
 
+    public float getScreenX(float levelX) {
+        return (levelX + this.xOff - Game.CENTER_X) * this.zoom + Game.CENTER_X;
+    }
+
     public float getLevelY(double screenPointY) {
         return (((float) screenPointY - Game.CENTER_Y) / this.zoom) - this.yOff + Game.CENTER_Y;
+    }
+
+    public float getScreenY(float levelY) {
+        return (levelY + this.yOff - Game.CENTER_Y) * this.zoom + Game.CENTER_Y;
     }
 
     public static float tileX(int x, int y) {

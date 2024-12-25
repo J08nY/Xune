@@ -7,6 +7,7 @@ import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,9 +61,10 @@ public class EntityOwner implements Tickable, Renderable {
 
     @Override
     public void render() {
-        for (Entity e : entities) {
-            e.render();
-        }
+        entities.stream().sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
+        //for (Entity e : entities) {
+        //    e.render();
+        //}
         for (Effect e : effects) {
             e.render();
         }

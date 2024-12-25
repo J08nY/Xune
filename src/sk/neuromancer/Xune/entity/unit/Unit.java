@@ -4,6 +4,7 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
@@ -77,7 +78,9 @@ public abstract class Unit extends Entity.PlayableEntity {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
+        float screenY = owner.getLevel().getScreenY(y);
+        float depth = screenY / Game.DEFAULT_HEIGHT;
+        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, depth);
         this.sprite.render();
         if (isSelected) {
             SpriteSheet.MISC_SHEET.getSprite(0, 0).render();

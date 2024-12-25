@@ -32,6 +32,7 @@ public class Window {
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
         glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+        glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
         long monitor = glfwGetPrimaryMonitor();
         GLFWVidMode vidmode = glfwGetVideoMode(monitor);
@@ -48,7 +49,7 @@ public class Window {
             );
         }
         glfwMakeContextCurrent(handle);
-        //glfwSwapInterval(1);
+        glfwSwapInterval(1);
 
         GL.createCapabilities();
 
@@ -57,7 +58,8 @@ public class Window {
         glLoadIdentity();
         glOrtho(0, width, height, 0, -1, 1);
 
-        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

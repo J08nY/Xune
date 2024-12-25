@@ -1,5 +1,6 @@
 package sk.neuromancer.Xune.entity;
 
+import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.Sprite;
@@ -103,7 +104,9 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         @Override
         public void render() {
             glPushMatrix();
-            glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
+            float screenY = owner.getLevel().getScreenY(y);
+            float depth = screenY / Game.DEFAULT_HEIGHT;
+            glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, depth);
             this.sprite.render();
             glPopMatrix();
             if (isSelected) {
