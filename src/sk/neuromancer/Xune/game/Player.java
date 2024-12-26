@@ -7,10 +7,7 @@ import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.level.Level;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static sk.neuromancer.Xune.game.Game.TPS;
 import static sk.neuromancer.Xune.level.Level.tileCenterX;
@@ -84,6 +81,7 @@ public class Player extends EntityOwner {
 
     private void handleRightClick() {
         for (PlayableEntity e : entities) {
+            selected.remove(e);
             e.unselect();
         }
     }

@@ -96,7 +96,9 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
                 Command current = commands.getFirst();
                 current.execute(this, tickCount);
                 if (current.isFinished(this)) {
+                    System.out.println("Command finished" + current + " " + this);
                     commands.removeFirst();
+                    current.finalize(this);
                 }
             }
         }

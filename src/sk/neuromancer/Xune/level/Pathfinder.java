@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 
 import java.util.*;
@@ -9,15 +10,17 @@ import java.util.*;
 import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.level.Tile.*;
 
-public class Pathfinder implements Renderable {
+public class Pathfinder implements Tickable, Renderable {
     private final Level l;
     private final PassMap levelMap;
     private final PassMap buildingMap;
+    private final List<Path> paths;
 
     public Pathfinder(Level l) {
         this.l = l;
         this.levelMap = new PassMap(l.getWidthInTiles(), l.getHeightInTiles());
         this.buildingMap = new PassMap(l.getWidthInTiles(), l.getHeightInTiles());
+        this.paths = new LinkedList<>();
 
         fillLevelMap(l);
     }
@@ -33,9 +36,19 @@ public class Pathfinder implements Renderable {
     }
 
     public Path find(Point src, Point dest) {
-        if (!isPassable(src) || !isPassable(dest)) {
+        if (!isPassable(src)) {
             return null;
         }
+        if (!isPassable(dest)) {
+            //XXX: This changes the path and thus the command gets confused before finishing up.
+            for (Point alt : getNeighbors(dest)) {
+                if (isPassable(alt)) {
+                    dest = alt;
+                    break;
+                }
+            }
+        }
+        //TODO: Keep track of paths that are already calculated
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingDouble(n -> n.f));
         Map<Point, Node> allNodes = new HashMap<>();
 
@@ -53,6 +66,7 @@ public class Pathfinder implements Renderable {
                 printPass(path);
                 System.out.println("Searched: " + searched);
                 System.out.println("Path length: " + path.p.length);
+                paths.add(path);
                 return path;
             }
 
@@ -139,6 +153,26 @@ public class Pathfinder implements Renderable {
         return levelMap.isPassable(p) && !buildingMap.isPassable(p);
     }
 
+    public void addEntity(Entity.PlayableEntity e) {
+        if (e instanceof Building building) {
+            buildingMap.setTile(building.tileX, building.tileY, negate(building.getPassable()));
+        }
+    }
+
+    private boolean[] negate(boolean[] passEdges) {
+        boolean[] negated = new boolean[passEdges.length];
+        for (int i = 0; i < passEdges.length; i++) {
+            negated[i] = !passEdges[i];
+        }
+        return negated;
+    }
+
+    public void removeEntity(Entity.PlayableEntity e) {
+        if (e instanceof Building building) {
+            buildingMap.resetTile(building.tileX, building.tileY);
+        }
+    }
+
     public static int levelXToGrid(float x) {
         return Math.round(x / ((float) TILE_WIDTH / 4));
     }
@@ -153,6 +187,11 @@ public class Pathfinder implements Renderable {
 
     public static float gridYToLevel(int y) {
         return y * ((float) (TILE_HEIGHT + 1) / 4) - 0.5f;
+    }
+
+    @Override
+    public void tick(int tickCount) {
+        paths.clear();
     }
 
     @Override
@@ -180,25 +219,6 @@ public class Pathfinder implements Renderable {
         glEnd();
     }
 
-    public void addEntity(Entity.PlayableEntity e) {
-        if (e instanceof Building building) {
-            buildingMap.setTile(building.tileX, building.tileY, negate(building.getPassable()));
-        }
-    }
-
-    private boolean[] negate(boolean[] passEdges) {
-        boolean[] negated = new boolean[passEdges.length];
-        for (int i = 0; i < passEdges.length; i++) {
-            negated[i] = !passEdges[i];
-        }
-        return negated;
-    }
-
-    public void removeEntity(Entity.PlayableEntity e) {
-        if (e instanceof Building building) {
-            buildingMap.resetTile(building.tileX, building.tileY);
-        }
-    }
 
     private static class PassMap {
         private final boolean[][] pass;

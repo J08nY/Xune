@@ -10,6 +10,8 @@ public abstract class Command {
 
     public abstract void execute(Entity entity, int tickCount);
 
+    public abstract void finalize(Entity entity);
+
     public abstract boolean isFinished(Entity entity);
 
     public static class FlyCommand extends Command {
@@ -45,13 +47,16 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (isFinished(unit)) {
-                    unit.setPosition(toX, toY);
-                } else {
-                    unit.move(toX, toY);
-                }
+                unit.move(toX, toY);
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
+            }
+        }
+
+        @Override
+        public void finalize(Entity entity) {
+            if (entity instanceof Unit unit) {
+                unit.setPosition(toX, toY);
             }
         }
     }
@@ -72,6 +77,7 @@ public abstract class Command {
             if (this.path == null) {
                 throw new IllegalArgumentException("No path found");
             }
+            stop = path.getPoints()[path.getPoints().length - 1];
 
             this.fromX = start.getLevelX();
             this.fromY = start.getLevelY();
@@ -110,14 +116,17 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (isFinished(unit)) {
-                    unit.setPosition(toX, toY);
-                } else {
-                    unit.move(getNext().getLevelX(), getNext().getLevelY());
-                    update(unit.x, unit.y);
-                }
+                unit.move(getNext().getLevelX(), getNext().getLevelY());
+                update(unit.x, unit.y);
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
+            }
+        }
+
+        @Override
+        public void finalize(Entity entity) {
+            if (entity instanceof Unit unit) {
+                unit.setPosition(toX, toY);
             }
         }
     }
@@ -142,6 +151,10 @@ public abstract class Command {
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
+        }
+
+        @Override
+        public void finalize(Entity entity) {
         }
     }
 
@@ -174,15 +187,23 @@ public abstract class Command {
                 } else {
                     if ((target.x != targetX || target.y != targetY) && tickCount % 30 == 0) {
                         // Target moved, update
-                        targetX = target.x;
-                        targetY = target.y;
-                        move = new MoveCommand(entity.x, entity.y, target.x, target.y, pathfinder);
+                        try {
+                            move = new MoveCommand(entity.x, entity.y, target.x, target.y, pathfinder);
+                            targetX = target.x;
+                            targetY = target.y;
+                        } catch (IllegalArgumentException e) {
+                            return;
+                        }
                     }
                     move.execute(entity, tickCount);
                 }
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
+        }
+
+        @Override
+        public void finalize(Entity entity) {
         }
     }
 
@@ -223,6 +244,10 @@ public abstract class Command {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
         }
+
+        @Override
+        public void finalize(Entity entity) {
+        }
     }
 
     public static class ProduceCommand extends Command {
@@ -257,6 +282,10 @@ public abstract class Command {
         @Override
         public boolean isFinished(Entity entity) {
             return finished;
+        }
+
+        @Override
+        public void finalize(Entity entity) {
         }
     }
 }
