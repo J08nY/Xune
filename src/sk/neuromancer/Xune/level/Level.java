@@ -48,32 +48,73 @@ public class Level implements Renderable, Tickable {
         InputHandler input = this.game.getInput();
 
         if (input.PLUS.isPressed()) {
-            this.zoom *= 1 + ZOOM_SPEED;
+            zoomIn();
         } else if (input.MINUS.isPressed()) {
-            if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
-                this.zoom *= 1 - ZOOM_SPEED;
+            zoomOut();
         }
 
         float dy = input.scroller.getDeltaY();
         if (dy > 0) {
-            this.zoom *= 1 + SCROLL_SPEED;
+            zoomIn();
         } else if (dy < 0) {
-            if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
-                this.zoom *= 1 - SCROLL_SPEED;
+            zoomOut();
         }
 
-        if (input.W.isPressed() && getLevelY(0) > -EDGE_MARGIN_Y) {
-            this.yOff += MOVE_SPEED * (1 / zoom);
-        } else if (input.A.isPressed() && getLevelX(0) > -EDGE_MARGIN_X) {
-            this.xOff += MOVE_SPEED * (1 / zoom);
-        } else if (input.S.isPressed() && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
-            this.yOff -= MOVE_SPEED * (1 / zoom);
-        } else if (input.D.isPressed() && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
-            this.xOff -= MOVE_SPEED * (1 / zoom);
+        float dx = input.scroller.getDeltaX();
+        if (dx > 0) {
+            moveLeft();
+        } else if (dx < 0) {
+            moveRight();
+        }
+
+        double mouseX = input.mouse.getX();
+        double mouseY = input.mouse.getY();
+
+        if (input.W.isPressed() || mouseY < 10) {
+            moveUp();
+        } else if (input.A.isPressed() || mouseX < 10) {
+            moveLeft();
+        } else if (input.S.isPressed() || mouseY > game.getWindow().getHeight() - 10) {
+            moveDown();
+        } else if (input.D.isPressed() || mouseX > game.getWindow().getWidth() - 10) {
+            moveRight();
         }
 
         player.tick(tickCount);
         enemy.tick(tickCount);
+    }
+
+    public void zoomIn() {
+        this.zoom *= 1 + ZOOM_SPEED;
+    }
+
+    public void zoomOut() {
+        if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
+            this.zoom *= 1 - SCROLL_SPEED;
+    }
+
+    public void moveUp() {
+        if (getLevelY(0) > -EDGE_MARGIN_Y) {
+            this.yOff += MOVE_SPEED * (1 / zoom);
+        }
+    }
+
+    public void moveDown() {
+        if (getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
+            this.yOff -= MOVE_SPEED * (1 / zoom);
+        }
+    }
+
+    public void moveLeft() {
+        if (getLevelX(0) > -EDGE_MARGIN_X) {
+            this.xOff += MOVE_SPEED * (1 / zoom);
+        }
+    }
+
+    public void moveRight() {
+        if (getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
+            this.xOff -= MOVE_SPEED * (1 / zoom);
+        }
     }
 
     @Override

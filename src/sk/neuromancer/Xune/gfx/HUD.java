@@ -27,6 +27,8 @@ public class HUD implements Tickable, Renderable {
         this.width = game.getWindow().getWidth();
         this.height = game.getWindow().getHeight();
         glfwSetInputMode(game.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        // TODO: This does nothing. Why?
+        glfwSetCursorPos(game.getWindow().getHandle(), (double) width / 2, (double) height / 2);
         currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
 
         logo = SpriteSheet.LOGO.getSprite(0);
@@ -91,15 +93,25 @@ public class HUD implements Tickable, Renderable {
         mouseX = mouse.getX();
         mouseY = mouse.getY();
 
-        if (mouseX < -20) {
-            mouseX = -20;
-        } else if (mouseX > width + 20) {
-            mouseX = width + 20;
+        boolean hitEdge = false;
+
+        if (mouseX < 10) {
+            mouseX = 10;
+            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(7);
+            hitEdge = true;
+        } else if (mouseX > width - 10) {
+            mouseX = width - 10;
+            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(5);
+            hitEdge = true;
         }
-        if (mouseY < -20) {
-            mouseY = -20;
-        } else if (mouseY > height + 20) {
-            mouseY = height + 20;
+        if (mouseY < 10) {
+            mouseY = 10;
+            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(4);
+            hitEdge = true;
+        } else if (mouseY > height - 10) {
+            mouseY = height - 10;
+            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(6);
+            hitEdge = true;
         }
         glfwSetCursorPos(game.getWindow().getHandle(), mouseX, mouseY);
 
@@ -107,20 +119,22 @@ public class HUD implements Tickable, Renderable {
         fromX = mouse.getLastLeftX();
         fromY = mouse.getLastLeftY();
 
-        if (game.getLevel().getPlayer().getSelected().isEmpty()) {
-            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
-        } else {
-            Entity entity = game.getLevel().entityAt(game.getLevel().getLevelX(mouseX), game.getLevel().getLevelY(mouseY));
-            if (entity != null) {
-                if (entity instanceof Entity.PlayableEntity playable) {
-                    if (playable.getOwner() == game.getLevel().getPlayer()) {
-                        currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
-                    } else {
-                        currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
-                    }
-                }
+        if (!hitEdge) {
+            if (game.getLevel().getPlayer().getSelected().isEmpty()) {
+                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
             } else {
-                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
+                Entity entity = game.getLevel().entityAt(game.getLevel().getLevelX(mouseX), game.getLevel().getLevelY(mouseY));
+                if (entity != null) {
+                    if (entity instanceof Entity.PlayableEntity playable) {
+                        if (playable.getOwner() == game.getLevel().getPlayer()) {
+                            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
+                        } else {
+                            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
+                        }
+                    }
+                } else {
+                    currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
+                }
             }
         }
     }
