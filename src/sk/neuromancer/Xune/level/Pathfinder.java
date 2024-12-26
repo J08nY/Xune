@@ -361,19 +361,18 @@ public class Pathfinder implements Renderable {
 
         @Override
         public void render() {
+            glEnable(GL_POINT_SMOOTH);
+            glPointSize(10);
+            glBegin(GL_POINTS);
+            glColor4f(0, 0, 0, 0.4f);
             for (Point point : p) {
                 float x = point.getLevelX();
                 float y = point.getLevelY();
-
-                glEnable(GL_POINT_SMOOTH);
-                glPointSize(10);
-                glBegin(GL_POINTS);
-                glColor4f(0, 0, 0, 0.4f);
                 glVertex3f(x, y, 0);
-                glColor4f(1, 1, 1, 1);
-                glEnd();
-                glDisable(GL_POINT_SMOOTH);
             }
+            glColor4f(1, 1, 1, 1);
+            glEnd();
+            glDisable(GL_POINT_SMOOTH);
         }
     }
 

@@ -7,15 +7,18 @@ import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.level.Level;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static sk.neuromancer.Xune.game.Game.TPS;
 import static sk.neuromancer.Xune.level.Level.tileCenterX;
 import static sk.neuromancer.Xune.level.Level.tileCenterY;
 
 public class Player extends EntityOwner {
-    private List<PlayableEntity> selected = new LinkedList<>();
+    private final List<PlayableEntity> selected = new LinkedList<>();
+    private final Map<Class<? extends PlayableEntity>, CommandStrategy> commandStrategies = new HashMap<>();
 
     public Player(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
@@ -33,6 +36,9 @@ public class Player extends EntityOwner {
         Buggy buggy = new Buggy(tileCenterX(6, 6), tileCenterY(6, 6), Orientation.EAST, this, this.flag);
         Command produceBuggy = new Command.ProduceCommand(TPS * 5, buggy);
         factory.pushCommand(produceBuggy);
+
+        commandStrategies.put(Heli.class, new CommandStrategy.AirStrategy());
+        commandStrategies.put(Buggy.class, new CommandStrategy.GroundStrategy());
     }
 
     @Override
@@ -99,35 +105,24 @@ public class Player extends EntityOwner {
     }
 
     private void handleLeftClick(float levelX, float levelY) {
-        PlayableEntity only = selected.size() == 1 ? selected.getFirst() : null;
-        for (PlayableEntity e : entities) {
-            if (e.intersects(levelX, levelY)) {
-                selected.add(e);
-                e.select();
+        Entity other = level.entityAt(levelX, levelY);
+        if (other instanceof PlayableEntity playable && entities.contains(playable)) {
+            if (selected.contains(playable)) {
+                selected.remove(playable);
+                playable.unselect();
             } else {
-                selected.remove(e);
-                e.unselect();
+                selected.add(playable);
+                playable.select();
             }
+            return;
         }
 
-        System.out.println("Selected: " + selected.size());
-        Entity other = level.entityAt(levelX, levelY);
-
-        if (selected.isEmpty() && only != null) {
-            if (only instanceof Heli) {
-                Command fly = new Command.FlyCommand(only.x, only.y, levelX, levelY);
-                only.pushCommand(fly);
-            } else if (only instanceof Buggy) {
-                try {
-                    if (other != null) {
-                        Command attack = new Command.MoveAndAttackCommand(only.x, only.y, level.getPathfinder(), other);
-                        only.pushCommand(attack);
-                    } else {
-                        Command move = new Command.MoveCommand(only.x, only.y, levelX, levelY, level.getPathfinder());
-                        only.pushCommand(move);
-                    }
-                } catch (IllegalArgumentException e) {
-                    System.out.println("No path found");
+        for (PlayableEntity only : selected) {
+            CommandStrategy strategy = commandStrategies.get(only.getClass());
+            if (strategy != null) {
+                Command command = strategy.createCommand(only, other, level, levelX, levelY);
+                if (command != null) {
+                    only.pushCommand(command);
                 }
             }
         }

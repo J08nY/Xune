@@ -1,9 +1,12 @@
 package sk.neuromancer.Xune.entity.unit;
 
+import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+
+import static org.lwjgl.opengl.GL11.*;
 
 
 public class Heli extends Unit {
@@ -13,6 +16,32 @@ public class Heli extends Unit {
         super(x, y, orientation, owner, flag, 100, 1.5f, 30f, 10, 2);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
+    }
+
+    @Override
+    public void render() {
+        Command current = currentCommand();
+        if (current instanceof Command.FlyCommand fly) {
+            glEnable(GL_POINT_SMOOTH);
+            glPointSize(10);
+            glBegin(GL_POINTS);
+            glColor4f(0, 0, 0, 0.4f);
+            float dx = fly.getToX() - fly.getFromX();
+            float dy = fly.getToY() - fly.getFromY();
+            float d = (float) Math.sqrt(dx * dx + dy * dy);
+            for (float i = 0; i < d; i += 6) {
+                float cx = fly.getFromX() + dx * i / d;
+                float cy = fly.getFromY() + dy * i / d;
+                if (Math.abs(cx - fly.getToX()) < Math.abs(x - fly.getToX()) &&
+                        Math.abs(cy - fly.getToY()) < Math.abs(y - fly.getToY())) {
+                    glVertex2f(cx, cy);
+                }
+            }
+            glColor4f(1, 1, 1, 1);
+            glEnd();
+            glDisable(GL_POINT_SMOOTH);
+        }
+        super.render();
     }
 
     @Override

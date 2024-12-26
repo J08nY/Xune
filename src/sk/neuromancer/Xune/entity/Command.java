@@ -3,10 +3,8 @@ package sk.neuromancer.Xune.entity;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.level.Pathfinder;
-import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.Arrays;
-import java.util.Random;
 
 public abstract class Command {
 
@@ -26,6 +24,22 @@ public abstract class Command {
 
         public boolean isFinished(Entity entity) {
             return Math.abs(entity.x - toX) <= 1.5 && Math.abs(entity.y - toY) <= 1.5;
+        }
+
+        public float getFromX() {
+            return fromX;
+        }
+
+        public float getFromY() {
+            return fromY;
+        }
+
+        public float getToX() {
+            return toX;
+        }
+
+        public float getToY() {
+            return toY;
         }
 
         @Override
@@ -172,13 +186,52 @@ public abstract class Command {
         }
     }
 
+    public static class FlyAndAttackCommand extends Command {
+        private FlyCommand move;
+        private AttackCommand attack;
+        private Entity target;
+        private float targetX, targetY;
+
+        public FlyAndAttackCommand(float fromX, float fromY, Entity target) {
+            this.move = new FlyCommand(fromX, fromY, target.x, target.y);
+            this.attack = new AttackCommand(target);
+            this.target = target;
+            this.targetX = target.x;
+            this.targetY = target.y;
+        }
+
+        @Override
+        public boolean isFinished(Entity entity) {
+            return attack.isFinished(entity);
+        }
+
+        @Override
+        public void execute(Entity entity, int tickCount) {
+            if (entity instanceof Unit unit) {
+                if (unit.inRange(target)) {
+                    attack.execute(entity, tickCount);
+                } else {
+                    if ((target.x != targetX || target.y != targetY) && tickCount % 30 == 0) {
+                        // Target moved, update
+                        targetX = target.x;
+                        targetY = target.y;
+                        move = new FlyCommand(unit.x, unit.y, target.x, target.y);
+                    }
+                    move.execute(entity, tickCount);
+                }
+            } else {
+                throw new IllegalArgumentException("Entity must be a unit.");
+            }
+        }
+    }
+
     public static class ProduceCommand extends Command {
         private int start;
         private boolean started;
         private boolean finished;
-        private int duration;
+        private final int duration;
 
-        private Entity.PlayableEntity result;
+        private final Entity.PlayableEntity result;
 
         public ProduceCommand(int duration, Entity.PlayableEntity result) {
             this.duration = duration;
