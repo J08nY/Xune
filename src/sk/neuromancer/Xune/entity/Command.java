@@ -2,7 +2,9 @@ package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;
-import sk.neuromancer.Xune.level.Pathfinder;
+import sk.neuromancer.Xune.level.paths.Pathfinder;
+import sk.neuromancer.Xune.level.paths.Path;
+import sk.neuromancer.Xune.level.paths.Point;
 
 import java.util.Arrays;
 
@@ -63,7 +65,7 @@ public abstract class Command {
 
     public static class MoveCommand extends Command {
         private final float fromX, fromY, toX, toY;
-        private final Pathfinder.Path path;
+        private final Path path;
         private int next;
 
         public MoveCommand(float fromX, float fromY, float toX, float toY, Pathfinder pathFinder) {
@@ -71,8 +73,8 @@ public abstract class Command {
             int startY = Pathfinder.levelYToGrid(fromY);
             int stopX = Pathfinder.levelXToGrid(toX);
             int stopY = Pathfinder.levelYToGrid(toY);
-            Pathfinder.Point start = new Pathfinder.Point(startX, startY);
-            Pathfinder.Point stop = new Pathfinder.Point(stopX, stopY);
+            Point start = new Point(startX, startY);
+            Point stop = new Point(stopX, stopY);
             this.path = pathFinder.find(start, stop);
             if (this.path == null) {
                 throw new IllegalArgumentException("No path found");
@@ -86,24 +88,24 @@ public abstract class Command {
             this.next = 0;
         }
 
-        public Pathfinder.Point getNext() {
+        public Point getNext() {
             return path.getPoints()[next];
         }
 
-        public Pathfinder.Path getPath() {
+        public Path getPath() {
             return path;
         }
 
-        public Pathfinder.Path getNextPath() {
-            Pathfinder.Point[] points = path.getPoints();
-            return new Pathfinder.Path(Arrays.copyOfRange(points, next, points.length));
+        public Path getNextPath() {
+            Point[] points = path.getPoints();
+            return new Path(Arrays.copyOfRange(points, next, points.length));
         }
 
         private void update(float x, float y) {
             if (this.next == path.getPoints().length - 1) {
                 return;
             }
-            Pathfinder.Point next = path.getPoints()[this.next];
+            Point next = path.getPoints()[this.next];
             if (Math.abs(x - next.getLevelX()) <= 1.5 && Math.abs(y - next.getLevelY()) <= 1.5) {
                 this.next++;
             }

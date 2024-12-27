@@ -7,6 +7,7 @@ import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.level.paths.Pathfinder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -82,6 +83,7 @@ public class Level implements Renderable, Tickable {
 
         player.tick(tickCount);
         enemy.tick(tickCount);
+        pathfinder.tick(tickCount);
     }
 
     public void zoomIn() {
