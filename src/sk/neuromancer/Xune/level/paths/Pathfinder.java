@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.level.paths;
 
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.Level;
@@ -47,7 +48,7 @@ public class Pathfinder implements Tickable, Renderable {
             return false;
         }
         for (Point end : ends) {
-            if (end.equals(dest) || isNextTo(end, dest)) {
+            if (end.equals(dest) || end.isNextTo(dest)) {
                 return false;
             }
         }
@@ -89,9 +90,6 @@ public class Pathfinder implements Tickable, Renderable {
     }
 
     public Path find(Point src, Point dest) {
-        //if (!isPassable(src)) {
-        //    return null;
-        //}
         dest = findValidDestination(dest, 50);
         if (dest == null) {
             return null;
@@ -99,7 +97,7 @@ public class Pathfinder implements Tickable, Renderable {
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingDouble(n -> n.f));
         Map<Point, Node> allNodes = new HashMap<>();
 
-        Node startNode = new Node(src, null, 0, heuristic(src, dest));
+        Node startNode = new Node(src, null, 0, src.heuristic(dest));
         openSet.add(startNode);
         allNodes.put(src, startNode);
 
@@ -120,12 +118,12 @@ public class Pathfinder implements Tickable, Renderable {
             for (Point neighbor : current.point.getNeighbors()) {
                 if (!isPassable(neighbor)) continue;
 
-                double tentativeG = current.g + distance(current.point, neighbor);
+                double tentativeG = current.g + current.point.distance(neighbor);
                 Node neighborNode = allNodes.getOrDefault(neighbor, new Node(neighbor));
 
                 if (tentativeG < neighborNode.g) {
                     neighborNode.g = tentativeG;
-                    neighborNode.f = tentativeG + heuristic(neighbor, dest);
+                    neighborNode.f = tentativeG + neighbor.heuristic(dest);
                     neighborNode.cameFrom = current;
                     openSet.add(neighborNode);
                     allNodes.put(neighbor, neighborNode);
@@ -176,18 +174,6 @@ public class Pathfinder implements Tickable, Renderable {
         return new Path(path.toArray(new Point[0]));
     }
 
-    private double heuristic(Point a, Point b) {
-        return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
-    }
-
-    private double distance(Point a, Point b) {
-        return Math.hypot(a.x - b.x, a.y - b.y);
-    }
-
-    private boolean isNextTo(Point p, Point q) {
-        return Math.abs(p.x - q.x) <= 1 && Math.abs(p.y - q.y) <= 1;
-    }
-
     private boolean isPassable(Point p) {
         return levelMap.isPassable(p) && !buildingMap.isPassable(p) && !entityMap.isPassable(p);
     }
@@ -195,9 +181,11 @@ public class Pathfinder implements Tickable, Renderable {
     public void addEntity(Entity.PlayableEntity e) {
         if (e instanceof Building building) {
             buildingMap.setTile(building.tileX, building.tileY, negate(building.getPassable()));
-        } else {
-            entities.add(e);
-            entityMap.set(levelXToGrid(e.x), levelYToGrid(e.y));
+        } else if (e instanceof Unit unit) {
+            entities.add(unit);
+            for (Point point : unit.getOccupied()) {
+                entityMap.set(point);
+            }
         }
     }
 
@@ -212,9 +200,11 @@ public class Pathfinder implements Tickable, Renderable {
     public void removeEntity(Entity.PlayableEntity e) {
         if (e instanceof Building building) {
             buildingMap.resetTile(building.tileX, building.tileY);
-        } else {
-            entities.remove(e);
-            entityMap.reset(levelXToGrid(e.x), levelYToGrid(e.y));
+        } else if (e instanceof Unit unit) {
+            entities.remove(unit);
+            for (Point point : unit.getOccupied()) {
+                entityMap.reset(point);
+            }
         }
     }
 
@@ -239,7 +229,11 @@ public class Pathfinder implements Tickable, Renderable {
         paths.clear();
         entityMap.resetAll();
         for (Entity e : entities) {
-            entityMap.set(levelXToGrid(e.x), levelYToGrid(e.y));
+            if (e instanceof Unit unit) {
+                for (Point point : unit.getOccupied()) {
+                    entityMap.set(point);
+                }
+            }
         }
     }
 

@@ -16,6 +16,8 @@ public class Effect implements Tickable, Renderable {
     private Sprite sprite;
 
     public static int EXPLOSION = 0;
+    public static int SPARKLE = 8;
+    public static int FIRE = 16;
 
     Effect(float x, float y, int type, int length, int duration, DoubleUnaryOperator ease) {
         this.x = x;
@@ -53,6 +55,18 @@ public class Effect implements Tickable, Renderable {
     public static class Explosion extends Effect {
         public Explosion(float x, float y) {
             super(x, y, EXPLOSION, 8, 200, Ease::easeOutSine);
+        }
+    }
+
+    public static class Sparkle extends Effect {
+        public Sparkle(float x, float y) {
+            super(x, y, SPARKLE, 4, 250, Ease::linear);
+        }
+    }
+
+    public static class Fire extends Effect {
+        public Fire(float x, float y) {
+            super(x, y - 10, FIRE, 8, 1000, Ease::linear);
         }
     }
 }

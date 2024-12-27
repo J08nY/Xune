@@ -5,7 +5,7 @@ import sk.neuromancer.Xune.level.Level;
 public abstract class CommandStrategy {
     public abstract Command createCommand(Entity entity, Entity other, Level level, float levelX, float levelY);
 
-    public static class GroundStrategy extends CommandStrategy {
+    public static class GroundAttackStrategy extends CommandStrategy {
         @Override
         public Command createCommand(Entity entity, Entity other, Level level, float levelX, float levelY) {
             try {
@@ -21,13 +21,26 @@ public abstract class CommandStrategy {
         }
     }
 
-    public static class AirStrategy extends CommandStrategy {
+    public static class AirAttackStrategy extends CommandStrategy {
         @Override
         public Command createCommand(Entity entity, Entity other, Level level, float levelX, float levelY) {
             if (other != null) {
                 return new Command.FlyAndAttackCommand(entity.x, entity.y, other);
             } else {
                 return new Command.FlyCommand(entity.x, entity.y, levelX, levelY);
+            }
+        }
+    }
+
+    public static class SpiceCollectStrategy extends CommandStrategy {
+
+        @Override
+        public Command createCommand(Entity entity, Entity other, Level level, float levelX, float levelY) {
+            try {
+                return new Command.MoveCommand(entity.x, entity.y, levelX, levelY, level.getPathfinder());
+            } catch (IllegalArgumentException e) {
+                System.out.println("No path found");
+                return null;
             }
         }
     }

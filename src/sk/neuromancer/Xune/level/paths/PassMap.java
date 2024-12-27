@@ -81,6 +81,14 @@ public class PassMap {
         fillTile(set, col, row, PASS_NONE);
     }
 
+    public void set(Point p) {
+        set(p.x, p.y);
+    }
+
+    public void reset(Point p) {
+        reset(p.x, p.y);
+    }
+
     public void set(int col, int row) {
         pass[row][col] = true;
         set[row][col] = true;

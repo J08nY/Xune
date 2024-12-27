@@ -5,6 +5,7 @@ import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.level.paths.Point;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -13,7 +14,7 @@ public class Heli extends Unit {
     private boolean wing;
 
     public Heli(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 100, 1.5f, 30f, 10, 2);
+        super(x, y, orientation, owner, flag, 100, 1.2f, 30f, 10, 2);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
     }
@@ -63,5 +64,9 @@ public class Heli extends Unit {
             animation = (i % 4) * 2 + SpriteSheet.SPRITE_ROW_LENGTH;
         }
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_HELI + SpriteSheet.flagToOffset(flag) + (wing ? 1 : 0) + animation);
+    }
+
+    public Point[] getOccupied() {
+        return new Point[]{};
     }
 }

@@ -33,6 +33,25 @@ public abstract class Building extends Entity.PlayableEntity {
         this.sprite.render();
         if (isSelected) {
             SpriteSheet.MISC_SHEET.getSprite(1, 0).render();
+            glPushMatrix();
+            glTranslatef(0, sprite.getHeight(), 0);
+            glBegin(GL_QUADS);
+            glColor3f(0, 1, 0);
+            float healthPercentage = (float) health / maxHealth;
+            for (int i = 0; i < 12; i++) {
+                if (i < healthPercentage * 12) {
+                    glColor3f(0, 1, 0);
+                } else {
+                    glColor3f(1, 0, 0);
+                }
+                glVertex2f(((float) 25 / 12) * i, 0);
+                glVertex2f(((float) 25 / 12) * i + 1, 0);
+                glVertex2f(((float) 25 / 12) * i + 1, 1);
+                glVertex2f(((float) 25 / 12) * i, 1);
+            }
+            glEnd();
+            glColor3f(1, 1, 1);
+            glPopMatrix();
         }
         glPopMatrix();
     }

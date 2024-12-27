@@ -30,6 +30,22 @@ public class Point {
         return Pathfinder.gridYToLevel(y);
     }
 
+    public Point add(Point other) {
+        return new Point(x + other.x, y + other.y);
+    }
+
+    public boolean isNextTo(Point q) {
+        return Math.abs(x - q.x) <= 1 && Math.abs(y - q.y) <= 1;
+    }
+
+    public double distance(Point b) {
+        return Math.hypot(x - b.x, y - b.y);
+    }
+
+    public double heuristic(Point b) {
+        return Math.max(Math.abs(x - b.x), Math.abs(y - b.y));
+    }
+
     public Point[] getNeighbors() {
         if ((x + y) % 2 == 0) {
             return new Point[]{
@@ -56,5 +72,6 @@ public class Point {
     public String toString() {
         return "Point{" + "x=" + x + ", y=" + y + '}';
     }
+
 
 }

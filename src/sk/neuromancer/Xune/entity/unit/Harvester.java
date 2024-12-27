@@ -1,15 +1,18 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.Command;
+import sk.neuromancer.Xune.entity.EntityOwner;
+import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 
-public class Buggy extends Unit {
-    public Buggy(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 100, 0.5f, 20f, 30, 10);
+public class Harvester extends Unit {
+    public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
+        super(x, y, orientation, owner, flag, 300, 0.07f, 0, 0, 0);
         updateSprite();
-        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, false));
+        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6, false));
     }
 
     @Override
@@ -25,7 +28,7 @@ public class Buggy extends Unit {
     protected void updateSprite() {
         int spriteRow = orientation.ordinal() / 4;
         int spriteOffset = orientation.ordinal() % 4;
-        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_BUGGY + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH + spriteOffset);
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_HARVESTER + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH + spriteOffset);
     }
 
     public Point[] getOccupied() {

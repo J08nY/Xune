@@ -6,6 +6,7 @@ import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.level.paths.Point;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -68,7 +69,7 @@ public abstract class Unit extends Entity.PlayableEntity {
     public void tick(int tickCount) {
         super.tick(tickCount);
         ready++;
-        if (ready % rate == 0) {
+        if (rate != 0 && ready % rate == 0) {
             ready = 0;
         }
     }
@@ -106,4 +107,6 @@ public abstract class Unit extends Entity.PlayableEntity {
         }
         glPopMatrix();
     }
+
+    public abstract Point[] getOccupied();
 }

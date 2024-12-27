@@ -1,5 +1,6 @@
 package sk.neuromancer.Xune.entity;
 
+import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Effect;
@@ -88,8 +89,11 @@ public class EntityOwner implements Tickable, Renderable {
     protected void handleDead() {
         for (Entity.PlayableEntity e : entities) {
             if (e.health == 0) {
-                toRemove.add(e);
+                removeEntity(e);
                 this.effects.add(new Effect.Explosion(e.x, e.y));
+                if (e instanceof Building) {
+                    this.effects.add(new Effect.Sparkle(e.x, e.y));
+                }
                 game.getSound().play(SoundManager.SOUND_EXPLOSION_1, false, 1.0f);
             }
         }
