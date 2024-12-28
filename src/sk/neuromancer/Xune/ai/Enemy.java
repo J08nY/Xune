@@ -16,7 +16,7 @@ public class Enemy extends EntityOwner {
         super(game, level, flag, money);
         this.addEntity(new Base(16, 8, Orientation.NORTH, this, this.flag));
         this.addEntity(new Refinery(16, 9, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Heli(Level.tileCenterX(14, 10), Level.tileCenterY(14, 10), Orientation.WEST, this, this.flag));
-        this.addEntity(new Buggy(Level.tileCenterX(13, 6), Level.tileCenterY(13, 6), Orientation.WEST, this, this.flag));
+        this.addEntity(new Heli(Level.tileToCenterLevelX(14, 10), Level.tileToCenterLevelY(14, 10), Orientation.WEST, this, this.flag));
+        this.addEntity(new Buggy(Level.tileToCenterLevelX(13, 6), Level.tileToCenterLevelY(13, 6), Orientation.WEST, this, this.flag));
     }
 }

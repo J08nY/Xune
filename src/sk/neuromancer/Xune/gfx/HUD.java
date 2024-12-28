@@ -140,17 +140,7 @@ public class HUD implements Tickable, Renderable {
     }
 
     private void renderText(float x, float y, String text) {
-        String charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ  0123456789.,!?'\"-+=/\\%()<>:;";
-        float textScaleFactor = SpriteSheet.TEXT_SHEET.getSprite(0).getScaleFactor();
-        float scaledSpriteWidth = SpriteSheet.TEXT_SHEET.getSprite(0).getWidth() * textScaleFactor;
-        text = text.toUpperCase();
-        for (int i = 0; i < text.length(); i++) {
-            int spriteId = charset.indexOf(text.charAt(i));
-            glPushMatrix();
-            glTranslated(x + scaledSpriteWidth * i, y, 0);
-            SpriteSheet.TEXT_SHEET.getSprite(spriteId).render();
-            glPopMatrix();
-        }
+        new Text(text, x, y).render();
     }
 
 }

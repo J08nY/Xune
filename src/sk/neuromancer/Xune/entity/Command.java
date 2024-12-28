@@ -1,9 +1,14 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.entity.building.Refinery;
+import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Unit;
-import sk.neuromancer.Xune.level.paths.Pathfinder;
+import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.level.Tile;
+import sk.neuromancer.Xune.level.paths.NoPathFound;
 import sk.neuromancer.Xune.level.paths.Path;
+import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 
 import java.util.Arrays;
@@ -77,7 +82,7 @@ public abstract class Command {
             Point stop = new Point(stopX, stopY);
             this.path = pathFinder.find(start, stop);
             if (this.path == null) {
-                throw new IllegalArgumentException("No path found");
+                throw new NoPathFound("No path found");
             }
             stop = path.getPoints()[path.getPoints().length - 1];
 
@@ -288,6 +293,89 @@ public abstract class Command {
 
         @Override
         public void finalize(Entity entity) {
+        }
+    }
+
+    public static class CollectSpiceCommand extends Command {
+        private final MoveCommand move;
+        private final Tile target;
+
+        public CollectSpiceCommand(float fromX, float fromY, Pathfinder pathfinder, Tile target) {
+            float targetX = Level.tileToCenterLevelX(target.getX(), target.getY());
+            float targetY = Level.tileToCenterLevelY(target.getX(), target.getY());
+            this.move = new MoveCommand(fromX, fromY, targetX, targetY, pathfinder);
+            this.target = target;
+        }
+
+        public Tile getTarget() {
+            return target;
+        }
+
+        public boolean collecting(Entity entity) {
+            return move.isFinished(entity) && !isFinished(entity);
+        }
+
+        @Override
+        public void execute(Entity entity, int tickCount) {
+            if (entity instanceof Harvester harvester) {
+                if (!move.isFinished(entity)) {
+                    move.execute(entity, tickCount);
+                } else {
+                    harvester.collectSpice(target);
+                }
+            } else {
+                throw new IllegalArgumentException("Entity must be a harvester.");
+            }
+        }
+
+        @Override
+        public boolean isFinished(Entity entity) {
+            if (entity instanceof Harvester harvester) {
+                return harvester.isFull() || target.getSpice() == 0;
+            } else {
+                throw new IllegalArgumentException("Entity must be a harvester.");
+            }
+        }
+
+        @Override
+        public void finalize(Entity entity) {
+            System.out.println("Spice collected");
+        }
+    }
+
+    public static class DropOffSpiceCommand extends Command {
+        private final MoveCommand move;
+        private final Refinery target;
+
+        public DropOffSpiceCommand(float fromX, float fromY, Pathfinder pathfinder, Refinery target) {
+            this.move = new MoveCommand(fromX, fromY, target.x, target.y, pathfinder);
+            this.target = target;
+        }
+
+        @Override
+        public void execute(Entity entity, int tickCount) {
+            if (entity instanceof Harvester harvester) {
+                if (!move.isFinished(entity)) {
+                    move.execute(entity, tickCount);
+                } else {
+                    harvester.dropOffSpice(target);
+                }
+            } else {
+                throw new IllegalArgumentException("Entity must be a harvester.");
+            }
+        }
+
+        @Override
+        public void finalize(Entity entity) {
+
+        }
+
+        @Override
+        public boolean isFinished(Entity entity) {
+            if (entity instanceof Harvester harvester) {
+                return harvester.getSpice() == 0;
+            }
+            return false;
         }
     }
 }

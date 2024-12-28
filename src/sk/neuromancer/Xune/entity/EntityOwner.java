@@ -1,6 +1,9 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.entity.unit.Buggy;
+import sk.neuromancer.Xune.entity.unit.Harvester;
+import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Effect;
@@ -8,9 +11,7 @@ import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 
 public class EntityOwner implements Tickable, Renderable {
@@ -22,12 +23,17 @@ public class EntityOwner implements Tickable, Renderable {
     protected List<Effect> effects = new LinkedList<>();
     protected int money;
     protected Flag flag;
+    protected final Map<Class<? extends Entity.PlayableEntity>, CommandStrategy> commandStrategies = new HashMap<>();
 
     public EntityOwner(Game game, Level level, Flag flag, int money) {
         this.game = game;
         this.level = level;
         this.flag = flag;
         this.money = money;
+
+        commandStrategies.put(Heli.class, new CommandStrategy.AirAttackStrategy());
+        commandStrategies.put(Buggy.class, new CommandStrategy.GroundAttackStrategy());
+        commandStrategies.put(Harvester.class, new CommandStrategy.SpiceCollectStrategy());
     }
 
     public void addEntity(Entity.PlayableEntity e) {
@@ -60,6 +66,14 @@ public class EntityOwner implements Tickable, Renderable {
         return money;
     }
 
+    public void addMoney(int money) {
+        this.money += money;
+    }
+
+    public void takeMoney(int money) {
+        this.money -= money;
+    }
+
     @Override
     public void render() {
         entities.stream().sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
@@ -82,6 +96,7 @@ public class EntityOwner implements Tickable, Renderable {
             e.tick(tickCount);
         }
         handleDead();
+        handleUnitBehavior();
         entities.removeAll(toRemove);
         toRemove.clear();
     }
@@ -98,5 +113,19 @@ public class EntityOwner implements Tickable, Renderable {
             }
         }
         effects.removeIf(Effect::isFinished);
+    }
+
+    private void handleUnitBehavior() {
+        for (Entity.PlayableEntity entity : entities) {
+            if (!entity.hasCommands()) {
+                CommandStrategy strategy = commandStrategies.get(entity.getClass());
+                if (strategy != null) {
+                    Command defaultCommand = strategy.defaultBehavior(entity, level);
+                    if (defaultCommand != null) {
+                        entity.pushCommand(defaultCommand);
+                    }
+                }
+            }
+        }
     }
 }

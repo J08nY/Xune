@@ -4,11 +4,20 @@ import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 
+import java.util.Random;
+
+import static org.lwjgl.opengl.GL11.*;
+
 public class Harvester extends Unit {
+    private int spice;
+    private Random rand = new Random();
+
     public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, orientation, owner, flag, 300, 0.07f, 0, 0, 0);
         updateSprite();
@@ -16,12 +25,33 @@ public class Harvester extends Unit {
     }
 
     @Override
+    public void tick(int tickCount) {
+        super.tick(tickCount);
+    }
+
+    @Override
     public void render() {
         Command current = currentCommand();
+        float sx = 0;
+        float sy = 0;
         if (current instanceof Command.MoveCommand move) {
             move.getNextPath().render();
+        } else if (current instanceof Command.CollectSpiceCommand collect) {
+            Tile target = collect.getTarget();
+            if (collect.collecting(this)) {
+                sx = rand.nextFloat();
+                sy = rand.nextFloat();
+            } else {
+                glPushMatrix();
+                glTranslatef(target.getLevelX(), target.getLevelY(), 0);
+                SpriteSheet.TILE_SHEET.getSprite(17).render();
+                glPopMatrix();
+            }
         }
+        glPushMatrix();
+        glTranslatef(sx, sy, 0);
         super.render();
+        glPopMatrix();
     }
 
     @Override
@@ -31,7 +61,33 @@ public class Harvester extends Unit {
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_HARVESTER + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH + spriteOffset);
     }
 
+    public boolean collectSpice(Tile target) {
+        System.out.println("Collecting spice " + this.spice);
+        if (target.getSpice() > 0 && !isFull()) {
+            target.takeSpice(1);
+            this.spice++;
+            return true;
+        }
+        return false;
+    }
+
+    public int getSpice() {
+        return spice;
+    }
+
+    public boolean isFull() {
+        return this.spice == 500;
+    }
+
+    public void dropOffSpice(Refinery target) {
+        if (this.spice > 0) {
+            target.getOwner().addMoney(1);
+            this.spice--;
+        }
+    }
+
     public Point[] getOccupied() {
         return new Point[]{new Point(Pathfinder.levelXToGrid(x), Pathfinder.levelYToGrid(y))};
     }
+
 }

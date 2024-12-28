@@ -126,6 +126,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             return owner;
         }
 
+        public boolean hasCommands() {
+            return !this.commands.isEmpty();
+        }
+
         public Command currentCommand() {
             return this.commands.isEmpty() ? null : this.commands.getFirst();
         }

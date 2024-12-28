@@ -8,14 +8,14 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.level.Level.tileCenterX;
-import static sk.neuromancer.Xune.level.Level.tileCenterY;
+import static sk.neuromancer.Xune.level.Level.tileToCenterLevelX;
+import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
 public abstract class Building extends Entity.PlayableEntity {
     public int tileX, tileY;
 
     public Building(int tileX, int tileY, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, int baseSpriteId) {
-        super(tileCenterX(tileX, tileY), tileCenterY(tileX, tileY), owner, flag, maxHealth);
+        super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner, flag, maxHealth);
         this.tileX = tileX;
         this.tileY = tileY;
         this.orientation = orientation;

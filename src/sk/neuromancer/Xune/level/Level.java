@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.ai.Enemy;
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Player;
@@ -12,8 +13,9 @@ import sk.neuromancer.Xune.level.paths.Pathfinder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -23,6 +25,7 @@ public class Level implements Renderable, Tickable {
     private Player player;
     private Enemy enemy;
     private Pathfinder pathfinder;
+    private List<Worm> worms;
 
     private Tile[][] level;
     private int width, height;
@@ -42,6 +45,8 @@ public class Level implements Renderable, Tickable {
 
     public Level(Game game) {
         this.game = game;
+        this.worms = new LinkedList<>();
+        worms.add(new Worm(tileToCenterLevelX(0, 0), tileToCenterLevelY(0, 0)));
     }
 
     @Override
@@ -83,6 +88,9 @@ public class Level implements Renderable, Tickable {
 
         player.tick(tickCount);
         enemy.tick(tickCount);
+        for (Worm worm : worms) {
+            worm.tick(tickCount);
+        }
         pathfinder.tick(tickCount);
     }
 
@@ -137,6 +145,9 @@ public class Level implements Renderable, Tickable {
         }
         enemy.render();
         player.render();
+        for (Worm worm : worms) {
+            worm.render();
+        }
         //pathfinder.render();
 
         glPopMatrix();
@@ -203,6 +214,11 @@ public class Level implements Renderable, Tickable {
     }
 
     public Entity entityAt(float levelX, float levelY) {
+        for (Worm worm : worms) {
+            if (worm.intersects(levelX, levelY)) {
+                return worm;
+            }
+        }
         for (Entity.PlayableEntity entity : player.getEntities()) {
             if (entity.intersects(levelX, levelY)) {
                 return entity;
@@ -222,6 +238,62 @@ public class Level implements Renderable, Tickable {
 
     public Tile getTile(int row, int column) {
         return this.level[column][row];
+    }
+
+    public Tile tileAt(float levelX, float levelY) {
+        int tileX = levelToTileX(levelX, levelY);
+        int tileY = levelToTileY(levelX, levelY);
+        if (tileX >= 0 && tileX < this.width && tileY >= 0 && tileY < this.height) {
+            return this.level[tileX][tileY];
+        }
+        return null;
+    }
+
+    public Tile[] getNeighbors(Tile currentTile) {
+        int x = currentTile.getX();
+        int y = currentTile.getY();
+        int[][] moves;
+        if (y % 2 == 0) {
+            moves = new int[][]{
+                    {-1, 0},
+                    {0, -1},
+                    {1, 0},
+                    {0, 1},
+                    {0, -2},
+                    {0, 2},
+                    {-1, 1}, // only if y%2 = 0
+                    {-1, -1}, // only if y%2 = 0
+            };
+        } else {
+            moves = new int[][]{
+                    {-1, 0},
+                    {0, -1},
+                    {1, 0},
+                    {0, 1},
+                    {0, -2},
+                    {0, 2},
+                    {1, -1}, //only if y%2 = 1
+                    {1, 1}  //only if y%2 = 1
+            };
+        }
+
+        List<Tile> neighbors = new LinkedList<>();
+        for (int[] move : moves) {
+            int newX = x + move[0];
+            int newY = y + move[1];
+            if (newX >= 0 && newX < this.width && newY >= 0 && newY < this.height) {
+                neighbors.add(this.level[newX][newY]);
+            }
+        }
+        return neighbors.toArray(new Tile[0]);
+    }
+
+    public Iterator<Tile> findClosestTile(Tile startTile, Predicate<Tile> condition) {
+        return new TileFinder(this, startTile, condition);
+    }
+
+    public Iterator<Entity> findClosestEntity(float levelX, float levelY, Predicate<Entity> condition) {
+        return new EntityFinder(this, levelX, levelY, condition);
     }
 
     public float getWidth() {
@@ -256,19 +328,112 @@ public class Level implements Renderable, Tickable {
         return (levelY + this.yOff - Game.CENTER_Y) * this.zoom + Game.CENTER_Y;
     }
 
-    public static float tileX(int x, int y) {
-        return (x + 0.5f * (y % 2)) * Tile.TILE_WIDTH;
+    public static float tileToLevelX(int tileX, int tileY) {
+        return (tileX + 0.5f * (tileY % 2)) * Tile.TILE_WIDTH;
     }
 
-    public static float tileCenterX(int x, int y) {
-        return tileX(x, y) + Tile.TILE_CENTER_X;
+    public static float tileToCenterLevelX(int tileX, int tileY) {
+        return tileToLevelX(tileX, tileY) + Tile.TILE_CENTER_X;
     }
 
-    public static float tileY(int x, int y) {
-        return 0.5f * y * Tile.TILE_HEIGHT + 0.5f * y;
+    public static int levelToTileX(float levelX, float levelY) {
+        int tileY = levelToTileY(levelX, levelY);
+        if (tileY % 2 == 0) {
+            return Math.round((levelX - Tile.TILE_CENTER_X) / Tile.TILE_WIDTH);
+        } else {
+            return Math.round((levelX - 2 * Tile.TILE_CENTER_X) / Tile.TILE_WIDTH);
+        }
     }
 
-    public static float tileCenterY(int x, int y) {
-        return tileY(x, y) + Tile.TILE_CENTER_Y;
+    public static float tileToLevelY(int tileX, int tileY) {
+        return 0.5f * tileY * (Tile.TILE_HEIGHT + 1);
+    }
+
+    public static float tileToCenterLevelY(int tileX, int tileY) {
+        return tileToLevelY(tileX, tileY) + Tile.TILE_CENTER_Y;
+    }
+
+    public static int levelToTileY(float levelX, float levelY) {
+        return Math.round((levelY - Tile.TILE_CENTER_Y) / (0.5f * (Tile.TILE_HEIGHT + 1)));
+    }
+
+    public static class TileFinder implements Iterator<Tile> {
+        private final Level level;
+        private final boolean[][] visited;
+        private final Queue<Tile> queue;
+        private final Predicate<Tile> condition;
+        private Tile next;
+
+        public TileFinder(Level level, Tile startTile, Predicate<Tile> condition) {
+            this.level = level;
+            this.visited = new boolean[level.height][level.width];
+            this.queue = new LinkedList<>();
+            this.queue.add(startTile);
+            this.visited[startTile.getY()][startTile.getX()] = true;
+            this.condition = condition;
+            this.next = findOne();
+        }
+
+
+        private Tile findOne() {
+            while (!queue.isEmpty()) {
+                Tile currentTile = queue.poll();
+                if (condition.test(currentTile)) {
+                    return currentTile;
+                }
+
+                for (Tile neighbor : level.getNeighbors(currentTile)) {
+                    if (!visited[neighbor.getY()][neighbor.getX()]) {
+                        queue.add(neighbor);
+                        visited[neighbor.getY()][neighbor.getX()] = true;
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        @Override
+        public Tile next() {
+            if (next == null) {
+                throw new NoSuchElementException();
+            }
+            Tile result = next;
+            next = findOne();
+            return result;
+        }
+    }
+
+    public static class EntityFinder implements Iterator<Entity> {
+        private final float startX, startY;
+        private final Predicate<Entity> condition;
+        private final List<Entity> filtered;
+
+        public EntityFinder(Level level, float startX, float startY, Predicate<Entity> condition) {
+            this.startX = startX;
+            this.startY = startY;
+            this.condition = condition;
+
+            //First merge entity lists from level
+            List<Entity> entities = new LinkedList<>();
+            entities.addAll(level.worms);
+            entities.addAll(level.player.getEntities());
+            entities.addAll(level.enemy.getEntities());
+            filtered = entities.stream().filter(condition).sorted(Comparator.comparingDouble(e -> Math.hypot(e.x - startX, e.y - startY))).collect(Collectors.toList());
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !filtered.isEmpty();
+        }
+
+        @Override
+        public Entity next() {
+            return filtered.removeFirst();
+        }
     }
 }

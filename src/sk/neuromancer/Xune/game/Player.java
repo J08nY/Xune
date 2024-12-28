@@ -9,15 +9,15 @@ import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.level.Level;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 import static sk.neuromancer.Xune.game.Game.TPS;
-import static sk.neuromancer.Xune.level.Level.tileCenterX;
-import static sk.neuromancer.Xune.level.Level.tileCenterY;
+import static sk.neuromancer.Xune.level.Level.tileToCenterLevelX;
+import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
 public class Player extends EntityOwner {
     private final List<PlayableEntity> selected = new LinkedList<>();
-    private final Map<Class<? extends PlayableEntity>, CommandStrategy> commandStrategies = new HashMap<>();
 
     public Player(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
@@ -28,18 +28,14 @@ public class Player extends EntityOwner {
         this.addEntity(new Helipad(4, 5, Orientation.NORTH, this, this.flag));
         Factory factory = new Factory(6, 5, Orientation.NORTH, this, this.flag);
         this.addEntity(factory);
-        this.addEntity(new Buggy(tileCenterX(6, 8), tileCenterY(6, 8), Orientation.SOUTHEAST, this, this.flag));
-        this.addEntity(new Buggy(tileCenterX(8, 4), tileCenterY(8, 4), Orientation.EAST, this, this.flag));
-        this.addEntity(new Heli(tileCenterX(7, 7), tileCenterY(7, 7), Orientation.EAST, this, this.flag));
-        this.addEntity(new Harvester(tileCenterX(11, 8), tileCenterY(11, 8), Orientation.SOUTHEAST, this, this.flag));
+        this.addEntity(new Buggy(tileToCenterLevelX(6, 8), tileToCenterLevelY(6, 8), Orientation.SOUTHEAST, this, this.flag));
+        this.addEntity(new Buggy(tileToCenterLevelX(8, 4), tileToCenterLevelY(8, 4), Orientation.EAST, this, this.flag));
+        this.addEntity(new Heli(tileToCenterLevelX(7, 7), tileToCenterLevelY(7, 7), Orientation.EAST, this, this.flag));
+        this.addEntity(new Harvester(tileToCenterLevelX(11, 8), tileToCenterLevelY(11, 8), Orientation.SOUTHEAST, this, this.flag));
 
-        Buggy buggy = new Buggy(tileCenterX(6, 6), tileCenterY(6, 6), Orientation.EAST, this, this.flag);
+        Buggy buggy = new Buggy(tileToCenterLevelX(6, 6), tileToCenterLevelY(6, 6), Orientation.EAST, this, this.flag);
         Command produceBuggy = new Command.ProduceCommand(TPS * 5, buggy);
         factory.pushCommand(produceBuggy);
-
-        commandStrategies.put(Heli.class, new CommandStrategy.AirAttackStrategy());
-        commandStrategies.put(Buggy.class, new CommandStrategy.GroundAttackStrategy());
-        commandStrategies.put(Harvester.class, new CommandStrategy.SpiceCollectStrategy());
 
         this.effects.add(new Effect.Fire(factory.x, factory.y));
     }

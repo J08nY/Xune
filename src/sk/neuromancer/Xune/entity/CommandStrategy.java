@@ -1,9 +1,18 @@
 package sk.neuromancer.Xune.entity;
 
+import sk.neuromancer.Xune.entity.building.Refinery;
+import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.level.Tile;
+import sk.neuromancer.Xune.level.paths.NoPathFound;
+
+import java.util.Iterator;
 
 public abstract class CommandStrategy {
+
     public abstract Command createCommand(Entity entity, Entity other, Level level, float levelX, float levelY);
+
+    public abstract Command defaultBehavior(Entity entity, Level level);
 
     public static class GroundAttackStrategy extends CommandStrategy {
         @Override
@@ -14,10 +23,32 @@ public abstract class CommandStrategy {
                 } else {
                     return new Command.MoveCommand(entity.x, entity.y, levelX, levelY, level.getPathfinder());
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (NoPathFound e) {
                 System.out.println("No path found");
                 return null;
             }
+        }
+
+        @Override
+        public Command defaultBehavior(Entity entity, Level level) {
+            /*
+            while (true) {
+                try {
+                    float patrolX = entity.x + (float) (Math.random() * 100 - 50);
+                    float patrolY = entity.y + (float) (Math.random() * 100 - 50);
+                    if (patrolX < 0) {
+                        patrolX = 0;
+                    }
+                    if (patrolY < 0) {
+                        patrolY = 0;
+                    }
+                    return new Command.MoveCommand(entity.x, entity.y, patrolX, patrolY, level.getPathfinder());
+                } catch (IllegalArgumentException e) {
+                    System.out.println("No path found");
+                }
+            }
+             */
+            return null;
         }
     }
 
@@ -30,6 +61,17 @@ public abstract class CommandStrategy {
                 return new Command.FlyCommand(entity.x, entity.y, levelX, levelY);
             }
         }
+
+        @Override
+        public Command defaultBehavior(Entity entity, Level level) {
+            // Example default behavior: hover around the current position
+            /*
+            float hoverX = entity.x + (float) (Math.random() * 100 - 50);
+            float hoverY = entity.y + (float) (Math.random() * 100 - 50);
+            return new Command.FlyCommand(entity.x, entity.y, hoverX, hoverY)
+             */
+            return null;
+        }
     }
 
     public static class SpiceCollectStrategy extends CommandStrategy {
@@ -37,11 +79,47 @@ public abstract class CommandStrategy {
         @Override
         public Command createCommand(Entity entity, Entity other, Level level, float levelX, float levelY) {
             try {
-                return new Command.MoveCommand(entity.x, entity.y, levelX, levelY, level.getPathfinder());
-            } catch (IllegalArgumentException e) {
+                if (other instanceof Refinery refinery) {
+                    return new Command.DropOffSpiceCommand(entity.x, entity.y, level.getPathfinder(), refinery);
+                }
+
+                int tileX = Level.levelToTileX(levelX, levelY);
+                int tileY = Level.levelToTileY(levelX, levelY);
+                Tile target = level.getTile(tileY, tileX);
+                if (target.isSpicy() && target.getSpice() > 0) {
+                    return new Command.CollectSpiceCommand(entity.x, entity.y, level.getPathfinder(), target);
+                } else {
+                    return new Command.MoveCommand(entity.x, entity.y, levelX, levelY, level.getPathfinder());
+                }
+            } catch (NoPathFound e) {
                 System.out.println("No path found");
                 return null;
             }
+        }
+
+        @Override
+        public Command defaultBehavior(Entity entity, Level level) {
+            if (entity instanceof Harvester harvester) {
+                if (harvester.isFull()) {
+                    for (Iterator<Entity> it = level.findClosestEntity(entity.x, entity.y, e -> e instanceof Entity.PlayableEntity playable && playable.owner == harvester.owner && e instanceof Refinery); it.hasNext(); ) {
+                        Refinery refinery = (Refinery) it.next();
+                        try {
+                            return new Command.DropOffSpiceCommand(entity.x, entity.y, level.getPathfinder(), refinery);
+                        } catch (NoPathFound ignored) {
+                        }
+                    }
+                } else {
+                    Tile harvesterTile = level.tileAt(harvester.x, harvester.y);
+                    for (Iterator<Tile> it = level.findClosestTile(harvesterTile, tile -> tile.isSpicy() && tile.getSpice() > 0); it.hasNext(); ) {
+                        Tile tile = it.next();
+                        try {
+                            return new Command.CollectSpiceCommand(entity.x, entity.y, level.getPathfinder(), tile);
+                        } catch (NoPathFound ignored) {
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }

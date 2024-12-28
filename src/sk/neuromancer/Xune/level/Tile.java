@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.gfx.Text;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -13,6 +14,7 @@ public class Tile implements Renderable {
     private final float px;    //POINT coordinates
     private final float py;
     private final boolean[] pass;
+    private int spice;
 
     /*
      *        / 0 \
@@ -88,7 +90,7 @@ public class Tile implements Renderable {
             {true, false, true, true, true, true, true, false, true, true, true, true, true}, //43
             {true, false, true, false, true, true, true, true, true, true, true, true, true}, //44
             {true, true, true, true, true, false, true, false, true, true, true, true, true}, //45
-            {true, true, true, true, true, true, true, true, false,  true, true, true, true}, //46
+            {true, true, true, true, true, true, true, true, false, true, true, true, true}, //46
             PASS_ALL                                                                          //47
     };
 
@@ -100,8 +102,8 @@ public class Tile implements Renderable {
     public Tile(int type, int x, int y) {
         this.x = x;
         this.y = y;
-        this.px = Level.tileX(x, y);
-        this.py = Level.tileY(x, y);
+        this.px = Level.tileToLevelX(x, y);
+        this.py = Level.tileToLevelY(x, y);
 
         this.type = type;
         if (type < 3) {
@@ -115,6 +117,37 @@ public class Tile implements Renderable {
         } else {
             throw new IllegalStateException("Invalid tile type: " + type);
         }
+        if (isSpicy()) {
+            this.spice = 1000;
+        }
+    }
+
+    public int getX() {
+        return this.x;
+    }
+
+    public int getY() {
+        return this.y;
+    }
+
+    public float getLevelX() {
+        return this.px;
+    }
+
+    public float getLevelY() {
+        return this.py;
+    }
+
+    public boolean isSpicy() {
+        return this.type == 1 || this.type == 2;
+    }
+
+    public int getSpice() {
+        return this.spice;
+    }
+
+    public void takeSpice(int amount) {
+        this.spice -= amount;
     }
 
     public boolean[] getPassable() {
@@ -125,8 +158,30 @@ public class Tile implements Renderable {
     public void render() {
         glPushMatrix();
         glTranslatef(px, py, 0.0f);
-        SpriteSheet.TILE_SHEET.getSprite(type).render();
+        if (isSpicy() && spice == 0) {
+            if (type == 1) {
+                SpriteSheet.TILE_SHEET.getSprite(0).render();
+            } else if (type == 2) {
+                SpriteSheet.TILE_SHEET.getSprite(7).render();
+            }
+        } else {
+            SpriteSheet.TILE_SHEET.getSprite(type).render();
+        }
+        glTranslatef(TILE_CENTER_X, TILE_CENTER_Y, 0);
+        glScalef(0.2f, 0.2f, 0);
+        new Text(x + "," + y).render();
         //SpriteSheet.TILE_SHEET.getSprite(2, 15).render();
         glPopMatrix();
+    }
+
+    @Override
+    public String toString() {
+        return "Tile{" +
+                "type=" + type +
+                ", x=" + x +
+                ", y=" + y +
+                ", px=" + px +
+                ", py=" + py +
+                '}';
     }
 }
