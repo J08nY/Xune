@@ -62,7 +62,6 @@ public class Harvester extends Unit {
     }
 
     public boolean collectSpice(Tile target) {
-        System.out.println("Collecting spice " + this.spice);
         if (target.getSpice() > 0 && !isFull()) {
             target.takeSpice(1);
             this.spice++;

@@ -22,9 +22,9 @@ public class Player extends EntityOwner {
     public Player(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
         this.addEntity(new Base(7, 2, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Refinery(5, 4, Orientation.NORTH, this, this.flag));
+        this.addEntity(new Refinery(5, 6, Orientation.NORTH, this, this.flag));
         this.addEntity(new Silo(5, 5, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Silo(5, 6, Orientation.NORTH, this, this.flag));
+        this.addEntity(new Silo(5, 4, Orientation.NORTH, this, this.flag));
         this.addEntity(new Helipad(4, 5, Orientation.NORTH, this, this.flag));
         Factory factory = new Factory(6, 5, Orientation.NORTH, this, this.flag);
         this.addEntity(factory);

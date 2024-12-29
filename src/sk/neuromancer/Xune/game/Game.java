@@ -93,7 +93,7 @@ public class Game implements Renderable {
             }
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastTimer1 > 1000) {
-                lastTimer1 += currentTime;
+                lastTimer1 = currentTime;
                 System.out.println(ticks + " ticks, " + frames + " fps");
                 frames = 0;
                 ticks = 0;

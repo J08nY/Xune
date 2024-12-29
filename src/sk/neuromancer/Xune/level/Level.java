@@ -3,10 +3,7 @@ package sk.neuromancer.Xune.level;
 import sk.neuromancer.Xune.ai.Enemy;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Worm;
-import sk.neuromancer.Xune.game.Game;
-import sk.neuromancer.Xune.game.InputHandler;
-import sk.neuromancer.Xune.game.Player;
-import sk.neuromancer.Xune.game.Tickable;
+import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 
@@ -148,7 +145,9 @@ public class Level implements Renderable, Tickable {
         for (Worm worm : worms) {
             worm.render();
         }
-        //pathfinder.render();
+        if (Config.DEBUG_PATH_GRID) {
+            pathfinder.render();
+        }
 
         glPopMatrix();
     }

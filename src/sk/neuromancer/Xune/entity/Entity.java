@@ -142,6 +142,11 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             this.commands.clear();
             this.commands.add(c);
         }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "." + flag + " at (" + x + "," + y + ").";
+        }
     }
 
 }

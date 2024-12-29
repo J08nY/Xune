@@ -6,7 +6,11 @@ import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.NoPathFound;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+
+import static sk.neuromancer.Xune.game.Game.TPS;
 
 public abstract class CommandStrategy {
 
@@ -24,7 +28,6 @@ public abstract class CommandStrategy {
                     return new Command.MoveCommand(entity.x, entity.y, levelX, levelY, level.getPathfinder());
                 }
             } catch (NoPathFound e) {
-                System.out.println("No path found");
                 return null;
             }
         }
@@ -75,6 +78,7 @@ public abstract class CommandStrategy {
     }
 
     public static class SpiceCollectStrategy extends CommandStrategy {
+        Map<Harvester, Integer> harvesters = new HashMap<>();
 
         @Override
         public Command createCommand(Entity entity, Entity other, Level level, float levelX, float levelY) {
@@ -92,7 +96,6 @@ public abstract class CommandStrategy {
                     return new Command.MoveCommand(entity.x, entity.y, levelX, levelY, level.getPathfinder());
                 }
             } catch (NoPathFound e) {
-                System.out.println("No path found");
                 return null;
             }
         }
@@ -100,6 +103,16 @@ public abstract class CommandStrategy {
         @Override
         public Command defaultBehavior(Entity entity, Level level) {
             if (entity instanceof Harvester harvester) {
+                if (harvesters.containsKey(harvester)) {
+                    int timeout = harvesters.get(harvester);
+                    if (timeout > 0) {
+                        harvesters.put(harvester, timeout - 1);
+                        return null;
+                    } else {
+                        harvesters.remove(harvester);
+                    }
+                }
+
                 if (harvester.isFull()) {
                     for (Iterator<Entity> it = level.findClosestEntity(entity.x, entity.y, e -> e instanceof Entity.PlayableEntity playable && playable.owner == harvester.owner && e instanceof Refinery); it.hasNext(); ) {
                         Refinery refinery = (Refinery) it.next();
@@ -118,8 +131,11 @@ public abstract class CommandStrategy {
                         }
                     }
                 }
+                harvesters.put(harvester, TPS);
+                return null;
+            } else {
+                throw new IllegalArgumentException("Entity is not a harvester");
             }
-            return null;
         }
     }
 }

@@ -64,6 +64,8 @@ public abstract class Command {
         public void finalize(Entity entity) {
             if (entity instanceof Unit unit) {
                 unit.setPosition(toX, toY);
+            } else {
+                throw new IllegalArgumentException("Entity must be a unit.");
             }
         }
     }
@@ -134,6 +136,8 @@ public abstract class Command {
         public void finalize(Entity entity) {
             if (entity instanceof Unit unit) {
                 unit.setPosition(toX, toY);
+            } else {
+                throw new IllegalArgumentException("Entity must be a unit.");
             }
         }
     }
@@ -339,7 +343,6 @@ public abstract class Command {
 
         @Override
         public void finalize(Entity entity) {
-            System.out.println("Spice collected");
         }
     }
 
@@ -348,7 +351,26 @@ public abstract class Command {
         private final Refinery target;
 
         public DropOffSpiceCommand(float fromX, float fromY, Pathfinder pathfinder, Refinery target) {
-            this.move = new MoveCommand(fromX, fromY, target.x, target.y, pathfinder);
+            float[][] offsets  = new float[][] {
+                    {0, Tile.TILE_CENTER_Y},
+                    {Tile.TILE_CENTER_X, 0},
+                    {0, -Tile.TILE_CENTER_Y},
+                    {-Tile.TILE_CENTER_X, 0}
+            };
+            MoveCommand m = null;
+            for (float[] offset : offsets) {
+                try {
+                    m = new MoveCommand(fromX, fromY, target.x + offset[0], target.y + offset[1], pathfinder);
+                    break;
+                } catch (NoPathFound ignore) {
+
+                }
+            }
+            if (m == null) {
+                throw new NoPathFound("No path to Refinery found.");
+            }
+            this.move = m;
+
             this.target = target;
         }
 
@@ -374,8 +396,9 @@ public abstract class Command {
         public boolean isFinished(Entity entity) {
             if (entity instanceof Harvester harvester) {
                 return harvester.getSpice() == 0;
+            } else {
+                throw new IllegalArgumentException("Entity must be a harvester.");
             }
-            return false;
         }
     }
 }

@@ -1,5 +1,6 @@
 package sk.neuromancer.Xune.level;
 
+import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.gfx.Text;
@@ -157,7 +158,7 @@ public class Tile implements Renderable {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(px, py, 0.0f);
+        glTranslatef(px, py, 0);
         if (isSpicy() && spice == 0) {
             if (type == 1) {
                 SpriteSheet.TILE_SHEET.getSprite(0).render();
@@ -167,10 +168,14 @@ public class Tile implements Renderable {
         } else {
             SpriteSheet.TILE_SHEET.getSprite(type).render();
         }
-        glTranslatef(TILE_CENTER_X, TILE_CENTER_Y, 0);
-        glScalef(0.2f, 0.2f, 0);
-        new Text(x + "," + y).render();
-        //SpriteSheet.TILE_SHEET.getSprite(2, 15).render();
+        if (Config.DEBUG_TILES) {
+            SpriteSheet.TILE_SHEET.getSprite(2, 15).render();
+        }
+        if (Config.DEBUG_TILE_GRID) {
+            glTranslatef(TILE_CENTER_X, TILE_CENTER_Y, 0);
+            glScalef(0.2f, 0.2f, 0);
+            new Text(x + "," + y).render();
+        }
         glPopMatrix();
     }
 

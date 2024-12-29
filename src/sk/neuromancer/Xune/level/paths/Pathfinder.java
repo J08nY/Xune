@@ -3,6 +3,7 @@ package sk.neuromancer.Xune.level.paths;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;
+import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.Level;
@@ -91,6 +92,10 @@ public class Pathfinder implements Tickable, Renderable {
 
     public Path find(Point src, Point dest) {
         dest = findValidDestination(dest, 50);
+        if (Config.DEBUG_PATHS) {
+            System.out.println("Source: " + src);
+            System.out.println("Destination: " + dest);
+        }
         if (dest == null) {
             return null;
         }
@@ -108,9 +113,13 @@ public class Pathfinder implements Tickable, Renderable {
 
             if (current.point.equals(dest)) {
                 Path path = reconstructPath(current);
-                printPass(path);
-                System.out.println("Searched: " + searched);
-                System.out.println("Path length: " + path.getPoints().length);
+                if (Config.DEBUG_PATH_PRINT) {
+                    printPass(path);
+                }
+                if (Config.DEBUG_PATHS) {
+                    System.out.println("Searched: " + searched);
+                    System.out.println("Path length: " + path.getPoints().length);
+                }
                 paths.add(path);
                 return path;
             }
@@ -130,7 +139,9 @@ public class Pathfinder implements Tickable, Renderable {
                 }
             }
         }
-
+        if (Config.DEBUG_PATHS) {
+            System.out.println("Searched: " + searched);
+        }
         return null; // No path found
     }
 
