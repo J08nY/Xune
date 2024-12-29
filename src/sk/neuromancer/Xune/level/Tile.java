@@ -174,9 +174,10 @@ public class Tile implements Renderable {
             SpriteSheet.TILE_SHEET.getSprite(2, 15).render();
         }
         if (Config.DEBUG_TILE_GRID) {
-            glTranslatef(TILE_CENTER_X, TILE_CENTER_Y, 0);
+            String s = x + "," + y;
+            glTranslatef(TILE_CENTER_X - s.length(), TILE_CENTER_Y - 1.5f, 0);
             glScalef(0.2f, 0.2f, 0);
-            new Text(x + "," + y).render();
+            new Text(s, true).render();
         }
         glPopMatrix();
     }

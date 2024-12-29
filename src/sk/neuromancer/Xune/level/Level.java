@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.ai.Enemy;
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.*;
@@ -24,6 +25,7 @@ public class Level implements Renderable, Tickable {
     private Enemy enemy;
     private Pathfinder pathfinder;
     private List<Worm> worms;
+    private List<Road> roads;
 
     private Tile[][] level;
     private boolean[][] visibility;
@@ -46,6 +48,13 @@ public class Level implements Renderable, Tickable {
         this.game = game;
         this.worms = new LinkedList<>();
         worms.add(new Worm(tileToCenterLevelX(0, 0), tileToCenterLevelY(0, 0)));
+        this.roads = new LinkedList<>();
+        roads.add(new Road(10, 4, Road.Variant.T_SE));
+        roads.add(new Road(10, 5, Road.Variant.I_NW_SE));
+        roads.add(new Road(11, 6, Road.Variant.CROSS));
+        roads.add(new Road(11, 5, Road.Variant.CROSS));
+        roads.add(new Road(12, 4, Road.Variant.I_NE_SW));
+        roads.add(new Road(12, 3, Road.Variant.V_S));
     }
 
     @Override
@@ -89,6 +98,9 @@ public class Level implements Renderable, Tickable {
         enemy.tick(tickCount);
         for (Worm worm : worms) {
             worm.tick(tickCount);
+        }
+        for (Road road: roads) {
+            road.tick(tickCount);
         }
         pathfinder.tick(tickCount);
         updateVisibility(true);
@@ -162,6 +174,9 @@ public class Level implements Renderable, Tickable {
                     t.render();
                 }
             }
+        }
+        for (Road road: roads) {
+            road.render();
         }
         enemy.render();
         player.render();
