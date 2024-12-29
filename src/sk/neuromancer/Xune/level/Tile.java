@@ -115,6 +115,8 @@ public class Tile implements Renderable {
             this.pass = PASS_HIGH[type - 18];
         } else if (type < 48) {
             this.pass = PASS_OPEN[type - 33];
+        } else if (type < 51) {
+            this.pass = PASS_ALL;
         } else {
             throw new IllegalStateException("Invalid tile type: " + type);
         }

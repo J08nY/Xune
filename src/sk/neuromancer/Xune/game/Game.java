@@ -48,9 +48,7 @@ public class Game implements Renderable {
         level = new Level(this);
         level.loadLevel(Level.LEVEL_1);
         player = new Player(this, level, Flag.RED, 100);
-        level.setPlayer(player);
         enemy = new Enemy(this, level, Flag.BLUE, 100);
-        level.setEnemy(enemy);
 
         hud = new HUD(this);
 

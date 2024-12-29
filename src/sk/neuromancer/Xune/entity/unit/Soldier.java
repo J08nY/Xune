@@ -8,7 +8,7 @@ public class Soldier extends Unit {
     private int step;
 
     public Soldier(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 20, 0.2f, 20f, 15, 2);
+        super(x, y, orientation, owner, flag, 20, 0.2f, 50f, 20f, 15, 2);
         updateSprite();
         this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 3, false));
     }

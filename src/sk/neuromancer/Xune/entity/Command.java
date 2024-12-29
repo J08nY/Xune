@@ -370,8 +370,11 @@ public abstract class Command {
                 throw new NoPathFound("No path to Refinery found.");
             }
             this.move = m;
-
             this.target = target;
+        }
+
+        public boolean dropping(Entity entity) {
+            return move.isFinished(entity) && !isFinished(entity);
         }
 
         @Override

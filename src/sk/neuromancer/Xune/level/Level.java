@@ -3,6 +3,7 @@ package sk.neuromancer.Xune.level;
 import sk.neuromancer.Xune.ai.Enemy;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Worm;
+import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
@@ -25,6 +26,7 @@ public class Level implements Renderable, Tickable {
     private List<Worm> worms;
 
     private Tile[][] level;
+    private boolean[][] visibility;
     private int width, height;
 
     public float zoom;
@@ -51,16 +53,16 @@ public class Level implements Renderable, Tickable {
         InputHandler input = this.game.getInput();
 
         if (input.PLUS.isPressed()) {
-            zoomIn();
+            zoomIn(ZOOM_SPEED);
         } else if (input.MINUS.isPressed()) {
-            zoomOut();
+            zoomOut(ZOOM_SPEED);
         }
 
         float dy = input.scroller.getDeltaY();
         if (dy > 0) {
-            zoomIn();
+            zoomIn(SCROLL_SPEED);
         } else if (dy < 0) {
-            zoomOut();
+            zoomOut(SCROLL_SPEED);
         }
 
         float dx = input.scroller.getDeltaX();
@@ -89,15 +91,34 @@ public class Level implements Renderable, Tickable {
             worm.tick(tickCount);
         }
         pathfinder.tick(tickCount);
+        updateVisibility(true);
     }
 
-    public void zoomIn() {
-        this.zoom *= 1 + ZOOM_SPEED;
+    private void updateVisibility(boolean onlyMoved) {
+        for (Entity.PlayableEntity e : player.getEntities()) {
+            updateVisibility(e, onlyMoved);
+        }
     }
 
-    public void zoomOut() {
+    private void updateVisibility(Entity.PlayableEntity entity, boolean onlyMoved) {
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                if (entity instanceof Unit unit && (!onlyMoved || unit.moved())) {
+                    if (unit.inSight(tileToCenterLevelX(x, y), tileToCenterLevelY(x, y))) {
+                        visibility[x][y] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    public void zoomIn(float speed) {
+        this.zoom *= 1 + speed;
+    }
+
+    public void zoomOut(float speed) {
         if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
-            this.zoom *= 1 - SCROLL_SPEED;
+            this.zoom *= 1 - speed;
     }
 
     public void moveUp() {
@@ -136,8 +157,10 @@ public class Level implements Renderable, Tickable {
 
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                Tile t = this.level[x][y];
-                t.render();
+                if (visibility[x][y]) {
+                    Tile t = this.level[x][y];
+                    t.render();
+                }
             }
         }
         enemy.render();
@@ -147,6 +170,14 @@ public class Level implements Renderable, Tickable {
         }
         if (Config.DEBUG_PATH_GRID) {
             pathfinder.render();
+        }
+
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                if (!visibility[x][y]) {
+                    new Tile(50, x, y).render();
+                }
+            }
         }
 
         glPopMatrix();
@@ -168,6 +199,7 @@ public class Level implements Renderable, Tickable {
             br.close();
 
             this.level = new Tile[this.width][this.height];
+            this.visibility = new boolean[this.width][this.height];
 
             for (int i = 0; i < lines.size(); i++) {
                 String[] row = lines.get(i).split(",");
@@ -206,6 +238,9 @@ public class Level implements Renderable, Tickable {
 
     public void addEntity(Entity.PlayableEntity e) {
         pathfinder.addEntity(e);
+        if (e.getOwner() == player) {
+            updateVisibility(e, false);
+        }
     }
 
     public void removeEntity(Entity.PlayableEntity e) {
@@ -231,11 +266,19 @@ public class Level implements Renderable, Tickable {
         return null;
     }
 
+    public boolean isTileVisible(Tile tile) {
+        return visibility[tile.getX()][tile.getY()];
+    }
+
+    public boolean isTileVisible(int column, int row) {
+        return visibility[column][row];
+    }
+
     public Tile[][] getTiles() {
         return this.level;
     }
 
-    public Tile getTile(int row, int column) {
+    public Tile getTile(int column, int row) {
         return this.level[column][row];
     }
 

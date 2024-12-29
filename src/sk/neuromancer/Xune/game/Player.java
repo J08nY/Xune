@@ -7,7 +7,6 @@ import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Soldier;
-import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.level.Level;
 
 import java.util.LinkedList;
@@ -22,6 +21,7 @@ public class Player extends EntityOwner {
 
     public Player(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
+        level.setPlayer(this);
         this.addEntity(new Base(7, 2, Orientation.NORTH, this, this.flag));
         this.addEntity(new Refinery(5, 6, Orientation.NORTH, this, this.flag));
         this.addEntity(new Silo(5, 5, Orientation.NORTH, this, this.flag));
@@ -38,8 +38,6 @@ public class Player extends EntityOwner {
         Buggy buggy = new Buggy(tileToCenterLevelX(6, 6), tileToCenterLevelY(6, 6), Orientation.EAST, this, this.flag);
         Command produceBuggy = new Command.ProduceCommand(TPS * 5, buggy);
         factory.pushCommand(produceBuggy);
-
-        this.effects.add(new Effect.Fire(factory.x, factory.y));
     }
 
     @Override
@@ -47,7 +45,6 @@ public class Player extends EntityOwner {
         super.removeEntity(e);
         selected.remove(e);
     }
-
 
     @Override
     public void tick(int tickCount) {

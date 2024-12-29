@@ -89,7 +89,7 @@ public abstract class CommandStrategy {
 
                 int tileX = Level.levelToTileX(levelX, levelY);
                 int tileY = Level.levelToTileY(levelX, levelY);
-                Tile target = level.getTile(tileY, tileX);
+                Tile target = level.getTile(tileX, tileY);
                 if (target.isSpicy() && target.getSpice() > 0) {
                     return new Command.CollectSpiceCommand(entity.x, entity.y, level.getPathfinder(), target);
                 } else {

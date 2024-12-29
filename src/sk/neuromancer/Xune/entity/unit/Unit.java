@@ -14,19 +14,23 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class Unit extends Entity.PlayableEntity {
     private float speed;
     private float range;
+    private float sight;
     private int rate;
     private int damage;
     private int ready = 0;
+    private boolean moved;
 
     public Unit(float x, float y, Orientation orientation, EntityOwner owner, Flag flag,
                 int maxHealth,
                 float speed,
+                float sight,
                 float range,
                 int rate,
                 int damage) {
         super(x, y, owner, flag, maxHealth);
         this.orientation = orientation;
         this.speed = speed;
+        this.sight = sight;
         this.range = range;
         this.rate = rate;
         this.damage = damage;
@@ -38,6 +42,11 @@ public abstract class Unit extends Entity.PlayableEntity {
         float angle = (float) Math.atan2(dy, dx);
         face(toX, toY);
         setPosition(x + (float) (speed * Math.cos(angle)), y + (float) (speed * Math.sin(angle)));
+        moved = true;
+    }
+
+    public boolean moved() {
+        return moved;
     }
 
     public void face(float toX, float toY) {
@@ -47,6 +56,12 @@ public abstract class Unit extends Entity.PlayableEntity {
         float azimuth = (float) ((angle < 0 ? angle + 2 * (float) Math.PI : angle) + (Math.PI / 2));
         this.orientation = Orientation.fromAngle(azimuth);
         updateSprite();
+    }
+
+    public boolean inSight(float x, float y) {
+        float dx = this.x - x;
+        float dy = this.y - y;
+        return dx * dx + dy * dy <= sight * sight;
     }
 
     public boolean inRange(Entity target) {
@@ -67,14 +82,13 @@ public abstract class Unit extends Entity.PlayableEntity {
 
     @Override
     public void tick(int tickCount) {
+        moved = false;
         super.tick(tickCount);
         ready++;
         if (rate != 0 && ready % rate == 0) {
             ready = 0;
         }
     }
-
-    protected abstract void updateSprite();
 
     @Override
     public void render() {
@@ -107,6 +121,8 @@ public abstract class Unit extends Entity.PlayableEntity {
         }
         glPopMatrix();
     }
+
+    protected abstract void updateSprite();
 
     public abstract Point[] getOccupied();
 }

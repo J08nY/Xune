@@ -37,7 +37,7 @@ public class Pathfinder implements Tickable, Renderable {
     private void fillLevelMap(Level l) {
         for (int row = 0; row < l.getHeightInTiles(); row++) {
             for (int col = 0; col < l.getWidthInTiles(); col++) {
-                Tile tile = l.getTile(row, col);
+                Tile tile = l.getTile(col, row);
                 boolean[] passable = tile.getPassable();
                 levelMap.setTile(col, row, passable);
             }

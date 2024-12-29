@@ -19,7 +19,7 @@ public class Harvester extends Unit {
     private Random rand = new Random();
 
     public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 300, 0.07f, 0, 0, 0);
+        super(x, y, orientation, owner, flag, 300, 0.07f, 40f, 0, 0, 0);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6, false));
     }
