@@ -6,6 +6,7 @@ import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Heli;
+import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.level.Level;
 
@@ -32,6 +33,7 @@ public class Player extends EntityOwner {
         this.addEntity(new Buggy(tileToCenterLevelX(8, 4), tileToCenterLevelY(8, 4), Orientation.EAST, this, this.flag));
         this.addEntity(new Heli(tileToCenterLevelX(7, 7), tileToCenterLevelY(7, 7), Orientation.EAST, this, this.flag));
         this.addEntity(new Harvester(tileToCenterLevelX(11, 8), tileToCenterLevelY(11, 8), Orientation.SOUTHEAST, this, this.flag));
+        this.addEntity(new Soldier(tileToCenterLevelX(10, 7), tileToCenterLevelY(10, 7), Orientation.SOUTHEAST, this, this.flag));
 
         Buggy buggy = new Buggy(tileToCenterLevelX(6, 6), tileToCenterLevelY(6, 6), Orientation.EAST, this, this.flag);
         Command produceBuggy = new Command.ProduceCommand(TPS * 5, buggy);

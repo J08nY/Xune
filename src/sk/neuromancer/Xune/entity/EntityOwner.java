@@ -4,6 +4,7 @@ import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Heli;
+import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Effect;
@@ -34,6 +35,7 @@ public class EntityOwner implements Tickable, Renderable {
         commandStrategies.put(Heli.class, new CommandStrategy.AirAttackStrategy());
         commandStrategies.put(Buggy.class, new CommandStrategy.GroundAttackStrategy());
         commandStrategies.put(Harvester.class, new CommandStrategy.SpiceCollectStrategy());
+        commandStrategies.put(Soldier.class, new CommandStrategy.GroundAttackStrategy());
     }
 
     public void addEntity(Entity.PlayableEntity e) {

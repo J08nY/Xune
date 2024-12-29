@@ -34,8 +34,9 @@ public class SpriteSheet {
     public static final int SPRITE_ID_BUGGY = 5;
     public static final int SPRITE_ID_HELI = 9;
     public static final int SPRITE_ID_HARVESTER = 17;
+    public static final int SPRITE_ID_SOLDRIED = 21;
 
-    public static final int SPRITE_ROW_LENGTH = 21;
+    public static final int SPRITE_ROW_LENGTH = 33;
 
     public static final int SPRITE_OFFSET_RED = 0;
     public static final int SPRITE_OFFSET_GREEN = SPRITE_ROW_LENGTH * 2;
