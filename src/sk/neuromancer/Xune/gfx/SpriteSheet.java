@@ -17,7 +17,7 @@ public class SpriteSheet {
     public static ScalableSpriteSheet CURSOR_SHEET = new ScalableSpriteSheet("cursors.png", 19, 19, 2);
     public static ScalableSpriteSheet LOGO = new ScalableSpriteSheet("logo.png", 160, 61);
     public static ScalableSpriteSheet HUD_PANEL = new ScalableSpriteSheet("gamepanel.png", 384, 60);
-    public static ScalableSpriteSheet TEXT_SHEET = new ScalableSpriteSheet("text.png", 8, 8);
+    public static ScalableSpriteSheet TEXT_SHEET = new ScalableSpriteSheet("text.png", 9, 9);
     public static SpriteSheet WORM_SHEET = new SpriteSheet("worm.png", 24, 11);
 
     protected int width, height;

@@ -140,7 +140,7 @@ public class HUD implements Tickable, Renderable {
     }
 
     private void renderText(float x, float y, String text) {
-        new Text(text, x, y).render();
+        new Text(text, x, y, false).render();
     }
 
 }

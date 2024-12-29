@@ -2,10 +2,7 @@ package sk.neuromancer.Xune.game;
 
 import sk.neuromancer.Xune.ai.Enemy;
 import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.gfx.HUD;
-import sk.neuromancer.Xune.gfx.Renderable;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
-import sk.neuromancer.Xune.gfx.Window;
+import sk.neuromancer.Xune.gfx.*;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
