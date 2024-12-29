@@ -46,7 +46,7 @@ public class Soldier extends Unit {
             case 1, 3 -> variant = 0;
             case 2 -> variant = 2;
         }
-        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_SOLDRIED + SpriteSheet.flagToOffset(flag) + variant + animation);
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_SOLDIER + SpriteSheet.flagToOffset(flag) + variant + animation);
     }
 
     @Override

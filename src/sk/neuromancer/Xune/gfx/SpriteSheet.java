@@ -28,15 +28,17 @@ public class SpriteSheet {
 
     public static final int SPRITE_ID_BASE = 0;
     public static final int SPRITE_ID_FACTORY = 1;
-    public static final int SPRITE_ID_REFINERY = 2;
-    public static final int SPRITE_ID_SILO = 3;
-    public static final int SPRITE_ID_HELIPAD = 4;
-    public static final int SPRITE_ID_BUGGY = 5;
-    public static final int SPRITE_ID_HELI = 9;
-    public static final int SPRITE_ID_HARVESTER = 17;
-    public static final int SPRITE_ID_SOLDRIED = 21;
+    public static final int SPRITE_ID_BARRACKS = 2;
+    public static final int SPRITE_ID_POWERPLANT = 3;
+    public static final int SPRITE_ID_REFINERY = 4;
+    public static final int SPRITE_ID_SILO = 5;
+    public static final int SPRITE_ID_HELIPAD = 6;
+    public static final int SPRITE_ID_BUGGY = 7;
+    public static final int SPRITE_ID_HELI = 11;
+    public static final int SPRITE_ID_HARVESTER = 19;
+    public static final int SPRITE_ID_SOLDIER = 23;
 
-    public static final int SPRITE_ROW_LENGTH = 33;
+    public static final int SPRITE_ROW_LENGTH = 35;
 
     public static final int SPRITE_OFFSET_RED = 0;
     public static final int SPRITE_OFFSET_GREEN = SPRITE_ROW_LENGTH * 2;

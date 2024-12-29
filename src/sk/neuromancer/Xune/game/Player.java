@@ -27,6 +27,8 @@ public class Player extends EntityOwner {
         this.addEntity(new Silo(5, 5, Orientation.NORTH, this, this.flag));
         this.addEntity(new Silo(5, 4, Orientation.NORTH, this, this.flag));
         this.addEntity(new Helipad(4, 5, Orientation.NORTH, this, this.flag));
+        this.addEntity(new Barracks(6, 4, Orientation.NORTH, this, this.flag));
+        this.addEntity(new Powerplant(6, 3, Orientation.NORTH, this, this.flag));
         Factory factory = new Factory(6, 5, Orientation.NORTH, this, this.flag);
         this.addEntity(factory);
         this.addEntity(new Buggy(tileToCenterLevelX(6, 8), tileToCenterLevelY(6, 8), Orientation.SOUTHEAST, this, this.flag));

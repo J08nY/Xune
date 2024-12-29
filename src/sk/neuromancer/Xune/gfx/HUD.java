@@ -64,6 +64,7 @@ public class HUD implements Tickable, Renderable {
         // Render HUD text
         glPushMatrix();
         glTranslatef(hudLeft, hudTop, 0);
+        glScalef(1.5f, 1.5f, 0);
 
         renderText(0, 60, "MONEY: " + game.getLevel().getPlayer().getMoney());
         float levelX = game.getLevel().getLevelX(mouseX);
