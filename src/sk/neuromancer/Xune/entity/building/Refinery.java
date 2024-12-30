@@ -10,7 +10,7 @@ import static sk.neuromancer.Xune.level.Tile.PASS_EDGES;
 public class Refinery extends Building {
 
     public Refinery(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_REFINERY);
+        super(x, y, orientation, owner, flag, 500, -75, SpriteSheet.SPRITE_ID_REFINERY);
     }
 
     @Override

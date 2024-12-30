@@ -5,6 +5,9 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Sprite.ScalableSprite;
+import sk.neuromancer.Xune.level.Level;
+
+import java.util.stream.Collectors;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -67,6 +70,8 @@ public class HUD implements Tickable, Renderable {
         glScalef(1.5f, 1.5f, 0);
 
         renderText(0, 60, "MONEY: " + game.getLevel().getPlayer().getMoney());
+        String selected = game.getLevel().getPlayer().getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
+        renderText(200, 60, selected);
         float levelX = game.getLevel().getLevelX(mouseX);
         float levelY = game.getLevel().getLevelY(mouseY);
 
@@ -121,13 +126,14 @@ public class HUD implements Tickable, Renderable {
         fromY = mouse.getLastLeftY();
 
         if (!hitEdge) {
-            if (game.getLevel().getPlayer().getSelected().isEmpty()) {
+            Level level = game.getLevel();
+            if (level.getPlayer().getSelected().isEmpty()) {
                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
             } else {
-                Entity entity = game.getLevel().entityAt(game.getLevel().getLevelX(mouseX), game.getLevel().getLevelY(mouseY));
-                if (entity != null) {
+                Entity entity = level.entityAt(level.getLevelX(mouseX), level.getLevelY(mouseY));
+                if (entity != null && level.isTileVisible(level.tileAt(entity))) {
                     if (entity instanceof Entity.PlayableEntity playable) {
-                        if (playable.getOwner() == game.getLevel().getPlayer()) {
+                        if (playable.getOwner() == level.getPlayer()) {
                             currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
                         } else {
                             currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);

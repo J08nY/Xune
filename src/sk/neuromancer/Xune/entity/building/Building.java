@@ -13,15 +13,23 @@ import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
 public abstract class Building extends Entity.PlayableEntity {
     public int tileX, tileY;
+    private int power;
 
-    public Building(int tileX, int tileY, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, int baseSpriteId) {
+    public Building(int tileX, int tileY, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, int power, int baseSpriteId) {
         super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner, flag, maxHealth);
         this.tileX = tileX;
         this.tileY = tileY;
+        this.power = power;
         this.orientation = orientation;
         int spriteRow = this.orientation.ordinal() % 2 == 0 ? 1 : 0;
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(baseSpriteId + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH);
         this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), true));
+    }
+
+    public boolean inSight(float x, float y) {
+        float dx = this.x - x;
+        float dy = this.y - y;
+        return dx * dx + dy * dy <= 60 * 60;
     }
 
     @Override

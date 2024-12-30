@@ -29,7 +29,7 @@ public class Game implements Renderable {
     public static final int CENTER_X = DEFAULT_WIDTH / 2;
     public static final int CENTER_Y = DEFAULT_HEIGHT / 2;
 
-    public static final int TPS = 120;
+    public static final int TPS = 50;
 
     public void start() {
         keepRunning = true;

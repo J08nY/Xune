@@ -4,6 +4,7 @@ import sk.neuromancer.Xune.ai.Enemy;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
+import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.gfx.Renderable;
@@ -28,7 +29,8 @@ public class Level implements Renderable, Tickable {
     private List<Road> roads;
 
     private Tile[][] level;
-    private boolean[][] visibility;
+    private boolean[][] visible;
+    private boolean[][] discovered;
     private int width, height;
 
     public float zoom;
@@ -47,14 +49,7 @@ public class Level implements Renderable, Tickable {
     public Level(Game game) {
         this.game = game;
         this.worms = new LinkedList<>();
-        worms.add(new Worm(tileToCenterLevelX(0, 0), tileToCenterLevelY(0, 0)));
         this.roads = new LinkedList<>();
-        roads.add(new Road(10, 4, Road.Variant.T_SE));
-        roads.add(new Road(10, 5, Road.Variant.I_NW_SE));
-        roads.add(new Road(11, 6, Road.Variant.CROSS));
-        roads.add(new Road(11, 5, Road.Variant.CROSS));
-        roads.add(new Road(12, 4, Road.Variant.I_NE_SW));
-        roads.add(new Road(12, 3, Road.Variant.V_S));
     }
 
     @Override
@@ -99,25 +94,38 @@ public class Level implements Renderable, Tickable {
         for (Worm worm : worms) {
             worm.tick(tickCount);
         }
-        for (Road road: roads) {
+        for (Road road : roads) {
             road.tick(tickCount);
         }
         pathfinder.tick(tickCount);
-        updateVisibility(true);
+        updateVisibility();
     }
 
-    private void updateVisibility(boolean onlyMoved) {
+    private void updateVisibility() {
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                visible[x][y] = false;
+            }
+        }
         for (Entity.PlayableEntity e : player.getEntities()) {
-            updateVisibility(e, onlyMoved);
+            updateVisibility(e);
         }
     }
 
-    private void updateVisibility(Entity.PlayableEntity entity, boolean onlyMoved) {
+    private void updateVisibility(Entity.PlayableEntity entity) {
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                if (entity instanceof Unit unit && (!onlyMoved || unit.moved())) {
-                    if (unit.inSight(tileToCenterLevelX(x, y), tileToCenterLevelY(x, y))) {
-                        visibility[x][y] = true;
+                float cx = tileToCenterLevelX(x, y);
+                float cy = tileToCenterLevelY(x, y);
+                if (entity instanceof Unit unit) {
+                    if (unit.inSight(cx, cy)) {
+                        visible[x][y] = true;
+                        discovered[x][y] = true;
+                    }
+                } else if (entity instanceof Building building) {
+                    if (building.inSight(cx, cy)) {
+                        visible[x][y] = true;
+                        discovered[x][y] = true;
                     }
                 }
             }
@@ -169,13 +177,13 @@ public class Level implements Renderable, Tickable {
 
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                if (visibility[x][y]) {
+                if (discovered[x][y]) {
                     Tile t = this.level[x][y];
                     t.render();
                 }
             }
         }
-        for (Road road: roads) {
+        for (Road road : roads) {
             road.render();
         }
         enemy.render();
@@ -189,12 +197,15 @@ public class Level implements Renderable, Tickable {
 
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                if (!visibility[x][y]) {
+                if (!discovered[x][y]) {
                     new Tile(50, x, y).render();
+                } else if (!visible[x][y]) {
+                    glColor4f(1, 1, 1, 0.5f);
+                    new Tile(50, x, y).render();
+                    glColor4f(1, 1, 1, 1);
                 }
             }
         }
-
         glPopMatrix();
     }
 
@@ -214,7 +225,8 @@ public class Level implements Renderable, Tickable {
             br.close();
 
             this.level = new Tile[this.width][this.height];
-            this.visibility = new boolean[this.width][this.height];
+            this.visible = new boolean[this.width][this.height];
+            this.discovered = new boolean[this.width][this.height];
 
             for (int i = 0; i < lines.size(); i++) {
                 String[] row = lines.get(i).split(",");
@@ -254,7 +266,7 @@ public class Level implements Renderable, Tickable {
     public void addEntity(Entity.PlayableEntity e) {
         pathfinder.addEntity(e);
         if (e.getOwner() == player) {
-            updateVisibility(e, false);
+            updateVisibility(e);
         }
     }
 
@@ -282,11 +294,11 @@ public class Level implements Renderable, Tickable {
     }
 
     public boolean isTileVisible(Tile tile) {
-        return visibility[tile.getX()][tile.getY()];
+        return visible[tile.getX()][tile.getY()];
     }
 
     public boolean isTileVisible(int column, int row) {
-        return visibility[column][row];
+        return visible[column][row];
     }
 
     public Tile[][] getTiles() {
@@ -295,6 +307,10 @@ public class Level implements Renderable, Tickable {
 
     public Tile getTile(int column, int row) {
         return this.level[column][row];
+    }
+
+    public Tile tileAt(Entity entity) {
+        return tileAt(entity.x, entity.y);
     }
 
     public Tile tileAt(float levelX, float levelY) {

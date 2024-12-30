@@ -10,7 +10,7 @@ import static sk.neuromancer.Xune.level.Tile.PASS_EDGES;
 public class Barracks extends Building {
 
     public Barracks(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_BARRACKS);
+        super(x, y, orientation, owner, flag, 500, -30, SpriteSheet.SPRITE_ID_BARRACKS);
     }
 
     @Override

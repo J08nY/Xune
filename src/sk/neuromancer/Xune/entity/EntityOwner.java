@@ -78,7 +78,7 @@ public class EntityOwner implements Tickable, Renderable {
 
     @Override
     public void render() {
-        entities.stream().sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
+        entities.stream().filter(e -> (e instanceof Building) || level.isTileVisible(level.tileAt(e))).sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
         //for (Entity e : entities) {
         //    e.render();
         //}
