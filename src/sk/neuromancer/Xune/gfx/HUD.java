@@ -20,6 +20,7 @@ public class HUD implements Tickable, Renderable {
     private ScalableSprite currentCursor;
     private final ScalableSprite logo;
     private final ScalableSprite hudPanel;
+    private final float hudScale;
 
     private double mouseX, mouseY;
     private double fromX, fromY;
@@ -38,11 +39,76 @@ public class HUD implements Tickable, Renderable {
         logo.setScaleFactor(1);
 
         hudPanel = SpriteSheet.HUD_PANEL.getSprite(0);
-        hudPanel.setScaleFactor(width / (float) hudPanel.getWidth());
+        hudScale = width / (float) hudPanel.getWidth();
+        hudPanel.setScaleFactor(hudScale);
     }
 
     @Override
     public void render() {
+        float hudTop = height - (hudPanel.getScaledHeight());
+        float hudLeft = (hudPanel.getScaledWidth()) * 0.18f;
+        //60
+
+        // Render HUD panel
+        glPushMatrix();
+        glTranslated(0, hudTop, 0);
+        // Render power
+        glPushMatrix();
+        glScalef(hudScale, hudScale, 0);
+        glBegin(GL_QUADS);
+        glColor3f(0.1f, 0.1f, 0.1f);
+        glVertex2i(71, 4);
+        glVertex2i(380, 4);
+        glVertex2i(380, 7);
+        glVertex2i(71, 7);
+        int production = game.getLevel().getPlayer().getPowerProduction();
+        int consumption = game.getLevel().getPlayer().getPowerConsumption();
+        glColor3f(0.1f, 0.6f, 0.1f);
+        glVertex2i(71, 4);
+        glVertex2i(380 * production / 1000, 4);
+        glVertex2i(380 * production / 1000, 7);
+        glVertex2i(71, 7);
+        if (production < consumption) {
+            glColor3f(0.6f, 0.1f, 0.1f);
+            glVertex2i(380 * production / 1000, 4);
+            glVertex2i(380 * (consumption - 2) / 1000, 4);
+            glVertex2i(380 * (consumption - 2) / 1000, 7);
+            glVertex2i(380 * production / 1000, 7);
+        }
+        glColor3f(0.6f, 0.6f, 0.6f);
+        glVertex2i(380 * (consumption - 2) / 1000, 4);
+        glVertex2i(380 * (consumption + 2) / 1000, 4);
+        glVertex2i(380 * (consumption + 2) / 1000, 7);
+        glVertex2i(380 * (consumption - 2) / 1000, 7);
+        glColor3f(1, 1, 1);
+        glEnd();
+        glPopMatrix();
+
+        hudPanel.render();
+        glPopMatrix();
+
+        // Render HUD text
+        glPushMatrix();
+        glTranslatef(hudLeft, hudTop, 0);
+        glScalef(1.5f, 1.5f, 0);
+
+        Level level = game.getLevel();
+        renderText(0, 60, "MONEY: " + level.getPlayer().getMoney());
+        String selected = level.getPlayer().getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
+        renderText(200, 60, selected);
+        float levelX = level.getLevelX(mouseX);
+        float levelY = level.getLevelY(mouseY);
+
+        renderText(0, 90, "X: " + mouseX);
+        renderText(0, 120, "Y: " + mouseY);
+        renderText(200, 90, "LEVELX: " + levelX);
+        renderText(200, 120, "LEVELY: " + levelY);
+        renderText(400, 90, "XOFF: " + level.xOff);
+        renderText(400, 120, "YOFF: " + level.yOff);
+        renderText(600, 90, "ZOOM: " + level.zoom);
+        glPopMatrix();
+
+        // Render Cursor
         if (drag) {
             glPushMatrix();
             glBegin(GL_QUADS);
@@ -55,36 +121,6 @@ public class HUD implements Tickable, Renderable {
             glColor4f(1.f, 1.f, 1.f, 1.f);
             glPopMatrix();
         }
-        float hudTop = height - (hudPanel.getHeight() * hudPanel.getScaleFactor());
-        float hudLeft = (hudPanel.getWidth() * hudPanel.getScaleFactor()) * 0.18f;
-
-        // Render HUD panel
-        glPushMatrix();
-        glTranslated(0, hudTop, 0);
-        hudPanel.render();
-        glPopMatrix();
-
-        // Render HUD text
-        glPushMatrix();
-        glTranslatef(hudLeft, hudTop, 0);
-        glScalef(1.5f, 1.5f, 0);
-
-        renderText(0, 60, "MONEY: " + game.getLevel().getPlayer().getMoney());
-        String selected = game.getLevel().getPlayer().getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
-        renderText(200, 60, selected);
-        float levelX = game.getLevel().getLevelX(mouseX);
-        float levelY = game.getLevel().getLevelY(mouseY);
-
-        renderText(0, 90, "X: " + mouseX);
-        renderText(0, 120, "Y: " + mouseY);
-        renderText(200, 90, "LEVELX: " + levelX);
-        renderText(200, 120, "LEVELY: " + levelY);
-        renderText(400, 90, "XOFF: " + game.getLevel().xOff);
-        renderText(400, 120, "YOFF: " + game.getLevel().yOff);
-        renderText(600, 90, "ZOOM: " + game.getLevel().zoom);
-        glPopMatrix();
-
-        // Render Cursor
         glPushMatrix();
         glTranslated(mouseX - (currentCursor.getWidth() * currentCursor.getScaleFactor()) / 2, mouseY - (currentCursor.getHeight() * currentCursor.getScaleFactor()) / 2, 0);
         currentCursor.render();
@@ -126,21 +162,25 @@ public class HUD implements Tickable, Renderable {
         fromY = mouse.getLastLeftY();
 
         if (!hitEdge) {
-            Level level = game.getLevel();
-            if (level.getPlayer().getSelected().isEmpty()) {
-                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
+            if (mouseY > height - hudPanel.getScaledHeight()) {
+                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(13);
             } else {
-                Entity entity = level.entityAt(level.getLevelX(mouseX), level.getLevelY(mouseY));
-                if (entity != null && level.isTileVisible(level.tileAt(entity))) {
-                    if (entity instanceof Entity.PlayableEntity playable) {
-                        if (playable.getOwner() == level.getPlayer()) {
-                            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
-                        } else {
-                            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
-                        }
-                    }
+                Level level = game.getLevel();
+                if (level.getPlayer().getSelected().isEmpty()) {
+                    currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
                 } else {
-                    currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
+                    Entity entity = level.entityAt(level.getLevelX(mouseX), level.getLevelY(mouseY));
+                    if (entity != null && level.isTileVisible(level.tileAt(entity))) {
+                        if (entity instanceof Entity.PlayableEntity playable) {
+                            if (playable.getOwner() == level.getPlayer()) {
+                                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
+                            } else {
+                                currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
+                            }
+                        }
+                    } else {
+                        currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
+                    }
                 }
             }
         }
@@ -150,4 +190,7 @@ public class HUD implements Tickable, Renderable {
         new Text(text, x, y, false).render();
     }
 
+    public boolean isMouseOverHud(float mouseY) {
+        return mouseY > height - hudPanel.getScaledHeight();
+    }
 }

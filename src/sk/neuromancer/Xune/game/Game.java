@@ -150,6 +150,10 @@ public class Game implements Renderable {
         return sound;
     }
 
+    public HUD getHud() {
+        return hud;
+    }
+
     public static void main(String[] args) {
         Game g = new Game();
         g.start();

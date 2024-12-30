@@ -25,10 +25,10 @@ public class Player extends EntityOwner {
         this.addEntity(new Base(7, 2, Orientation.NORTH, this, this.flag));
         this.addEntity(new Refinery(5, 6, Orientation.NORTH, this, this.flag));
         this.addEntity(new Silo(5, 5, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Silo(5, 4, Orientation.NORTH, this, this.flag));
         this.addEntity(new Helipad(4, 5, Orientation.NORTH, this, this.flag));
         this.addEntity(new Barracks(6, 4, Orientation.NORTH, this, this.flag));
         this.addEntity(new Powerplant(6, 3, Orientation.NORTH, this, this.flag));
+        this.addEntity(new Powerplant(5, 4, Orientation.NORTH, this, this.flag));
         Factory factory = new Factory(6, 5, Orientation.NORTH, this, this.flag);
         this.addEntity(factory);
         this.addEntity(new Buggy(tileToCenterLevelX(6, 8), tileToCenterLevelY(6, 8), Orientation.SOUTHEAST, this, this.flag));
@@ -60,6 +60,10 @@ public class Player extends EntityOwner {
         float mouseY = (float) mouse.getY();
         float fromX = (float) mouse.getLastLeftX();
         float fromY = (float) mouse.getLastLeftY();
+
+        if (game.getHud().isMouseOverHud(mouseY)) {
+            return;
+        }
 
         float levelX = level.getLevelX(mouseX);
         float levelY = level.getLevelY(mouseY);

@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL11.*;
+import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class Level implements Renderable, Tickable {
     private final Game game;
@@ -39,9 +40,9 @@ public class Level implements Renderable, Tickable {
     public float yOff;
 
     public static final String LEVEL_1 = "newlevel.lvl";
-    public static final float ZOOM_SPEED = 0.02f;
-    public static final float SCROLL_SPEED = 0.04f;
-    public static final float MOVE_SPEED = 5f;
+    public static final float ZOOM_SPEED = (float) 3 / TPS;
+    public static final float SCROLL_SPEED = (float) 5 / TPS;
+    public static final float MOVE_SPEED = (float) TPS / 4.5f;
     public static final float EDGE_MARGIN_X = Tile.TILE_WIDTH * 2;
     public static final float EDGE_MARGIN_Y = Tile.TILE_HEIGHT * 4;
 
@@ -238,7 +239,7 @@ public class Level implements Renderable, Tickable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.zoom = 4.0f;
+        this.zoom = 5.0f;
         this.xOff = Game.CENTER_X - Game.CENTER_X / this.zoom;
         this.yOff = Game.CENTER_Y - Game.CENTER_Y / this.zoom;
     }
@@ -299,6 +300,14 @@ public class Level implements Renderable, Tickable {
 
     public boolean isTileVisible(int column, int row) {
         return visible[column][row];
+    }
+
+    public boolean isTileDiscovered(Tile tile) {
+        return discovered[tile.getX()][tile.getY()];
+    }
+
+    public boolean isTileDiscovered(int column, int row) {
+        return discovered[column][row];
     }
 
     public Tile[][] getTiles() {

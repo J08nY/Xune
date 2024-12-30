@@ -123,7 +123,7 @@ public abstract class CommandStrategy {
                     }
                 } else {
                     Tile harvesterTile = level.tileAt(harvester.x, harvester.y);
-                    for (Iterator<Tile> it = level.findClosestTile(harvesterTile, tile -> tile.isSpicy() && tile.getSpice() > 0); it.hasNext(); ) {
+                    for (Iterator<Tile> it = level.findClosestTile(harvesterTile, tile -> level.isTileDiscovered(tile) && tile.isSpicy() && tile.getSpice() > 0); it.hasNext(); ) {
                         Tile tile = it.next();
                         try {
                             return new Command.CollectSpiceCommand(entity.x, entity.y, level.getPathfinder(), tile);

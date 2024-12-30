@@ -76,12 +76,17 @@ public class EntityOwner implements Tickable, Renderable {
         this.money -= money;
     }
 
+    public int getPowerConsumption() {
+        return Math.abs(entities.stream().filter(e -> e instanceof Building).mapToInt(e -> ((Building) e).getPower()).filter(i -> i < 0).sum());
+    }
+
+    public int getPowerProduction() {
+        return entities.stream().filter(e -> e instanceof Building).mapToInt(e -> ((Building) e).getPower()).filter(i -> i > 0).sum();
+    }
+
     @Override
     public void render() {
         entities.stream().filter(e -> (e instanceof Building) || level.isTileVisible(level.tileAt(e))).sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
-        //for (Entity e : entities) {
-        //    e.render();
-        //}
         for (Effect e : effects) {
             e.render();
         }

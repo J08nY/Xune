@@ -122,6 +122,14 @@ public class Sprite implements Renderable {
             glDisable(GL_TEXTURE_2D);
         }
 
+        public float getScaledWidth() {
+            return width * scaleFactor;
+        }
+
+        public float getScaledHeight() {
+            return height * scaleFactor;
+        }
+
         public float getScaleFactor() {
             return scaleFactor;
         }

@@ -64,5 +64,9 @@ public abstract class Building extends Entity.PlayableEntity {
         glPopMatrix();
     }
 
+    public int getPower() {
+        return power;
+    }
+
     public abstract boolean[] getPassable();
 }
