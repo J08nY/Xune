@@ -54,13 +54,13 @@ public class Effect implements Tickable, Renderable {
 
     public static class Explosion extends Effect {
         public Explosion(float x, float y) {
-            super(x, y, EXPLOSION, 8, 200, Ease::easeOutSine);
+            super(x, y, EXPLOSION, 8, 100, Ease::easeOutSine);
         }
     }
 
     public static class Sparkle extends Effect {
         public Sparkle(float x, float y) {
-            super(x, y, SPARKLE, 4, 250, Ease::linear);
+            super(x, y, SPARKLE, 4, 130, Ease::linear);
         }
     }
 

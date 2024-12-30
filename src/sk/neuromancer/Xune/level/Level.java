@@ -295,6 +295,9 @@ public class Level implements Renderable, Tickable {
     }
 
     public boolean isTileVisible(Tile tile) {
+        if (tile == null) {
+            return true;
+        }
         return visible[tile.getX()][tile.getY()];
     }
 
@@ -303,6 +306,9 @@ public class Level implements Renderable, Tickable {
     }
 
     public boolean isTileDiscovered(Tile tile) {
+        if (tile == null) {
+            return true;
+        }
         return discovered[tile.getX()][tile.getY()];
     }
 

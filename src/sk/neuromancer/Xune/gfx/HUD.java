@@ -21,10 +21,15 @@ public class HUD implements Tickable, Renderable {
     private final ScalableSprite logo;
     private final ScalableSprite hudPanel;
     private final float hudScale;
+    private final float hudTop;
+    private final float hudLeft;
 
     private double mouseX, mouseY;
     private double fromX, fromY;
     private boolean drag;
+
+
+    public static final int MAX_POWER = 1000;
 
     public HUD(Game game) {
         this.game = game;
@@ -41,73 +46,20 @@ public class HUD implements Tickable, Renderable {
         hudPanel = SpriteSheet.HUD_PANEL.getSprite(0);
         hudScale = width / (float) hudPanel.getWidth();
         hudPanel.setScaleFactor(hudScale);
+        hudTop = height - (hudPanel.getScaledHeight());
+        hudLeft = 60 * hudScale;
     }
+
 
     @Override
     public void render() {
-        float hudTop = height - (hudPanel.getScaledHeight());
-        float hudLeft = (hudPanel.getScaledWidth()) * 0.18f;
-        //60
+        renderPanel();
+        renderCursor();
 
-        // Render HUD panel
-        glPushMatrix();
-        glTranslated(0, hudTop, 0);
-        // Render power
-        glPushMatrix();
-        glScalef(hudScale, hudScale, 0);
-        glBegin(GL_QUADS);
-        glColor3f(0.1f, 0.1f, 0.1f);
-        glVertex2i(71, 4);
-        glVertex2i(380, 4);
-        glVertex2i(380, 7);
-        glVertex2i(71, 7);
-        int production = game.getLevel().getPlayer().getPowerProduction();
-        int consumption = game.getLevel().getPlayer().getPowerConsumption();
-        glColor3f(0.1f, 0.6f, 0.1f);
-        glVertex2i(71, 4);
-        glVertex2i(380 * production / 1000, 4);
-        glVertex2i(380 * production / 1000, 7);
-        glVertex2i(71, 7);
-        if (production < consumption) {
-            glColor3f(0.6f, 0.1f, 0.1f);
-            glVertex2i(380 * production / 1000, 4);
-            glVertex2i(380 * (consumption - 2) / 1000, 4);
-            glVertex2i(380 * (consumption - 2) / 1000, 7);
-            glVertex2i(380 * production / 1000, 7);
-        }
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glVertex2i(380 * (consumption - 2) / 1000, 4);
-        glVertex2i(380 * (consumption + 2) / 1000, 4);
-        glVertex2i(380 * (consumption + 2) / 1000, 7);
-        glVertex2i(380 * (consumption - 2) / 1000, 7);
-        glColor3f(1, 1, 1);
-        glEnd();
-        glPopMatrix();
+        logo.render();
+    }
 
-        hudPanel.render();
-        glPopMatrix();
-
-        // Render HUD text
-        glPushMatrix();
-        glTranslatef(hudLeft, hudTop, 0);
-        glScalef(1.5f, 1.5f, 0);
-
-        Level level = game.getLevel();
-        renderText(0, 60, "MONEY: " + level.getPlayer().getMoney());
-        String selected = level.getPlayer().getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
-        renderText(200, 60, selected);
-        float levelX = level.getLevelX(mouseX);
-        float levelY = level.getLevelY(mouseY);
-
-        renderText(0, 90, "X: " + mouseX);
-        renderText(0, 120, "Y: " + mouseY);
-        renderText(200, 90, "LEVELX: " + levelX);
-        renderText(200, 120, "LEVELY: " + levelY);
-        renderText(400, 90, "XOFF: " + level.xOff);
-        renderText(400, 120, "YOFF: " + level.yOff);
-        renderText(600, 90, "ZOOM: " + level.zoom);
-        glPopMatrix();
-
+    private void renderCursor() {
         // Render Cursor
         if (drag) {
             glPushMatrix();
@@ -125,18 +77,108 @@ public class HUD implements Tickable, Renderable {
         glTranslated(mouseX - (currentCursor.getWidth() * currentCursor.getScaleFactor()) / 2, mouseY - (currentCursor.getHeight() * currentCursor.getScaleFactor()) / 2, 0);
         currentCursor.render();
         glPopMatrix();
+    }
 
-        logo.render();
+    private void renderPanelText() {
+        // Render HUD text
+        glPushMatrix();
+        glTranslatef(hudLeft, hudTop, 0);
+        glScalef(2f, 2f, 0);
+
+        Level level = game.getLevel();
+        renderText(0, 30, "MONEY: " + level.getPlayer().getMoney());
+        String selected = level.getPlayer().getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
+        renderText(200, 110, selected);
+
+        float levelX = level.getLevelX(mouseX);
+        float levelY = level.getLevelY(mouseY);
+
+        renderText(0, 70, String.format("X:      %.2f", mouseX));
+        renderText(0, 80, String.format("Y:      %.2f", mouseY));
+        renderText(0, 90, String.format("LEVELX: %.2f", levelX));
+        renderText(0, 100, String.format("LEVELY: %.2f", levelY));
+        renderText(0, 110, String.format("XOFF:   %.2f", level.xOff));
+        renderText(0, 120, String.format("YOFF:   %.2f", level.yOff));
+        renderText(200, 120, String.format("ZOOM:   %.2f", level.zoom));
+        glPopMatrix();
+    }
+
+    private void renderPower() {
+        // Render power
+        glPushMatrix();
+        glScalef(hudScale, hudScale, 0);
+        glBegin(GL_QUADS);
+        glColor3f(0.1f, 0.1f, 0.1f);
+        glVertex2i(71, 4);
+        glVertex2i(380, 4);
+        glVertex2i(380, 7);
+        glVertex2i(71, 7);
+        int production = game.getLevel().getPlayer().getPowerProduction();
+        int consumption = game.getLevel().getPlayer().getPowerConsumption();
+        glColor3f(0.1f, 0.6f, 0.1f);
+        glVertex2i(71, 4);
+        glVertex2i(380 * production / MAX_POWER, 4);
+        glVertex2i(380 * production / MAX_POWER, 7);
+        glVertex2i(71, 7);
+        if (production < consumption) {
+            glColor3f(0.6f, 0.1f, 0.1f);
+            glVertex2i(380 * production / MAX_POWER, 4);
+            glVertex2i(380 * (consumption - 2) / MAX_POWER, 4);
+            glVertex2i(380 * (consumption - 2) / MAX_POWER, 7);
+            glVertex2i(380 * production / MAX_POWER, 7);
+        }
+        glColor3f(0.6f, 0.6f, 0.6f);
+        glVertex2i(380 * (consumption - 2) / MAX_POWER, 4);
+        glVertex2i(380 * (consumption + 2) / MAX_POWER, 4);
+        glVertex2i(380 * (consumption + 2) / MAX_POWER, 7);
+        glVertex2i(380 * (consumption - 2) / MAX_POWER, 7);
+        glColor3f(1, 1, 1);
+        glEnd();
+        glPopMatrix();
+    }
+
+    private void renderPanel() {
+        glPushMatrix();
+        glTranslated(0, hudTop, 0);
+        renderPower();
+        hudPanel.render();
+        renderEntities();
+        glPopMatrix();
+
+        renderPanelText();
+    }
+
+    private void renderEntities() {
+        // Render entities
+        glPushMatrix();
+        glTranslatef(hudLeft, 0, 0);
+        glScalef(4f, 4f, 0);
+        glTranslatef(100, 16, 0);
+        int playerOffset = SpriteSheet.flagToOffset(game.getLevel().getPlayer().getFlag());
+        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_BASE + playerOffset).render();
+        glTranslatef(24, 0, 0);
+        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset).render();
+        glTranslatef(24, 0, 0);
+        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_BARRACKS + playerOffset).render();
+        glTranslatef(24, 0, 0);
+        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_FACTORY + playerOffset).render();
+        glTranslatef(24, 0, 0);
+        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_REFINERY + playerOffset).render();
+        glTranslatef(24, 0, 0);
+        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_SILO + playerOffset).render();
+        glTranslatef(24, 0, 0);
+        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_HELIPAD + playerOffset).render();
+        glPopMatrix();
     }
 
     @Override
     public void tick(int tickCount) {
-        InputHandler.Mouse mouse = game.getInput().mouse;
-        mouseX = mouse.getX();
-        mouseY = mouse.getY();
+        updateInputs();
+        updateCursor();
+    }
 
+    private void updateCursor() {
         boolean hitEdge = false;
-
         if (mouseX < 10) {
             mouseX = 10;
             currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(7);
@@ -156,10 +198,6 @@ public class HUD implements Tickable, Renderable {
             hitEdge = true;
         }
         glfwSetCursorPos(game.getWindow().getHandle(), mouseX, mouseY);
-
-        drag = mouse.wasLeftDrag();
-        fromX = mouse.getLastLeftX();
-        fromY = mouse.getLastLeftY();
 
         if (!hitEdge) {
             if (mouseY > height - hudPanel.getScaledHeight()) {
@@ -184,6 +222,15 @@ public class HUD implements Tickable, Renderable {
                 }
             }
         }
+    }
+
+    private void updateInputs() {
+        InputHandler.Mouse mouse = game.getInput().mouse;
+        mouseX = mouse.getX();
+        mouseY = mouse.getY();
+        drag = mouse.wasLeftDrag();
+        fromX = mouse.getLastLeftX();
+        fromY = mouse.getLastLeftY();
     }
 
     private void renderText(float x, float y, String text) {
