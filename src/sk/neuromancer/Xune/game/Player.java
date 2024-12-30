@@ -62,6 +62,9 @@ public class Player extends EntityOwner {
         float fromY = (float) mouse.getLastLeftY();
 
         if (game.getHud().isMouseOverHud(mouseY)) {
+            if (game.getInput().mouse.isLeftReleased()) {
+                handleHUDClick(mouseX, mouseY);
+            }
             return;
         }
 
@@ -131,6 +134,10 @@ public class Player extends EntityOwner {
                 }
             }
         }
+    }
+
+    private void handleHUDClick(float mouseX, float mouseY) {
+
     }
 
     public List<PlayableEntity> getSelected() {

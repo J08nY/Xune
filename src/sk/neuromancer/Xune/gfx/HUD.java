@@ -1,12 +1,16 @@
 package sk.neuromancer.Xune.gfx;
 
+import sk.neuromancer.Xune.entity.Clickable;
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.game.Tickable;
-import sk.neuromancer.Xune.gfx.Sprite.ScalableSprite;
 import sk.neuromancer.Xune.level.Level;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -14,42 +18,61 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class HUD implements Tickable, Renderable {
     private final Game game;
+    private final Level level;
+    private final Player player;
     private final float width;
     private final float height;
 
-    private ScalableSprite currentCursor;
-    private final ScalableSprite logo;
-    private final ScalableSprite hudPanel;
+    private Sprite currentCursor;
+    private final float cursorScale = 2f;
+    private final Sprite logo;
+    private final Sprite hudPanel;
     private final float hudScale;
     private final float hudTop;
     private final float hudLeft;
+
+    private final List<Button> buttons;
 
     private double mouseX, mouseY;
     private double fromX, fromY;
     private boolean drag;
 
-
     public static final int MAX_POWER = 1000;
 
     public HUD(Game game) {
         this.game = game;
+        this.level = game.getLevel();
+        this.player = level.getPlayer();
         this.width = game.getWindow().getWidth();
         this.height = game.getWindow().getHeight();
         glfwSetInputMode(game.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
         // TODO: This does nothing. Why?
         glfwSetCursorPos(game.getWindow().getHandle(), (double) width / 2, (double) height / 2);
-        currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
+        this.currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
 
-        logo = SpriteSheet.LOGO.getSprite(0);
-        logo.setScaleFactor(1);
+        this.logo = SpriteSheet.LOGO.getSprite(0);
 
-        hudPanel = SpriteSheet.HUD_PANEL.getSprite(0);
-        hudScale = width / (float) hudPanel.getWidth();
-        hudPanel.setScaleFactor(hudScale);
-        hudTop = height - (hudPanel.getScaledHeight());
-        hudLeft = 60 * hudScale;
+        this.hudPanel = SpriteSheet.HUD_PANEL.getSprite(0);
+        this.hudScale = width / (float) hudPanel.getWidth();
+        this.hudTop = height - (hudPanel.getHeight() * hudScale);
+        this.hudLeft = 60 * hudScale;
+
+        this.buttons = new LinkedList<>();
+        int playerOffset = SpriteSheet.flagToOffset(player.getFlag());
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_BASE + playerOffset, 1 , hudLeft + 400, hudTop + 64, 4));
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset, 1,hudLeft + 400 + 4 * 25, hudTop + 64, 4));
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_BARRACKS + playerOffset, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_FACTORY + playerOffset, 1,hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_REFINERY + playerOffset, 1,hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_SILO + playerOffset, 1,hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_HELIPAD + playerOffset, 1,hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
+
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_SOLDIER + playerOffset, 1,hudLeft + 400, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_BUGGY + playerOffset, 1,hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_HELI + playerOffset, 1,hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_HARVESTER + playerOffset, 1,hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
     }
-
 
     @Override
     public void render() {
@@ -74,7 +97,8 @@ public class HUD implements Tickable, Renderable {
             glPopMatrix();
         }
         glPushMatrix();
-        glTranslated(mouseX - (currentCursor.getWidth() * currentCursor.getScaleFactor()) / 2, mouseY - (currentCursor.getHeight() * currentCursor.getScaleFactor()) / 2, 0);
+        glTranslated(mouseX - (currentCursor.getWidth() * cursorScale) / 2, mouseY - (currentCursor.getHeight() * cursorScale) / 2, 0);
+        glScalef(cursorScale, cursorScale, 0);
         currentCursor.render();
         glPopMatrix();
     }
@@ -85,9 +109,8 @@ public class HUD implements Tickable, Renderable {
         glTranslatef(hudLeft, hudTop, 0);
         glScalef(2f, 2f, 0);
 
-        Level level = game.getLevel();
-        renderText(0, 30, "MONEY: " + level.getPlayer().getMoney());
-        String selected = level.getPlayer().getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
+        renderText(0, 30, "MONEY: " + player.getMoney());
+        String selected = player.getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
         renderText(200, 110, selected);
 
         float levelX = level.getLevelX(mouseX);
@@ -106,6 +129,7 @@ public class HUD implements Tickable, Renderable {
     private void renderPower() {
         // Render power
         glPushMatrix();
+        glTranslated(0, hudTop, 0);
         glScalef(hudScale, hudScale, 0);
         glBegin(GL_QUADS);
         glColor3f(0.1f, 0.1f, 0.1f);
@@ -113,8 +137,8 @@ public class HUD implements Tickable, Renderable {
         glVertex2i(380, 4);
         glVertex2i(380, 7);
         glVertex2i(71, 7);
-        int production = game.getLevel().getPlayer().getPowerProduction();
-        int consumption = game.getLevel().getPlayer().getPowerConsumption();
+        int production = player.getPowerProduction();
+        int consumption = player.getPowerConsumption();
         glColor3f(0.1f, 0.6f, 0.1f);
         glVertex2i(71, 4);
         glVertex2i(380 * production / MAX_POWER, 4);
@@ -138,36 +162,26 @@ public class HUD implements Tickable, Renderable {
     }
 
     private void renderPanel() {
-        glPushMatrix();
-        glTranslated(0, hudTop, 0);
         renderPower();
-        hudPanel.render();
+        renderPanelBackground();
         renderEntities();
-        glPopMatrix();
-
         renderPanelText();
+    }
+
+    private void renderPanelBackground() {
+        glPushMatrix();
+        glTranslatef(0, hudTop, 0);
+        glScalef(hudScale, hudScale, 0);
+        hudPanel.render();
+        glPopMatrix();
     }
 
     private void renderEntities() {
         // Render entities
         glPushMatrix();
-        glTranslatef(hudLeft, 0, 0);
-        glScalef(4f, 4f, 0);
-        glTranslatef(100, 16, 0);
-        int playerOffset = SpriteSheet.flagToOffset(game.getLevel().getPlayer().getFlag());
-        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_BASE + playerOffset).render();
-        glTranslatef(24, 0, 0);
-        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset).render();
-        glTranslatef(24, 0, 0);
-        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_BARRACKS + playerOffset).render();
-        glTranslatef(24, 0, 0);
-        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_FACTORY + playerOffset).render();
-        glTranslatef(24, 0, 0);
-        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_REFINERY + playerOffset).render();
-        glTranslatef(24, 0, 0);
-        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_SILO + playerOffset).render();
-        glTranslatef(24, 0, 0);
-        SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_HELIPAD + playerOffset).render();
+        for (Button button : buttons) {
+            button.render();
+        }
         glPopMatrix();
     }
 
@@ -200,17 +214,16 @@ public class HUD implements Tickable, Renderable {
         glfwSetCursorPos(game.getWindow().getHandle(), mouseX, mouseY);
 
         if (!hitEdge) {
-            if (mouseY > height - hudPanel.getScaledHeight()) {
+            if (mouseY > height - (hudPanel.getHeight() * hudScale)) {
                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(13);
             } else {
-                Level level = game.getLevel();
-                if (level.getPlayer().getSelected().isEmpty()) {
+                if (player.getSelected().isEmpty()) {
                     currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
                 } else {
                     Entity entity = level.entityAt(level.getLevelX(mouseX), level.getLevelY(mouseY));
                     if (entity != null && level.isTileVisible(level.tileAt(entity))) {
                         if (entity instanceof Entity.PlayableEntity playable) {
-                            if (playable.getOwner() == level.getPlayer()) {
+                            if (playable.getOwner() == player) {
                                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
                             } else {
                                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
@@ -238,6 +251,72 @@ public class HUD implements Tickable, Renderable {
     }
 
     public boolean isMouseOverHud(float mouseY) {
-        return mouseY > height - hudPanel.getScaledHeight();
+        return mouseY > height - (hudPanel.getHeight() * hudScale);
+    }
+
+    public static class Button implements Clickable, Tickable, Renderable {
+        private final Building.Type buildingType;
+        private Sprite sprite;
+        private final int spriteOffset;
+        private final int numSprites;
+        private float x;
+        private float y;
+        private final float width;
+        private final float height;
+        private final float scale;
+
+        public Button(Building.Type buildingType, int spriteOffset, int numSprites, float x, float y, float scale) {
+            this.buildingType = buildingType;
+            this.spriteOffset = spriteOffset;
+            this.numSprites = numSprites;
+            this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(spriteOffset);
+            this.x = x;
+            this.y = y;
+            this.width = sprite.getWidth();
+            this.height = sprite.getHeight();
+            this.scale = scale;
+        }
+
+        @Override
+        public void tick(int tickCount) {
+
+        }
+
+        @Override
+        public void render() {
+            glPushMatrix();
+            glTranslatef(x, y, 0);
+            glScalef(scale, scale, 0);
+            glBegin(GL_QUADS);
+            glColor4f(1, 1, 1, 0.2f);
+            glVertex2f(0, 0);
+            glVertex2f(width, 0);
+            glVertex2f(width, height);
+            glVertex2f(0, height);
+            glColor4f(1, 1, 1, 1);
+            glEnd();
+            sprite.render();
+            glPopMatrix();
+        }
+
+        @Override
+        public boolean intersects(float x, float y) {
+            return x >= this.x && x <= this.x + width * scale && y >= this.y && y <= this.y + height * scale;
+        }
+
+        @Override
+        public boolean intersects(float fromX, float fromY, float toX, float toY) {
+            return false;
+        }
+
+        @Override
+        public void setPosition(float x, float y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public Building.Type getBuildingType() {
+            return buildingType;
+        }
     }
 }

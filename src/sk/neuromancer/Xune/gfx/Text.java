@@ -22,16 +22,23 @@ public class Text implements Renderable {
         this(text, 0, 0, false);
     }
 
+    public float getWidth() {
+        return text.length() * SpriteSheet.TEXT_SHEET.getSpriteWidth();
+    }
+
+    public float getHeight() {
+        return SpriteSheet.TEXT_SHEET.getSpriteHeight();
+    }
+
 
     @Override
     public void render() {
         String charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ  0123456789.,!?'\"-+=/\\%()<>:;";
-        float textScaleFactor = SpriteSheet.TEXT_SHEET.getSprite(0).getScaleFactor();
-        float scaledSpriteWidth = SpriteSheet.TEXT_SHEET.getSprite(0).getWidth() * textScaleFactor;
+        float sw = SpriteSheet.TEXT_SHEET.getSpriteWidth();
         for (int i = 0; i < text.length(); i++) {
             int spriteId = charset.indexOf(text.charAt(i)) + (outline ? SpriteSheet.TEXT_SHEET.width * 2 : 0);
             glPushMatrix();
-            glTranslated(x + scaledSpriteWidth * i, y, 0);
+            glTranslated(x + sw * i, y, 0);
             SpriteSheet.TEXT_SHEET.getSprite(spriteId).render();
             glPopMatrix();
         }

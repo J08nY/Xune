@@ -1,23 +1,20 @@
 package sk.neuromancer.Xune.gfx;
 
 import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.gfx.Sprite.ScalableSprite;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
-import static sk.neuromancer.Xune.gfx.Sprite.DEFAULT_SCALE_FACTOR;
 
 public class SpriteSheet {
     public static SpriteSheet ENTITY_SHEET = new SpriteSheet("entities.png", 24, 11);
     public static SpriteSheet TILE_SHEET = new SpriteSheet("tiles.png", 24, 11);
     public static SpriteSheet EFFECTS_SHEET = new SpriteSheet("effects.png", 24, 11);
     public static SpriteSheet MISC_SHEET = new SpriteSheet("misc.png", 24, 11);
-    public static ScalableSpriteSheet CURSOR_SHEET = new ScalableSpriteSheet("cursors.png", 19, 19, 2);
-    public static ScalableSpriteSheet LOGO = new ScalableSpriteSheet("logo.png", 160, 61);
-    public static ScalableSpriteSheet HUD_PANEL = new ScalableSpriteSheet("gamepanel.png", 384, 60);
-    public static ScalableSpriteSheet TEXT_SHEET = new ScalableSpriteSheet("text.png", 9, 9);
+    public static SpriteSheet CURSOR_SHEET = new SpriteSheet("cursors.png", 19, 19);
+    public static SpriteSheet LOGO = new SpriteSheet("logo.png", 160, 61);
+    public static SpriteSheet HUD_PANEL = new SpriteSheet("gamepanel.png", 384, 60);
+    public static SpriteSheet TEXT_SHEET = new SpriteSheet("text.png", 9, 9);
     public static SpriteSheet WORM_SHEET = new SpriteSheet("worm.png", 24, 11);
 
     protected int width, height;
@@ -135,62 +132,4 @@ public class SpriteSheet {
         SpriteSheet.TEXT_SHEET.destroySheet();
         SpriteSheet.WORM_SHEET.destroySheet();
     }
-
-    public static class ScalableSpriteSheet extends SpriteSheet {
-        private float scaleFactor = DEFAULT_SCALE_FACTOR;
-
-        public ScalableSpriteSheet(String imageName, int spriteWidth, int spriteHeight) {
-            super(imageName, spriteWidth, spriteHeight);
-        }
-
-        public ScalableSpriteSheet(String imageName, int spriteWidth, int spriteHeight, float scaleFactor) {
-            super(imageName, spriteWidth, spriteHeight);
-            this.scaleFactor = scaleFactor;
-        }
-
-        @Override
-        public void initSheet() {
-            BufferedImage img = null;
-            try {
-                img = ImageIO.read(getClass().getResourceAsStream("/sk/neuromancer/Xune/img/" + imageName));
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-
-            width = img.getWidth() / spriteWidth;
-            height = img.getHeight() / spriteHeight;
-
-            sprites = new ScalableSprite[width * height];
-
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    int[] RGBAData = null;
-                    RGBAData = img.getData().getPixels(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight, RGBAData);
-                    sprites[y * width + x] = new ScalableSprite(RGBAData, spriteWidth, spriteHeight, scaleFactor);
-                }
-            }
-            isInitiated = true;
-        }
-
-        @Override
-        public ScalableSprite getSprite(int index) {
-            return (ScalableSprite) sprites[index];
-        }
-
-        @Override
-        public ScalableSprite getSprite(int x, int y) {
-            return getSprite(y * width + x);
-        }
-
-        public void setScaleFactor(float scaleFactor) {
-            this.scaleFactor = scaleFactor;
-            for (Sprite s : sprites) {
-                ScalableSprite ss = (ScalableSprite) s;
-                ss.setScaleFactor(scaleFactor);
-            }
-        }
-
-    }
-
 }
