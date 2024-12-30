@@ -2,7 +2,8 @@ package sk.neuromancer.Xune.gfx;
 
 import sk.neuromancer.Xune.entity.Clickable;
 import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.entity.building.*;
+import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Player;
@@ -31,7 +32,7 @@ public class HUD implements Tickable, Renderable {
     private final float hudTop;
     private final float hudLeft;
 
-    private final List<Button> buttons;
+    private final List<Button<?>> buttons;
 
     private double mouseX, mouseY;
     private double fromX, fromY;
@@ -60,18 +61,18 @@ public class HUD implements Tickable, Renderable {
 
         this.buttons = new LinkedList<>();
         int playerOffset = SpriteSheet.flagToOffset(player.getFlag());
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_BASE + playerOffset, 1 , hudLeft + 400, hudTop + 64, 4));
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset, 1,hudLeft + 400 + 4 * 25, hudTop + 64, 4));
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_BARRACKS + playerOffset, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_FACTORY + playerOffset, 1,hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_REFINERY + playerOffset, 1,hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_SILO + playerOffset, 1,hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_HELIPAD + playerOffset, 1,hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Base.class, SpriteSheet.SPRITE_ID_BASE + playerOffset, 1, hudLeft + 400, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Powerplant.class, SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset, 1, hudLeft + 400 + 4 * 25, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Barracks.class, SpriteSheet.SPRITE_ID_BARRACKS + playerOffset, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Factory.class, SpriteSheet.SPRITE_ID_FACTORY + playerOffset, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Refinery.class, SpriteSheet.SPRITE_ID_REFINERY + playerOffset, 1, hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Silo.class, SpriteSheet.SPRITE_ID_SILO + playerOffset, 1, hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Base.class, SpriteSheet.SPRITE_ID_HELIPAD + playerOffset, 1, hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
 
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_SOLDIER + playerOffset, 1,hudLeft + 400, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_BUGGY + playerOffset, 1,hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_HELI + playerOffset, 1,hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button(Building.Type.BASE, SpriteSheet.SPRITE_ID_HARVESTER + playerOffset, 1,hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Soldier.class, SpriteSheet.SPRITE_ID_SOLDIER + playerOffset, 1, hudLeft + 400, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Buggy.class, SpriteSheet.SPRITE_ID_BUGGY + playerOffset, 1, hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Heli.class, SpriteSheet.SPRITE_ID_HELI + playerOffset, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Harvester.class, SpriteSheet.SPRITE_ID_HARVESTER + playerOffset, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
     }
 
     @Override
@@ -179,7 +180,7 @@ public class HUD implements Tickable, Renderable {
     private void renderEntities() {
         // Render entities
         glPushMatrix();
-        for (Button button : buttons) {
+        for (Button<?> button : buttons) {
             button.render();
         }
         glPopMatrix();
@@ -254,8 +255,12 @@ public class HUD implements Tickable, Renderable {
         return mouseY > height - (hudPanel.getHeight() * hudScale);
     }
 
-    public static class Button implements Clickable, Tickable, Renderable {
-        private final Building.Type buildingType;
+    public List<Button<?>> getButtons() {
+        return buttons;
+    }
+
+    public static class Button<T extends Entity.PlayableEntity> implements Clickable, Tickable, Renderable {
+        private final Class<T> klass;
         private Sprite sprite;
         private final int spriteOffset;
         private final int numSprites;
@@ -265,8 +270,8 @@ public class HUD implements Tickable, Renderable {
         private final float height;
         private final float scale;
 
-        public Button(Building.Type buildingType, int spriteOffset, int numSprites, float x, float y, float scale) {
-            this.buildingType = buildingType;
+        public Button(Class<T> klass, int spriteOffset, int numSprites, float x, float y, float scale) {
+            this.klass = klass;
             this.spriteOffset = spriteOffset;
             this.numSprites = numSprites;
             this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(spriteOffset);
@@ -315,8 +320,8 @@ public class HUD implements Tickable, Renderable {
             this.y = y;
         }
 
-        public Building.Type getBuildingType() {
-            return buildingType;
+        public Class<T> getKlass() {
+            return klass;
         }
     }
 }

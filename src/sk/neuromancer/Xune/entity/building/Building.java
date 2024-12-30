@@ -15,10 +15,6 @@ public abstract class Building extends Entity.PlayableEntity {
     public int tileX, tileY;
     private int power;
 
-    public enum Type {
-        BASE, BARRACKS, FACTORY, REFINERY, POWERPLANT, SILO, HELIPAD;
-    }
-
     public Building(int tileX, int tileY, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, int power, int baseSpriteId) {
         super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner, flag, maxHealth);
         this.tileX = tileX;

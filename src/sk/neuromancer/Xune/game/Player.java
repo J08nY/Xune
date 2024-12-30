@@ -3,10 +3,8 @@ package sk.neuromancer.Xune.game;
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.*;
-import sk.neuromancer.Xune.entity.unit.Buggy;
-import sk.neuromancer.Xune.entity.unit.Harvester;
-import sk.neuromancer.Xune.entity.unit.Heli;
-import sk.neuromancer.Xune.entity.unit.Soldier;
+import sk.neuromancer.Xune.entity.unit.*;
+import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.level.Level;
 
 import java.util.LinkedList;
@@ -137,7 +135,16 @@ public class Player extends EntityOwner {
     }
 
     private void handleHUDClick(float mouseX, float mouseY) {
-
+        for (HUD.Button<?> button : game.getHud().getButtons()) {
+            if (button.intersects(mouseX, mouseY)) {
+                Class<? extends PlayableEntity> klass = button.getKlass();
+                if (Building.class.isAssignableFrom(klass)) {
+                    System.out.println("Build " + klass.getSimpleName());
+                } else if (Unit.class.isAssignableFrom(klass)) {
+                    System.out.println("Produce " + klass.getSimpleName());
+                }
+            }
+        }
     }
 
     public List<PlayableEntity> getSelected() {
