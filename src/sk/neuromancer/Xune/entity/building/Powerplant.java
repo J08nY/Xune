@@ -11,10 +11,11 @@ public class Powerplant extends Building {
 
     static {
         setCost(Powerplant.class, 225);
+        setPower(Powerplant.class, 200);
     }
 
     public Powerplant(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 500, 200, SpriteSheet.SPRITE_ID_POWERPLANT);
+        super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_POWERPLANT);
     }
 
     @Override

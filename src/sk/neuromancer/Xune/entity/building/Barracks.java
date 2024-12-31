@@ -14,11 +14,12 @@ public class Barracks extends Building {
 
     static {
         setCost(Barracks.class, 225);
+        setPower(Barracks.class, -30);
         registerPrerequisites(Barracks.class, Arrays.asList(new Prerequisite(Powerplant.class)));
     }
 
     public Barracks(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 500, -30, SpriteSheet.SPRITE_ID_BARRACKS);
+        super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_BARRACKS);
     }
 
     @Override

@@ -12,11 +12,12 @@ public class Silo extends Building {
 
     static {
         setCost(Silo.class, 120);
+        setPower(Silo.class, -15);
         registerPrerequisites(Silo.class, Arrays.asList(new Prerequisite(Powerplant.class)));
     }
 
     public Silo(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 500, -15, SpriteSheet.SPRITE_ID_SILO);
+        super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_SILO);
     }
 
     @Override

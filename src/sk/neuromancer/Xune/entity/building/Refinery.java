@@ -14,12 +14,13 @@ public class Refinery extends Building {
 
     static {
         setCost(Refinery.class, 1500);
+        setPower(Refinery.class, -75);
         registerPrerequisites(Refinery.class, Arrays.asList(new Prerequisite(Powerplant.class)));
     }
 
 
     public Refinery(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 500, -75, SpriteSheet.SPRITE_ID_REFINERY);
+        super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_REFINERY);
     }
 
     @Override

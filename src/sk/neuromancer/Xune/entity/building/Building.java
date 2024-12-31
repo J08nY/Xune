@@ -7,19 +7,21 @@ import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelX;
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
 public abstract class Building extends Entity.PlayableEntity {
+    protected static final Map<Class<? extends Building>, Integer> powerMap = new HashMap<>();
     public int tileX, tileY;
-    private int power;
 
-    public Building(int tileX, int tileY, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, int power, int baseSpriteId) {
+    public Building(int tileX, int tileY, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, int baseSpriteId) {
         super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner, flag, maxHealth);
         this.tileX = tileX;
         this.tileY = tileY;
-        this.power = power;
         this.orientation = orientation;
         int spriteRow = this.orientation.ordinal() % 2 == 0 ? 1 : 0;
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(baseSpriteId + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH);
@@ -65,7 +67,11 @@ public abstract class Building extends Entity.PlayableEntity {
     }
 
     public int getPower() {
-        return power;
+        return powerMap.getOrDefault(this.getClass(), 0);
+    }
+
+    protected static void setPower(Class<? extends Building> klass, int cost) {
+        powerMap.put(klass, cost);
     }
 
     public abstract boolean[] getPassable();

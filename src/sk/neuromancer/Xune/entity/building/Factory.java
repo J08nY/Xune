@@ -14,11 +14,12 @@ public class Factory extends Building {
 
     static {
         setCost(Factory.class, 500);
+        setPower(Factory.class, -125);
         registerPrerequisites(Factory.class, Arrays.asList(new Prerequisite(Refinery.class)));
     }
 
     public Factory(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 500, -125, SpriteSheet.SPRITE_ID_FACTORY);
+        super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_FACTORY);
     }
 
     @Override

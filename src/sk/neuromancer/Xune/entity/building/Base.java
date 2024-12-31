@@ -11,10 +11,11 @@ public class Base extends Building {
 
     static {
         setCost(Base.class, 2000);
+        setPower(Base.class, 20);
     }
 
     public Base(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 1000, 20, SpriteSheet.SPRITE_ID_BASE);
+        super(x, y, orientation, owner, flag, 1000, SpriteSheet.SPRITE_ID_BASE);
     }
 
     @Override
