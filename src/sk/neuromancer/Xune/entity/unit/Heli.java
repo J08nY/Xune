@@ -1,17 +1,21 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.Command;
-import sk.neuromancer.Xune.entity.EntityOwner;
-import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.building.Helipad;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
+
+import java.util.Arrays;
 
 import static org.lwjgl.opengl.GL11.*;
 
 
 public class Heli extends Unit {
     private boolean wing;
+
+    static {
+        registerPrerequisites(Heli.class, Arrays.asList(new Prerequisite(Helipad.class)));
+    }
 
     public Heli(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, orientation, owner, flag, 100, 1.2f, 100f, 30f, 10, 2);

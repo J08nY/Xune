@@ -1,11 +1,18 @@
 package sk.neuromancer.Xune.entity.unit;
 
 import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.building.Barracks;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
 
+import java.util.Arrays;
+
 public class Soldier extends Unit {
     private int step;
+
+    static {
+        registerPrerequisites(Soldier.class, Arrays.asList(new Prerequisite(Barracks.class)));
+    }
 
     public Soldier(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, orientation, owner, flag, 20, 0.2f, 50f, 20f, 15, 2);

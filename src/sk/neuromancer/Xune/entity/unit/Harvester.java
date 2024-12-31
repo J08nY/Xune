@@ -1,22 +1,24 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.Command;
-import sk.neuromancer.Xune.entity.EntityOwner;
-import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class Harvester extends Unit {
     private int spice;
-    private Random rand = new Random();
+    private final Random rand = new Random();
+
+    static {
+        registerPrerequisites(Harvester.class, Arrays.asList(new Prerequisite(Refinery.class)));
+    }
 
     public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, orientation, owner, flag, 300, 0.1f, 40f, 0, 0, 0);

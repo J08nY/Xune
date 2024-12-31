@@ -1,11 +1,20 @@
 package sk.neuromancer.Xune.entity.unit;
 
 import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.building.Factory;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 
+import java.util.Arrays;
+
 public class Buggy extends Unit {
+
+    static {
+        registerPrerequisites(Buggy.class, Arrays.asList(new Prerequisite(Factory.class)));
+    }
+
+
     public Buggy(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, orientation, owner, flag, 100, 0.5f, 50f, 20f, 30, 10);
         updateSprite();

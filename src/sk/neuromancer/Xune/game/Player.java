@@ -10,7 +10,6 @@ import sk.neuromancer.Xune.level.Level;
 import java.util.LinkedList;
 import java.util.List;
 
-import static sk.neuromancer.Xune.game.Game.TPS;
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelX;
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
@@ -27,17 +26,13 @@ public class Player extends EntityOwner {
         this.addEntity(new Barracks(6, 4, Orientation.NORTH, this, this.flag));
         this.addEntity(new Powerplant(6, 3, Orientation.NORTH, this, this.flag));
         this.addEntity(new Powerplant(5, 4, Orientation.NORTH, this, this.flag));
-        Factory factory = new Factory(6, 5, Orientation.NORTH, this, this.flag);
-        this.addEntity(factory);
+        this.addEntity(new Factory(6, 5, Orientation.NORTH, this, this.flag));
         this.addEntity(new Buggy(tileToCenterLevelX(6, 8), tileToCenterLevelY(6, 8), Orientation.SOUTHEAST, this, this.flag));
         this.addEntity(new Buggy(tileToCenterLevelX(8, 4), tileToCenterLevelY(8, 4), Orientation.EAST, this, this.flag));
         this.addEntity(new Heli(tileToCenterLevelX(7, 7), tileToCenterLevelY(7, 7), Orientation.EAST, this, this.flag));
         this.addEntity(new Harvester(tileToCenterLevelX(11, 8), tileToCenterLevelY(11, 8), Orientation.SOUTHEAST, this, this.flag));
         this.addEntity(new Soldier(tileToCenterLevelX(10, 7), tileToCenterLevelY(10, 7), Orientation.SOUTHEAST, this, this.flag));
 
-        Buggy buggy = new Buggy(tileToCenterLevelX(6, 6), tileToCenterLevelY(6, 6), Orientation.EAST, this, this.flag);
-        Command produceBuggy = new Command.ProduceCommand(TPS * 5, buggy);
-        factory.pushCommand(produceBuggy);
     }
 
     @Override

@@ -5,9 +5,7 @@ import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.Sprite;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -70,6 +68,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     }
 
     public static abstract class PlayableEntity extends Entity {
+        protected static final Map<Class<? extends PlayableEntity>, List<Prerequisite>> prerequisitesMap = new HashMap<>();
         protected EntityOwner owner;
         protected List<Command> commands;
         protected Flag flag;
@@ -141,6 +140,23 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         public void pushCommand(Command c) {
             this.commands.clear();
             this.commands.add(c);
+        }
+
+        protected static void registerPrerequisites(Class<? extends PlayableEntity> klass, List<Prerequisite> prerequisites) {
+            prerequisitesMap.put(klass, prerequisites);
+        }
+
+        public static boolean canBeBuilt(Class<? extends PlayableEntity> klass, EntityOwner owner) {
+            List<Prerequisite> prerequisites = prerequisitesMap.get(klass);
+            if (prerequisites == null) {
+                return true;
+            }
+            for (Prerequisite prerequisite : prerequisites) {
+                if (!prerequisite.isMet(owner)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         @Override
