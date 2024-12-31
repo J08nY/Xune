@@ -4,10 +4,12 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -16,6 +18,7 @@ import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
 public abstract class Building extends Entity.PlayableEntity {
     protected static final Map<Class<? extends Building>, Integer> powerMap = new HashMap<>();
+    protected static final Map<Class<? extends Building>, List<Class<? extends Unit>>> producesMap = new HashMap<>();
     public int tileX, tileY;
 
     public Building(int tileX, int tileY, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, int baseSpriteId) {
@@ -70,8 +73,16 @@ public abstract class Building extends Entity.PlayableEntity {
         return powerMap.getOrDefault(this.getClass(), 0);
     }
 
+    public List<Class<? extends Unit>> getProduces() {
+        return producesMap.getOrDefault(this.getClass(), null);
+    }
+
     protected static void setPower(Class<? extends Building> klass, int cost) {
         powerMap.put(klass, cost);
+    }
+
+    protected static void setProduces(Class<? extends Building> klass, List<Class<? extends Unit>> units) {
+        producesMap.put(klass, units);
     }
 
     public abstract boolean[] getPassable();

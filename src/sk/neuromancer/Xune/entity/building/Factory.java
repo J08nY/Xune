@@ -4,6 +4,8 @@ import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
+import sk.neuromancer.Xune.entity.unit.Buggy;
+import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 import java.util.Arrays;
@@ -15,6 +17,7 @@ public class Factory extends Building {
     static {
         setCost(Factory.class, 500);
         setPower(Factory.class, -125);
+        setProduces(Factory.class, Arrays.asList(Buggy.class, Harvester.class));
         registerPrerequisites(Factory.class, Arrays.asList(new Prerequisite(Refinery.class)));
     }
 

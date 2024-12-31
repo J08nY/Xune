@@ -11,6 +11,8 @@ import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 public abstract class Command {
@@ -262,16 +264,15 @@ public abstract class Command {
     }
 
     public static class ProduceCommand extends Command {
+        private final Class<? extends Unit> resultClass;
         private int start;
         private boolean started;
         private boolean finished;
         private final int duration;
 
-        private final Entity.PlayableEntity result;
-
-        public ProduceCommand(int duration, Entity.PlayableEntity result) {
+        public ProduceCommand(int duration, Class<? extends Unit> resultClass) {
             this.duration = duration;
-            this.result = result;
+            this.resultClass = resultClass;
         }
 
         @Override
@@ -282,6 +283,16 @@ public abstract class Command {
                     started = true;
                 }
                 if (tickCount - start >= duration) {
+                    Unit result;
+                    try {
+                        Constructor<? extends Unit> con = resultClass.getConstructor(float.class, float.class, Orientation.class, EntityOwner.class, Flag.class);
+                        result = con.newInstance(building.x, building.y + Tile.TILE_CENTER_Y, building.orientation, building.owner, building.flag);
+                    } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                             IllegalAccessException ex) {
+                        System.out.println("Failed to create unit." + ex);
+                        finished = true;
+                        return;
+                    }
                     building.owner.addEntity(result);
                     finished = true;
                 }
@@ -351,7 +362,7 @@ public abstract class Command {
         private final Refinery target;
 
         public DropOffSpiceCommand(float fromX, float fromY, Pathfinder pathfinder, Refinery target) {
-            float[][] offsets  = new float[][] {
+            float[][] offsets = new float[][]{
                     {0, Tile.TILE_CENTER_Y},
                     {Tile.TILE_CENTER_X, 0},
                     {0, -Tile.TILE_CENTER_Y},

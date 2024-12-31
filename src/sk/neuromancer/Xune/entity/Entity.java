@@ -147,6 +147,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             costMap.put(klass, cost);
         }
 
+        public static int getCost(Class<? extends PlayableEntity> klass) {
+            return costMap.get(klass);
+        }
+
         protected static void registerPrerequisites(Class<? extends PlayableEntity> klass, List<Prerequisite> prerequisites) {
             prerequisitesMap.put(klass, prerequisites);
         }

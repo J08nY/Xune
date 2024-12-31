@@ -4,6 +4,7 @@ import sk.neuromancer.Xune.entity.EntityOwner;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
+import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 import java.util.Arrays;
@@ -15,6 +16,7 @@ public class Barracks extends Building {
     static {
         setCost(Barracks.class, 225);
         setPower(Barracks.class, -30);
+        setProduces(Barracks.class, Arrays.asList(Soldier.class));
         registerPrerequisites(Barracks.class, Arrays.asList(new Prerequisite(Powerplant.class)));
     }
 

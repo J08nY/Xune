@@ -137,9 +137,18 @@ public class Player extends EntityOwner {
                     System.out.println("Build " + klass.getSimpleName());
                 } else if (Unit.class.isAssignableFrom(klass)) {
                     if (PlayableEntity.canBeBuilt(klass, this)) {
-                        System.out.println("CanProduce " + klass.getSimpleName());
+                        for (PlayableEntity e : entities) {
+                            if (e instanceof Building building) {
+                                List<Class<? extends Unit>> produces = building.getProduces();
+                                if (produces != null && produces.contains(klass)) {
+                                    takeMoney(PlayableEntity.getCost(klass));
+                                    building.sendCommand(new Command.ProduceCommand(100, (Class<? extends Unit>) klass));
+                                    return;
+                                }
+                            }
+                        }
                     } else {
-
+                        System.out.println("Cannot build " + klass.getSimpleName());
                     }
                 }
             }
