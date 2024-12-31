@@ -17,6 +17,7 @@ public class Harvester extends Unit {
     private final Random rand = new Random();
 
     static {
+        setCost(Harvester.class, 1200);
         registerPrerequisites(Harvester.class, Arrays.asList(new Prerequisite(Refinery.class)));
     }
 

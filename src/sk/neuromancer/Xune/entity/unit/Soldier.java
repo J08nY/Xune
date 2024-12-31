@@ -11,6 +11,7 @@ public class Soldier extends Unit {
     private int step;
 
     static {
+        setCost(Soldier.class, 50);
         registerPrerequisites(Soldier.class, Arrays.asList(new Prerequisite(Barracks.class)));
     }
 

@@ -7,10 +7,7 @@ import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Soldier;
-import sk.neuromancer.Xune.game.Game;
-import sk.neuromancer.Xune.game.InputHandler;
-import sk.neuromancer.Xune.game.Player;
-import sk.neuromancer.Xune.game.Tickable;
+import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.level.Level;
 
 import java.util.LinkedList;
@@ -19,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class HUD implements Tickable, Renderable {
     private final Game game;
@@ -65,18 +63,18 @@ public class HUD implements Tickable, Renderable {
 
         this.buttons = new LinkedList<>();
         int playerOffset = SpriteSheet.flagToOffset(player.getFlag());
-        this.buttons.add(new Button<>(Base.class, player, SpriteSheet.SPRITE_ID_BASE + playerOffset, 1, hudLeft + 400, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Powerplant.class, player, SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset, 1, hudLeft + 400 + 4 * 25, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Barracks.class, player, SpriteSheet.SPRITE_ID_BARRACKS + playerOffset, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Factory.class, player, SpriteSheet.SPRITE_ID_FACTORY + playerOffset, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Refinery.class, player, SpriteSheet.SPRITE_ID_REFINERY + playerOffset, 1, hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Silo.class, player, SpriteSheet.SPRITE_ID_SILO + playerOffset, 1, hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Base.class, player, SpriteSheet.SPRITE_ID_HELIPAD + playerOffset, 1, hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Base.class, player, SpriteSheet.SPRITE_ID_BASE + playerOffset, 2, 1, hudLeft + 400, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Powerplant.class, player, SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset, 2, 1, hudLeft + 400 + 4 * 25, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Barracks.class, player, SpriteSheet.SPRITE_ID_BARRACKS + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Factory.class, player, SpriteSheet.SPRITE_ID_FACTORY + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Refinery.class, player, SpriteSheet.SPRITE_ID_REFINERY + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Silo.class, player, SpriteSheet.SPRITE_ID_SILO + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Base.class, player, SpriteSheet.SPRITE_ID_HELIPAD + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
 
-        this.buttons.add(new Button<>(Soldier.class, player, SpriteSheet.SPRITE_ID_SOLDIER + playerOffset, 1, hudLeft + 400, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Buggy.class, player, SpriteSheet.SPRITE_ID_BUGGY + playerOffset, 1, hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Heli.class, player, SpriteSheet.SPRITE_ID_HELI + playerOffset, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Harvester.class, player, SpriteSheet.SPRITE_ID_HARVESTER + playerOffset, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Soldier.class, player, SpriteSheet.SPRITE_ID_SOLDIER + playerOffset, 2, 12, hudLeft + 400, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Buggy.class, player, SpriteSheet.SPRITE_ID_BUGGY + playerOffset, 2, 4, hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Heli.class, player, SpriteSheet.SPRITE_ID_HELI + playerOffset, 2, 8, hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Harvester.class, player, SpriteSheet.SPRITE_ID_HARVESTER + playerOffset, 2, 4, hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
     }
 
     @Override
@@ -117,7 +115,7 @@ public class HUD implements Tickable, Renderable {
         glTranslatef(hudLeft, hudTop, 0);
         glScalef(2f, 2f, 0);
 
-        renderText(0, 30, "MONEY: " + player.getMoney());
+        renderText(0, 30, "MONEY: " + player.getMoney() + "$");
         String selected = player.getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
         renderText(200, 110, selected);
 
@@ -286,20 +284,23 @@ public class HUD implements Tickable, Renderable {
         private final Class<T> klass;
         private final Player player;
         private Sprite sprite;
+        private int animation;
         private boolean enabled;
         private final int spriteOffset;
-        private final int numSprites;
+        private final int spriteRows, spriteCols;
         private float x;
         private float y;
         private final float width;
         private final float height;
         private final float scale;
 
-        public Button(Class<T> klass, Player player, int spriteOffset, int numSprites, float x, float y, float scale) {
+
+        public Button(Class<T> klass, Player player, int spriteOffset, int spriteRows, int spriteCols, float x, float y, float scale) {
             this.klass = klass;
             this.player = player;
             this.spriteOffset = spriteOffset;
-            this.numSprites = numSprites;
+            this.spriteRows = spriteRows;
+            this.spriteCols = spriteCols;
             this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(spriteOffset);
             this.x = x;
             this.y = y;
@@ -311,6 +312,12 @@ public class HUD implements Tickable, Renderable {
         @Override
         public void tick(int tickCount) {
             enabled = Entity.PlayableEntity.canBeBuilt(klass, player);
+            if (Config.ANIMATE_HUD_BUTTONS && tickCount % TPS == 0) {
+                animation = (animation + 1) % (spriteCols * spriteRows);
+                int row = animation / spriteCols;
+                int col = animation % spriteCols;
+                sprite = SpriteSheet.ENTITY_SHEET.getSprite(spriteOffset + row * SpriteSheet.SPRITE_ROW_LENGTH + col);
+            }
         }
 
         @Override

@@ -11,9 +11,9 @@ import java.util.Arrays;
 public class Buggy extends Unit {
 
     static {
+        setCost(Buggy.class, 100);
         registerPrerequisites(Buggy.class, Arrays.asList(new Prerequisite(Factory.class)));
     }
-
 
     public Buggy(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
         super(x, y, orientation, owner, flag, 100, 0.5f, 50f, 20f, 30, 10);

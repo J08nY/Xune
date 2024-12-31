@@ -136,7 +136,11 @@ public class Player extends EntityOwner {
                 if (Building.class.isAssignableFrom(klass)) {
                     System.out.println("Build " + klass.getSimpleName());
                 } else if (Unit.class.isAssignableFrom(klass)) {
-                    System.out.println("Produce " + klass.getSimpleName());
+                    if (PlayableEntity.canBeBuilt(klass, this)) {
+                        System.out.println("CanProduce " + klass.getSimpleName());
+                    } else {
+
+                    }
                 }
             }
         }

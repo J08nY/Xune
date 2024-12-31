@@ -69,6 +69,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
     public static abstract class PlayableEntity extends Entity {
         protected static final Map<Class<? extends PlayableEntity>, List<Prerequisite>> prerequisitesMap = new HashMap<>();
+        protected static final Map<Class<? extends PlayableEntity>, Integer> costMap = new HashMap<>();
         protected EntityOwner owner;
         protected List<Command> commands;
         protected Flag flag;
@@ -142,11 +143,19 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             this.commands.add(c);
         }
 
+        protected static void setCost(Class<? extends PlayableEntity> klass, int cost) {
+            costMap.put(klass, cost);
+        }
+
         protected static void registerPrerequisites(Class<? extends PlayableEntity> klass, List<Prerequisite> prerequisites) {
             prerequisitesMap.put(klass, prerequisites);
         }
 
         public static boolean canBeBuilt(Class<? extends PlayableEntity> klass, EntityOwner owner) {
+            int cost = costMap.get(klass);
+            if (cost > owner.getMoney()) {
+                return false;
+            }
             List<Prerequisite> prerequisites = prerequisitesMap.get(klass);
             if (prerequisites == null) {
                 return true;

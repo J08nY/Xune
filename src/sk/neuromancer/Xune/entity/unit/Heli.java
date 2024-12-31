@@ -14,6 +14,7 @@ public class Heli extends Unit {
     private boolean wing;
 
     static {
+        setCost(Heli.class, 1000);
         registerPrerequisites(Heli.class, Arrays.asList(new Prerequisite(Helipad.class)));
     }
 
