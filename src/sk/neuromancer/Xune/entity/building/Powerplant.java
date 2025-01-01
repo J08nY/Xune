@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.entity.building;
 
-import sk.neuromancer.Xune.entity.EntityOwner;
+import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
@@ -14,7 +14,7 @@ public class Powerplant extends Building {
         setPower(Powerplant.class, 200);
     }
 
-    public Powerplant(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
+    public Powerplant(int x, int y, Orientation orientation, Player owner, Flag flag) {
         super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_POWERPLANT);
     }
 

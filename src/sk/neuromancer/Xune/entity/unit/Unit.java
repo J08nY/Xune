@@ -17,7 +17,7 @@ public abstract class Unit extends Entity.PlayableEntity {
     private int ready = 0;
     private boolean moved;
 
-    public Unit(float x, float y, Orientation orientation, EntityOwner owner, Flag flag,
+    public Unit(float x, float y, Orientation orientation, Player owner, Flag flag,
                 int maxHealth,
                 float speed,
                 float sight,

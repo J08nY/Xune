@@ -9,7 +9,7 @@ public class Prerequisite {
         this.requiredBuilding = requiredBuilding;
     }
 
-    public boolean isMet(EntityOwner owner) {
+    public boolean isMet(Player owner) {
         for (Entity.PlayableEntity entity : owner.getEntities()) {
             if (requiredBuilding.isInstance(entity)) {
                 return true;

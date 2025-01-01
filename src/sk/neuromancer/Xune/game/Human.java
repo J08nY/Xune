@@ -13,10 +13,10 @@ import java.util.List;
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelX;
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
-public class Player extends EntityOwner {
+public class Human extends Player {
     private final List<PlayableEntity> selected = new LinkedList<>();
 
-    public Player(Game g, Level level, Flag flag, int money) {
+    public Human(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
         level.setPlayer(this);
         this.addEntity(new Base(7, 2, Orientation.NORTH, this, this.flag));

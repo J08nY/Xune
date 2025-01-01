@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.level;
 
-import sk.neuromancer.Xune.ai.Enemy;
+import sk.neuromancer.Xune.ai.Bot;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
@@ -23,8 +23,8 @@ import static sk.neuromancer.Xune.game.Game.TPS;
 public class Level implements Renderable, Tickable {
     private final Game game;
 
-    private Player player;
-    private Enemy enemy;
+    private Human human;
+    private Bot bot;
     private Pathfinder pathfinder;
     private List<Worm> worms;
     private List<Road> roads;
@@ -90,8 +90,8 @@ public class Level implements Renderable, Tickable {
             moveRight();
         }
 
-        player.tick(tickCount);
-        enemy.tick(tickCount);
+        human.tick(tickCount);
+        bot.tick(tickCount);
         for (Worm worm : worms) {
             worm.tick(tickCount);
         }
@@ -108,7 +108,7 @@ public class Level implements Renderable, Tickable {
                 visible[x][y] = false;
             }
         }
-        for (Entity.PlayableEntity e : player.getEntities()) {
+        for (Entity.PlayableEntity e : human.getEntities()) {
             updateVisibility(e);
         }
     }
@@ -187,8 +187,8 @@ public class Level implements Renderable, Tickable {
         for (Road road : roads) {
             road.render();
         }
-        enemy.render();
-        player.render();
+        bot.render();
+        human.render();
         for (Worm worm : worms) {
             worm.render();
         }
@@ -244,20 +244,20 @@ public class Level implements Renderable, Tickable {
         this.yOff = Game.CENTER_Y - Game.CENTER_Y / this.zoom;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setPlayer(Human human) {
+        this.human = human;
     }
 
-    public void setEnemy(Enemy enemy) {
-        this.enemy = enemy;
+    public void setEnemy(Bot bot) {
+        this.bot = bot;
     }
 
-    public Player getPlayer() {
-        return this.player;
+    public Human getPlayer() {
+        return this.human;
     }
 
-    public Enemy getEnemy() {
-        return this.enemy;
+    public Bot getEnemy() {
+        return this.bot;
     }
 
     public Pathfinder getPathfinder() {
@@ -266,7 +266,7 @@ public class Level implements Renderable, Tickable {
 
     public void addEntity(Entity.PlayableEntity e) {
         pathfinder.addEntity(e);
-        if (e.getOwner() == player) {
+        if (e.getOwner() == human) {
             updateVisibility(e);
         }
     }
@@ -281,12 +281,12 @@ public class Level implements Renderable, Tickable {
                 return worm;
             }
         }
-        for (Entity.PlayableEntity entity : player.getEntities()) {
+        for (Entity.PlayableEntity entity : human.getEntities()) {
             if (entity.intersects(levelX, levelY)) {
                 return entity;
             }
         }
-        for (Entity.PlayableEntity entity : enemy.getEntities()) {
+        for (Entity.PlayableEntity entity : bot.getEntities()) {
             if (entity.intersects(levelX, levelY)) {
                 return entity;
             }
@@ -509,8 +509,8 @@ public class Level implements Renderable, Tickable {
             //First merge entity lists from level
             List<Entity> entities = new LinkedList<>();
             entities.addAll(level.worms);
-            entities.addAll(level.player.getEntities());
-            entities.addAll(level.enemy.getEntities());
+            entities.addAll(level.human.getEntities());
+            entities.addAll(level.bot.getEntities());
             filtered = entities.stream().filter(condition).sorted(Comparator.comparingDouble(e -> Math.hypot(e.x - startX, e.y - startY))).collect(Collectors.toList());
         }
 

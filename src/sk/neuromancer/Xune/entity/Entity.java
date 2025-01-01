@@ -70,12 +70,12 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     public static abstract class PlayableEntity extends Entity {
         protected static final Map<Class<? extends PlayableEntity>, List<Prerequisite>> prerequisitesMap = new HashMap<>();
         protected static final Map<Class<? extends PlayableEntity>, Integer> costMap = new HashMap<>();
-        protected EntityOwner owner;
+        protected Player owner;
         protected List<Command> commands;
         protected Flag flag;
         protected boolean isSelected;
 
-        public PlayableEntity(float x, float y, EntityOwner owner, Flag flag, int maxHealth) {
+        public PlayableEntity(float x, float y, Player owner, Flag flag, int maxHealth) {
             super(x, y, maxHealth);
             this.owner = owner;
             this.commands = new LinkedList<>();
@@ -122,7 +122,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             }
         }
 
-        public EntityOwner getOwner() {
+        public Player getOwner() {
             return owner;
         }
 
@@ -155,7 +155,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             prerequisitesMap.put(klass, prerequisites);
         }
 
-        public static boolean canBeBuilt(Class<? extends PlayableEntity> klass, EntityOwner owner) {
+        public static boolean canBeBuilt(Class<? extends PlayableEntity> klass, Player owner) {
             int cost = costMap.get(klass);
             if (cost > owner.getMoney()) {
                 return false;

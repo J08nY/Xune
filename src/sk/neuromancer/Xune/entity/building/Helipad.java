@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.entity.building;
 
-import sk.neuromancer.Xune.entity.EntityOwner;
+import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
@@ -20,7 +20,7 @@ public class Helipad extends Building {
         registerPrerequisites(Helipad.class, Arrays.asList(new Prerequisite(Refinery.class)));
     }
 
-    public Helipad(int x, int y, Orientation orientation, EntityOwner owner, Flag flag) {
+    public Helipad(int x, int y, Orientation orientation, Player owner, Flag flag) {
         super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_HELIPAD);
     }
 

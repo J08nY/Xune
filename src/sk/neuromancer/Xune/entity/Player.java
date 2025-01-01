@@ -15,7 +15,7 @@ import sk.neuromancer.Xune.sfx.SoundManager;
 import java.util.*;
 
 
-public class EntityOwner implements Tickable, Renderable {
+public class Player implements Tickable, Renderable {
     protected final Game game;
     protected final Level level;
     protected List<Entity.PlayableEntity> entities = new LinkedList<>();
@@ -26,7 +26,7 @@ public class EntityOwner implements Tickable, Renderable {
     protected Flag flag;
     protected final Map<Class<? extends Entity.PlayableEntity>, CommandStrategy> commandStrategies = new HashMap<>();
 
-    public EntityOwner(Game game, Level level, Flag flag, int money) {
+    public Player(Game game, Level level, Flag flag, int money) {
         this.game = game;
         this.level = level;
         this.flag = flag;

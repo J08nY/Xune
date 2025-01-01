@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.game;
 
-import sk.neuromancer.Xune.ai.Enemy;
+import sk.neuromancer.Xune.ai.Bot;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.gfx.*;
 import sk.neuromancer.Xune.level.Level;
@@ -17,8 +17,8 @@ public class Game implements Renderable {
     private InputHandler input;
     private Window window;
     private Level level;
-    private Player player;
-    private Enemy enemy;
+    private Human human;
+    private Bot bot;
 
     private HUD hud;
 
@@ -47,8 +47,8 @@ public class Game implements Renderable {
 
         level = new Level(this);
         level.loadLevel(Level.LEVEL_1);
-        player = new Player(this, level, Flag.RED, 100);
-        enemy = new Enemy(this, level, Flag.BLUE, 100);
+        human = new Human(this, level, Flag.RED, 100);
+        bot = new Bot(this, level, Flag.BLUE, 100);
 
         hud = new HUD(this);
 

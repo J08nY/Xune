@@ -21,7 +21,7 @@ import static sk.neuromancer.Xune.game.Game.TPS;
 public class HUD implements Tickable, Renderable {
     private final Game game;
     private final Level level;
-    private final Player player;
+    private final Human human;
     private final float width;
     private final float height;
 
@@ -45,7 +45,7 @@ public class HUD implements Tickable, Renderable {
     public HUD(Game game) {
         this.game = game;
         this.level = game.getLevel();
-        this.player = level.getPlayer();
+        this.human = level.getPlayer();
         this.width = game.getWindow().getWidth();
         this.height = game.getWindow().getHeight();
         glfwSetInputMode(game.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -62,19 +62,19 @@ public class HUD implements Tickable, Renderable {
         this.hudLeft = 60 * hudScale;
 
         this.buttons = new LinkedList<>();
-        int playerOffset = SpriteSheet.flagToOffset(player.getFlag());
-        this.buttons.add(new Button<>(Base.class, player, SpriteSheet.SPRITE_ID_BASE + playerOffset, 2, 1, hudLeft + 400, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Powerplant.class, player, SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset, 2, 1, hudLeft + 400 + 4 * 25, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Barracks.class, player, SpriteSheet.SPRITE_ID_BARRACKS + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Factory.class, player, SpriteSheet.SPRITE_ID_FACTORY + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Refinery.class, player, SpriteSheet.SPRITE_ID_REFINERY + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Silo.class, player, SpriteSheet.SPRITE_ID_SILO + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Base.class, player, SpriteSheet.SPRITE_ID_HELIPAD + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
+        int playerOffset = SpriteSheet.flagToOffset(human.getFlag());
+        this.buttons.add(new Button<>(Base.class, human, SpriteSheet.SPRITE_ID_BASE + playerOffset, 2, 1, hudLeft + 400, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Powerplant.class, human, SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset, 2, 1, hudLeft + 400 + 4 * 25, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Barracks.class, human, SpriteSheet.SPRITE_ID_BARRACKS + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Factory.class, human, SpriteSheet.SPRITE_ID_FACTORY + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Refinery.class, human, SpriteSheet.SPRITE_ID_REFINERY + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Silo.class, human, SpriteSheet.SPRITE_ID_SILO + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Base.class, human, SpriteSheet.SPRITE_ID_HELIPAD + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
 
-        this.buttons.add(new Button<>(Soldier.class, player, SpriteSheet.SPRITE_ID_SOLDIER + playerOffset, 2, 12, hudLeft + 400, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Buggy.class, player, SpriteSheet.SPRITE_ID_BUGGY + playerOffset, 2, 4, hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Heli.class, player, SpriteSheet.SPRITE_ID_HELI + playerOffset, 2, 8, hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Harvester.class, player, SpriteSheet.SPRITE_ID_HARVESTER + playerOffset, 2, 4, hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Soldier.class, human, SpriteSheet.SPRITE_ID_SOLDIER + playerOffset, 2, 12, hudLeft + 400, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Buggy.class, human, SpriteSheet.SPRITE_ID_BUGGY + playerOffset, 2, 4, hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Heli.class, human, SpriteSheet.SPRITE_ID_HELI + playerOffset, 2, 8, hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Harvester.class, human, SpriteSheet.SPRITE_ID_HARVESTER + playerOffset, 2, 4, hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
     }
 
     @Override
@@ -115,8 +115,8 @@ public class HUD implements Tickable, Renderable {
         glTranslatef(hudLeft, hudTop, 0);
         glScalef(2f, 2f, 0);
 
-        renderText(0, 30, "MONEY: " + player.getMoney() + "$");
-        String selected = player.getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
+        renderText(0, 30, "MONEY: " + human.getMoney() + "$");
+        String selected = human.getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
         renderText(200, 110, selected);
 
         float levelX = level.getLevelX(mouseX);
@@ -143,8 +143,8 @@ public class HUD implements Tickable, Renderable {
         glVertex2i(380, 4);
         glVertex2i(380, 7);
         glVertex2i(71, 7);
-        int production = player.getPowerProduction();
-        int consumption = player.getPowerConsumption();
+        int production = human.getPowerProduction();
+        int consumption = human.getPowerConsumption();
         glColor3f(0.1f, 0.6f, 0.1f);
         glVertex2i(71, 4);
         glVertex2i(380 * production / MAX_POWER, 4);
@@ -240,12 +240,12 @@ public class HUD implements Tickable, Renderable {
                 if (entity != null && level.isTileVisible(level.tileAt(entity))) {
                     tooltip = new Text(entity.getClass().getSimpleName(), (float) mouseX, (float) mouseY + 20, true, 1f);
                 }
-                if (player.getSelected().isEmpty()) {
+                if (human.getSelected().isEmpty()) {
                     currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
                 } else {
                     if (entity != null && level.isTileVisible(level.tileAt(entity))) {
                         if (entity instanceof Entity.PlayableEntity playable) {
-                            if (playable.getOwner() == player) {
+                            if (playable.getOwner() == human) {
                                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
                             } else {
                                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
@@ -282,7 +282,7 @@ public class HUD implements Tickable, Renderable {
 
     public static class Button<T extends Entity.PlayableEntity> implements Clickable, Tickable, Renderable {
         private final Class<T> klass;
-        private final Player player;
+        private final Human human;
         private Sprite sprite;
         private int animation;
         private boolean enabled;
@@ -295,9 +295,9 @@ public class HUD implements Tickable, Renderable {
         private final float scale;
 
 
-        public Button(Class<T> klass, Player player, int spriteOffset, int spriteRows, int spriteCols, float x, float y, float scale) {
+        public Button(Class<T> klass, Human human, int spriteOffset, int spriteRows, int spriteCols, float x, float y, float scale) {
             this.klass = klass;
-            this.player = player;
+            this.human = human;
             this.spriteOffset = spriteOffset;
             this.spriteRows = spriteRows;
             this.spriteCols = spriteCols;
@@ -311,7 +311,7 @@ public class HUD implements Tickable, Renderable {
 
         @Override
         public void tick(int tickCount) {
-            enabled = Entity.PlayableEntity.canBeBuilt(klass, player);
+            enabled = Entity.PlayableEntity.canBeBuilt(klass, human);
             if (Config.ANIMATE_HUD_BUTTONS && tickCount % TPS == 0) {
                 animation = (animation + 1) % (spriteCols * spriteRows);
                 int row = animation / spriteCols;

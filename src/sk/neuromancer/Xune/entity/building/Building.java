@@ -1,7 +1,7 @@
 package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.EntityOwner;
+import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.unit.Unit;
@@ -21,7 +21,7 @@ public abstract class Building extends Entity.PlayableEntity {
     protected static final Map<Class<? extends Building>, List<Class<? extends Unit>>> producesMap = new HashMap<>();
     public int tileX, tileY;
 
-    public Building(int tileX, int tileY, Orientation orientation, EntityOwner owner, Flag flag, int maxHealth, int baseSpriteId) {
+    public Building(int tileX, int tileY, Orientation orientation, Player owner, Flag flag, int maxHealth, int baseSpriteId) {
         super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner, flag, maxHealth);
         this.tileX = tileX;
         this.tileY = tileY;

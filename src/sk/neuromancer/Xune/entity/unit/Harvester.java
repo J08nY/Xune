@@ -21,7 +21,7 @@ public class Harvester extends Unit {
         registerPrerequisites(Harvester.class, Arrays.asList(new Prerequisite(Refinery.class)));
     }
 
-    public Harvester(float x, float y, Orientation orientation, EntityOwner owner, Flag flag) {
+    public Harvester(float x, float y, Orientation orientation, Player owner, Flag flag) {
         super(x, y, orientation, owner, flag, 300, 0.1f, 40f, 0, 0, 0);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6, false));

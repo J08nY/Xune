@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.ai;
 
-import sk.neuromancer.Xune.entity.EntityOwner;
+import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.building.Base;
@@ -11,9 +11,9 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 
 
-public class Enemy extends EntityOwner {
+public class Bot extends Player {
 
-    public Enemy(Game game, Level level, Flag flag, int money) {
+    public Bot(Game game, Level level, Flag flag, int money) {
         super(game, level, flag, money);
         level.setEnemy(this);
         this.addEntity(new Base(16, 8, Orientation.NORTH, this, this.flag));
