@@ -52,6 +52,8 @@ public class SoundManager implements Tickable {
 
     public static final int TRACK_DUNESHIFTER = 11;
 
+    private static SoundManager instance;
+
     public SoundManager(Game game) {
         this.game = game;
         this.device = alcOpenDevice((ByteBuffer) null);
@@ -70,6 +72,7 @@ public class SoundManager implements Tickable {
         for (int i = 0; i < this.sounds.length; i++) {
             this.sounds[i] = new Sound(SoundManager.soundNames[i]);
         }
+        instance = this;
     }
 
     @Override
@@ -79,9 +82,9 @@ public class SoundManager implements Tickable {
         players.removeAll(stopped);
     }
 
-    public SoundPlayer play(int soundIndex, boolean loop, float gain) {
-        SoundPlayer player = new SoundPlayer(this.sounds[soundIndex], loop, gain);
-        players.add(player);
+    public static SoundPlayer play(int soundIndex, boolean loop, float gain) {
+        SoundPlayer player = new SoundPlayer(instance.sounds[soundIndex], loop, gain);
+        instance.players.add(player);
         player.play();
         return player;
     }

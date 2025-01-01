@@ -124,7 +124,7 @@ public class Player implements Tickable, Renderable {
                 if (e instanceof Building) {
                     this.effects.add(new Effect.Sparkle(e.x, e.y));
                 }
-                game.getSound().play(SoundManager.SOUND_EXPLOSION_1, false, 1.0f);
+                SoundManager.play(SoundManager.SOUND_EXPLOSION_1, false, 1.0f);
             }
         }
         effects.removeIf(Effect::isFinished);

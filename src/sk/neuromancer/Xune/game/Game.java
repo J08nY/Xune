@@ -53,7 +53,7 @@ public class Game implements Renderable {
         hud = new HUD(this);
 
         sound = new SoundManager(this);
-        sound.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
+        SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
 
         window.show();
     }

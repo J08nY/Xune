@@ -63,7 +63,7 @@ public abstract class Unit extends Entity.PlayableEntity {
         }
         if (ready % rate == 0 && inRange(target)) {
             target.takeDamage(damage);
-            owner.getGame().getSound().play(SoundManager.SOUND_SHOT_1, false, 1.0f);
+            SoundManager.play(SoundManager.SOUND_SHOT_1, false, 1.0f);
         }
     }
 

@@ -10,6 +10,7 @@ import sk.neuromancer.Xune.level.paths.NoPathFound;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -317,6 +318,7 @@ public abstract class Command {
                         finished = true;
                         return;
                     }
+                    SoundManager.play(SoundManager.SOUND_TADA_1, false, 1.0f);
                     building.owner.addEntity(result);
                     finished = true;
                 }

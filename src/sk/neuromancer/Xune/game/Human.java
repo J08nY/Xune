@@ -148,7 +148,7 @@ public class Human extends Player {
                                 if (produces != null && produces.contains(klass)) {
                                     takeMoney(PlayableEntity.getCost(klass));
                                     building.sendCommand(new Command.ProduceCommand(100, (Class<? extends Unit>) klass));
-                                    game.getSound().play(SoundManager.SOUND_BLIP_1, false, 1.0f);
+                                    SoundManager.play(SoundManager.SOUND_BLIP_1, false, 0.5f);
                                     return;
                                 }
                             }
