@@ -62,10 +62,25 @@ public abstract class Unit extends Entity.PlayableEntity {
             return;
         }
         if (ready % rate == 0 && inRange(target)) {
-            System.out.println("Attack!" + target + " <- " + this);
             target.takeDamage(damage);
             owner.getGame().getSound().play(SoundManager.SOUND_SHOT_1, false, 1.0f);
         }
+    }
+
+    public float getRange() {
+        return range;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public int getRate() {
+        return rate;
     }
 
     @Override

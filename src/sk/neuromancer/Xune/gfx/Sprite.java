@@ -14,8 +14,6 @@ public class Sprite implements Renderable {
 
     public static final int TEXTURE_UNIT = GL_TEXTURE0;
 
-    public static final float DEFAULT_SCALE_FACTOR = 1f;
-
     public Sprite(int[] pixels, int width, int height) {
         this.width = width;
         this.height = height;

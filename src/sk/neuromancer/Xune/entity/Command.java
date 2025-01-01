@@ -33,10 +33,6 @@ public abstract class Command {
             this.toY = toY;
         }
 
-        public boolean isFinished(Entity entity) {
-            return Math.abs(entity.x - toX) <= 1.5 && Math.abs(entity.y - toY) <= 1.5;
-        }
-
         public float getFromX() {
             return fromX;
         }
@@ -51,6 +47,16 @@ public abstract class Command {
 
         public float getToY() {
             return toY;
+        }
+
+        @Override
+        public boolean isFinished(Entity entity) {
+            if (entity instanceof Unit unit) {
+                float speed = unit.getSpeed();
+                return Math.abs(unit.x - toX) <= speed && Math.abs(unit.y - toY) <= speed;
+            } else {
+                throw new IllegalArgumentException("Entity must be a unit.");
+            }
         }
 
         @Override
@@ -120,8 +126,14 @@ public abstract class Command {
             }
         }
 
+        @Override
         public boolean isFinished(Entity entity) {
-            return Math.abs(entity.x - toX) <= 1.5 && Math.abs(entity.y - toY) <= 1.5;
+            if (entity instanceof Unit unit) {
+                float speed = unit.getSpeed();
+                return Math.abs(unit.x - toX) <= speed && Math.abs(unit.y - toY) <= speed;
+            } else {
+                throw new IllegalArgumentException("Entity must be a unit.");
+            }
         }
 
         @Override

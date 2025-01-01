@@ -6,6 +6,7 @@ import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -147,6 +148,7 @@ public class Human extends Player {
                                 if (produces != null && produces.contains(klass)) {
                                     takeMoney(PlayableEntity.getCost(klass));
                                     building.sendCommand(new Command.ProduceCommand(100, (Class<? extends Unit>) klass));
+                                    game.getSound().play(SoundManager.SOUND_BLIP_1, false, 1.0f);
                                     return;
                                 }
                             }

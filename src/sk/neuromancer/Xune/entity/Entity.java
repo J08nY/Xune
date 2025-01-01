@@ -17,6 +17,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     public float x, y;
     public int health;
     protected int maxHealth;
+    protected int sight;
     protected Orientation orientation;
     protected List<Clickable> clickableAreas = new ArrayList<>();
 
@@ -24,7 +25,8 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         this.x = x;
         this.y = y;
         this.health = getMaxHealth(getClass());
-        this.maxHealth = getMaxHealth(getClass());;
+        this.maxHealth = getMaxHealth(getClass());
+        this.sight = getSight(getClass());
     }
 
     public void setPosition(float x, float y) {
@@ -55,6 +57,13 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         return false;
     }
 
+    public void repair(int health) {
+        this.health += health;
+        if (this.health > this.maxHealth) {
+            this.health = this.maxHealth;
+        }
+    }
+
     public void takeDamage(int damage) {
         this.health -= damage;
         if (this.health <= 0) {
@@ -82,15 +91,18 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         sightMap.put(klass, sight);
     }
 
-    public int getSight() {
-        return sightMap.get(getClass());
+    public int getSight(Class<? extends Entity> klass) {
+        return sightMap.get(klass);
     }
 
     public boolean inSight(float x, float y) {
         float dx = this.x - x;
         float dy = this.y - y;
-        int sight = getSight();
         return dx * dx + dy * dy <= sight * sight;
+    }
+
+    public boolean inSight(Entity target) {
+        return inSight(target.x, target.y);
     }
 
 
