@@ -237,7 +237,7 @@ public class HUD implements Tickable, Renderable {
                 }
             } else {
                 Entity entity = level.entityAt(level.getLevelX(mouseX), level.getLevelY(mouseY));
-                if (entity != null) {
+                if (entity != null && level.isTileVisible(level.tileAt(entity))) {
                     tooltip = new Text(entity.getClass().getSimpleName(), (float) mouseX, (float) mouseY + 20, true, 1f);
                 }
                 if (player.getSelected().isEmpty()) {

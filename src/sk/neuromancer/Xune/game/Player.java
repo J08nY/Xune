@@ -118,6 +118,10 @@ public class Player extends EntityOwner {
             return;
         }
 
+        if (other != null && !level.isTileVisible(level.tileAt(other))) {
+            return;
+        }
+
         for (PlayableEntity only : selected) {
             CommandStrategy strategy = commandStrategies.get(only.getClass());
             if (strategy != null) {

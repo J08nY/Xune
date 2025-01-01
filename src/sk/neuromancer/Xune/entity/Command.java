@@ -151,6 +151,10 @@ public abstract class Command {
             this.target = target;
         }
 
+        public Entity getTarget() {
+            return target;
+        }
+
         @Override
         public boolean isFinished(Entity entity) {
             return target.health == 0;
@@ -218,6 +222,10 @@ public abstract class Command {
         @Override
         public void finalize(Entity entity) {
         }
+
+        public AttackCommand getAttackCommand() {
+            return attack;
+        }
     }
 
     public static class FlyAndAttackCommand extends Command {
@@ -260,6 +268,10 @@ public abstract class Command {
 
         @Override
         public void finalize(Entity entity) {
+        }
+
+        public AttackCommand getAttackCommand() {
+            return attack;
         }
     }
 

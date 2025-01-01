@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.entity.unit.Harvester;
+import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.NoPathFound;
@@ -34,23 +35,15 @@ public abstract class CommandStrategy {
 
         @Override
         public Command defaultBehavior(Entity entity, Level level) {
-            /*
-            while (true) {
-                try {
-                    float patrolX = entity.x + (float) (Math.random() * 100 - 50);
-                    float patrolY = entity.y + (float) (Math.random() * 100 - 50);
-                    if (patrolX < 0) {
-                        patrolX = 0;
+            if (entity instanceof Unit unit) {
+                // If there is an enemy in range: attack
+                for (Entity enemyEntity : level.getEnemy().entities) {
+                    if (unit.inRange(enemyEntity)) {
+                        return new Command.AttackCommand(enemyEntity);
                     }
-                    if (patrolY < 0) {
-                        patrolY = 0;
-                    }
-                    return new Command.MoveCommand(entity.x, entity.y, patrolX, patrolY, level.getPathfinder());
-                } catch (IllegalArgumentException e) {
-                    System.out.println("No path found");
                 }
+                // If there is an enemy attacking us: respond
             }
-             */
             return null;
         }
     }

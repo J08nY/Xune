@@ -1,9 +1,6 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.EntityOwner;
-import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
@@ -75,6 +72,7 @@ public abstract class Unit extends Entity.PlayableEntity {
             return;
         }
         if (ready % rate == 0 && inRange(target)) {
+            System.out.println("Attack!" + target + " <- " + this);
             target.takeDamage(damage);
             owner.getGame().getSound().play(SoundManager.SOUND_SHOT_1, false, 1.0f);
         }
@@ -120,6 +118,25 @@ public abstract class Unit extends Entity.PlayableEntity {
             glPopMatrix();
         }
         glPopMatrix();
+        Command current = currentCommand();
+        Command.AttackCommand attack = null;
+        if (current instanceof Command.AttackCommand atk) {
+            attack = atk;
+        } else if (current instanceof Command.MoveAndAttackCommand ma) {
+            attack = ma.getAttackCommand();
+        } else if (current instanceof Command.FlyAndAttackCommand fa) {
+            attack = fa.getAttackCommand();
+        }
+        if (attack != null) {
+            glLineWidth(5);
+            glColor4f(1, 0, 0, 0.5f);
+            glBegin(GL_LINES);
+            Entity target = attack.getTarget();
+            glVertex3f(x, y, 0);
+            glVertex3f(target.x, target.y, 0);
+            glEnd();
+            glColor4f(1, 1, 1, 1);
+        }
     }
 
     protected abstract void updateSprite();

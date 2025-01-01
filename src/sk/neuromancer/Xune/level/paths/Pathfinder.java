@@ -91,7 +91,7 @@ public class Pathfinder implements Tickable, Renderable {
     }
 
     public Path find(Point src, Point dest) {
-        dest = findValidDestination(dest, 50);
+        dest = findValidDestination(dest, 100);
         if (Config.DEBUG_PATHS) {
             System.out.println("Source: " + src);
             System.out.println("Destination: " + dest);
