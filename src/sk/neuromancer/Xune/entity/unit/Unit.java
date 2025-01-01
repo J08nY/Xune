@@ -11,7 +11,6 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class Unit extends Entity.PlayableEntity {
     private float speed;
     private float range;
-    private float sight;
     private int rate;
     private int damage;
     private int ready = 0;
@@ -19,14 +18,12 @@ public abstract class Unit extends Entity.PlayableEntity {
 
     public Unit(float x, float y, Orientation orientation, Player owner,
                 float speed,
-                float sight,
                 float range,
                 int rate,
                 int damage) {
         super(x, y, owner);
         this.orientation = orientation;
         this.speed = speed;
-        this.sight = sight;
         this.range = range;
         this.rate = rate;
         this.damage = damage;
@@ -52,12 +49,6 @@ public abstract class Unit extends Entity.PlayableEntity {
         float azimuth = (float) ((angle < 0 ? angle + 2 * (float) Math.PI : angle) + (Math.PI / 2));
         this.orientation = Orientation.fromAngle(azimuth);
         updateSprite();
-    }
-
-    public boolean inSight(float x, float y) {
-        float dx = this.x - x;
-        float dy = this.y - y;
-        return dx * dx + dy * dy <= sight * sight;
     }
 
     public boolean inRange(Entity target) {

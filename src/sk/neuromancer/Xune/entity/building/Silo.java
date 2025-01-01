@@ -13,6 +13,7 @@ public class Silo extends Building {
         setMaxHealth(Silo.class, 500);
         setCost(Silo.class, 120);
         setPower(Silo.class, -15);
+        setSight(Silo.class, 60);
         registerPrerequisites(Silo.class, Arrays.asList(new Prerequisite(Powerplant.class)));
     }
 

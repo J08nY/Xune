@@ -11,6 +11,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 public abstract class Entity implements Renderable, Tickable, Clickable {
     protected static final Map<Class<? extends Entity>, Integer> healthMap = new HashMap<>();
+    protected static final Map<Class<? extends Entity>, Integer> sightMap = new HashMap<>();
 
     protected Sprite sprite;
     public float x, y;
@@ -75,6 +76,21 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
     public static int getMaxHealth(Class<? extends Entity> klass) {
         return healthMap.get(klass);
+    }
+
+    protected static void setSight(Class<? extends Entity> klass, int sight) {
+        sightMap.put(klass, sight);
+    }
+
+    public int getSight() {
+        return sightMap.get(getClass());
+    }
+
+    public boolean inSight(float x, float y) {
+        float dx = this.x - x;
+        float dy = this.y - y;
+        int sight = getSight();
+        return dx * dx + dy * dy <= sight * sight;
     }
 
 

@@ -17,6 +17,7 @@ public class Factory extends Building {
         setMaxHealth(Factory.class, 500);
         setCost(Factory.class, 500);
         setPower(Factory.class, -125);
+        setSight(Factory.class, 60);
         setProduces(Factory.class, Arrays.asList(Buggy.class, Harvester.class));
         registerPrerequisites(Factory.class, Arrays.asList(new Prerequisite(Refinery.class)));
     }

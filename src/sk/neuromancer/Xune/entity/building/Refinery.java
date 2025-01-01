@@ -15,6 +15,7 @@ public class Refinery extends Building {
         setMaxHealth(Refinery.class, 500);
         setCost(Refinery.class, 1500);
         setPower(Refinery.class, -75);
+        setSight(Refinery.class, 60);
         registerPrerequisites(Refinery.class, Arrays.asList(new Prerequisite(Powerplant.class)));
     }
 

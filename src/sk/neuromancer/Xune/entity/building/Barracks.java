@@ -17,6 +17,7 @@ public class Barracks extends Building {
         setCost(Barracks.class, 225);
         setPower(Barracks.class, -30);
         setProduces(Barracks.class, Arrays.asList(Soldier.class));
+        setSight(Barracks.class, 60);
         registerPrerequisites(Barracks.class, Arrays.asList(new Prerequisite(Powerplant.class)));
     }
 

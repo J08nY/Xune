@@ -16,11 +16,12 @@ public class Heli extends Unit {
     static {
         setMaxHealth(Heli.class, 100);
         setCost(Heli.class, 1000);
+        setSight(Heli.class, 100);
         registerPrerequisites(Heli.class, Arrays.asList(new Prerequisite(Helipad.class)));
     }
 
     public Heli(float x, float y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner,  1.2f, 100f, 30f, 10, 2);
+        super(x, y, orientation, owner,  1.2f, 30f, 10, 2);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
     }

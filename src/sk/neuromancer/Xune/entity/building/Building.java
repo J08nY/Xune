@@ -1,8 +1,8 @@
 package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
@@ -28,12 +28,6 @@ public abstract class Building extends Entity.PlayableEntity {
         int spriteRow = this.orientation.ordinal() % 2 == 0 ? 1 : 0;
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(baseSpriteId + SpriteSheet.flagToOffset(owner.getFlag()) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH);
         this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), true));
-    }
-
-    public boolean inSight(float x, float y) {
-        float dx = this.x - x;
-        float dy = this.y - y;
-        return dx * dx + dy * dy <= 60 * 60;
     }
 
     @Override

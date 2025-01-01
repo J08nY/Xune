@@ -12,6 +12,7 @@ public class Base extends Building {
         setMaxHealth(Base.class, 1000);
         setCost(Base.class, 2000);
         setPower(Base.class, 20);
+        setSight(Base.class, 60);
     }
 
     public Base(int x, int y, Orientation orientation, Player owner) {

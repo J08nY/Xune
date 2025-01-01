@@ -12,6 +12,7 @@ public class Powerplant extends Building {
         setMaxHealth(Powerplant.class, 500);
         setCost(Powerplant.class, 225);
         setPower(Powerplant.class, 200);
+        setSight(Powerplant.class, 60);
     }
 
     public Powerplant(int x, int y, Orientation orientation, Player owner) {

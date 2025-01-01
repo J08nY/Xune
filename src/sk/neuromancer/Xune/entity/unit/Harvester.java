@@ -19,11 +19,12 @@ public class Harvester extends Unit {
     static {
         setMaxHealth(Harvester.class, 300);
         setCost(Harvester.class, 1200);
+        setSight(Harvester.class, 40);
         registerPrerequisites(Harvester.class, Arrays.asList(new Prerequisite(Refinery.class)));
     }
 
     public Harvester(float x, float y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 0.1f, 40f, 0, 0, 0);
+        super(x, y, orientation, owner, 0.1f, 0, 0, 0);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6, false));
     }
