@@ -1,7 +1,6 @@
 package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Player;
-import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
@@ -16,8 +15,8 @@ public class Silo extends Building {
         registerPrerequisites(Silo.class, Arrays.asList(new Prerequisite(Powerplant.class)));
     }
 
-    public Silo(int x, int y, Orientation orientation, Player owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_SILO);
+    public Silo(int x, int y, Orientation orientation, Player owner) {
+        super(x, y, orientation, owner, 500, SpriteSheet.SPRITE_ID_SILO);
     }
 
     @Override

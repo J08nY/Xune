@@ -18,8 +18,8 @@ public class Heli extends Unit {
         registerPrerequisites(Heli.class, Arrays.asList(new Prerequisite(Helipad.class)));
     }
 
-    public Heli(float x, float y, Orientation orientation, Player owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 100, 1.2f, 100f, 30f, 10, 2);
+    public Heli(float x, float y, Orientation orientation, Player owner) {
+        super(x, y, orientation, owner, 100, 1.2f, 100f, 30f, 10, 2);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
     }

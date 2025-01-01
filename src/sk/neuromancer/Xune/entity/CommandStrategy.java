@@ -37,7 +37,7 @@ public abstract class CommandStrategy {
         public Command defaultBehavior(Entity entity, Level level) {
             if (entity instanceof Unit unit) {
                 // If there is an enemy in range: attack
-                for (Entity enemyEntity : level.getEnemy().entities) {
+                for (Entity enemyEntity : level.getBot().entities) {
                     if (unit.inRange(enemyEntity)) {
                         return new Command.AttackCommand(enemyEntity);
                     }

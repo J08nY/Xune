@@ -18,20 +18,20 @@ public class Human extends Player {
 
     public Human(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
-        level.setPlayer(this);
-        this.addEntity(new Base(7, 2, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Refinery(5, 6, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Silo(5, 5, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Helipad(4, 5, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Barracks(6, 4, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Powerplant(6, 3, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Powerplant(5, 4, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Factory(6, 5, Orientation.NORTH, this, this.flag));
-        this.addEntity(new Buggy(tileToCenterLevelX(6, 8), tileToCenterLevelY(6, 8), Orientation.SOUTHEAST, this, this.flag));
-        this.addEntity(new Buggy(tileToCenterLevelX(8, 4), tileToCenterLevelY(8, 4), Orientation.EAST, this, this.flag));
-        this.addEntity(new Heli(tileToCenterLevelX(7, 7), tileToCenterLevelY(7, 7), Orientation.EAST, this, this.flag));
-        this.addEntity(new Harvester(tileToCenterLevelX(11, 8), tileToCenterLevelY(11, 8), Orientation.SOUTHEAST, this, this.flag));
-        this.addEntity(new Soldier(tileToCenterLevelX(10, 7), tileToCenterLevelY(10, 7), Orientation.SOUTHEAST, this, this.flag));
+        level.setHuman(this);
+        this.addEntity(new Base(7, 2, Orientation.NORTH, this));
+        this.addEntity(new Refinery(5, 6, Orientation.NORTH, this));
+        this.addEntity(new Silo(5, 5, Orientation.NORTH, this));
+        this.addEntity(new Helipad(4, 5, Orientation.NORTH, this));
+        this.addEntity(new Barracks(6, 4, Orientation.NORTH, this));
+        this.addEntity(new Powerplant(6, 3, Orientation.NORTH, this));
+        this.addEntity(new Powerplant(5, 4, Orientation.NORTH, this));
+        this.addEntity(new Factory(6, 5, Orientation.NORTH, this));
+        this.addEntity(new Buggy(tileToCenterLevelX(6, 8), tileToCenterLevelY(6, 8), Orientation.SOUTHEAST, this));
+        this.addEntity(new Buggy(tileToCenterLevelX(8, 4), tileToCenterLevelY(8, 4), Orientation.EAST, this));
+        this.addEntity(new Heli(tileToCenterLevelX(7, 7), tileToCenterLevelY(7, 7), Orientation.EAST, this));
+        this.addEntity(new Harvester(tileToCenterLevelX(11, 8), tileToCenterLevelY(11, 8), Orientation.SOUTHEAST, this));
+        this.addEntity(new Soldier(tileToCenterLevelX(10, 7), tileToCenterLevelY(10, 7), Orientation.SOUTHEAST, this));
 
     }
 

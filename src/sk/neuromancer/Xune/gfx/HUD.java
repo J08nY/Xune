@@ -45,7 +45,7 @@ public class HUD implements Tickable, Renderable {
     public HUD(Game game) {
         this.game = game;
         this.level = game.getLevel();
-        this.human = level.getPlayer();
+        this.human = level.getHuman();
         this.width = game.getWindow().getWidth();
         this.height = game.getWindow().getHeight();
         glfwSetInputMode(game.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);

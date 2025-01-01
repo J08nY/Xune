@@ -17,14 +17,14 @@ public abstract class Unit extends Entity.PlayableEntity {
     private int ready = 0;
     private boolean moved;
 
-    public Unit(float x, float y, Orientation orientation, Player owner, Flag flag,
+    public Unit(float x, float y, Orientation orientation, Player owner,
                 int maxHealth,
                 float speed,
                 float sight,
                 float range,
                 int rate,
                 int damage) {
-        super(x, y, owner, flag, maxHealth);
+        super(x, y, owner, maxHealth);
         this.orientation = orientation;
         this.speed = speed;
         this.sight = sight;

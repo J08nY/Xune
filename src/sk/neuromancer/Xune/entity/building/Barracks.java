@@ -1,7 +1,6 @@
 package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Player;
-import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.unit.Soldier;
@@ -20,8 +19,8 @@ public class Barracks extends Building {
         registerPrerequisites(Barracks.class, Arrays.asList(new Prerequisite(Powerplant.class)));
     }
 
-    public Barracks(int x, int y, Orientation orientation, Player owner, Flag flag) {
-        super(x, y, orientation, owner, flag, 500, SpriteSheet.SPRITE_ID_BARRACKS);
+    public Barracks(int x, int y, Orientation orientation, Player owner) {
+        super(x, y, orientation, owner, 500, SpriteSheet.SPRITE_ID_BARRACKS);
     }
 
     @Override

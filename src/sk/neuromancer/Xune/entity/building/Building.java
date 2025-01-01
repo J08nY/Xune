@@ -2,7 +2,6 @@ package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Player;
-import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.Game;
@@ -21,13 +20,13 @@ public abstract class Building extends Entity.PlayableEntity {
     protected static final Map<Class<? extends Building>, List<Class<? extends Unit>>> producesMap = new HashMap<>();
     public int tileX, tileY;
 
-    public Building(int tileX, int tileY, Orientation orientation, Player owner, Flag flag, int maxHealth, int baseSpriteId) {
-        super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner, flag, maxHealth);
+    public Building(int tileX, int tileY, Orientation orientation, Player owner, int maxHealth, int baseSpriteId) {
+        super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner, maxHealth);
         this.tileX = tileX;
         this.tileY = tileY;
         this.orientation = orientation;
         int spriteRow = this.orientation.ordinal() % 2 == 0 ? 1 : 0;
-        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(baseSpriteId + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH);
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(baseSpriteId + SpriteSheet.flagToOffset(owner.getFlag()) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH);
         this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), true));
     }
 

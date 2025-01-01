@@ -75,11 +75,11 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         protected Flag flag;
         protected boolean isSelected;
 
-        public PlayableEntity(float x, float y, Player owner, Flag flag, int maxHealth) {
+        public PlayableEntity(float x, float y, Player owner, int maxHealth) {
             super(x, y, maxHealth);
             this.owner = owner;
             this.commands = new LinkedList<>();
-            this.flag = flag;
+            this.flag = owner.getFlag();
         }
 
         public void select() {

@@ -244,19 +244,19 @@ public class Level implements Renderable, Tickable {
         this.yOff = Game.CENTER_Y - Game.CENTER_Y / this.zoom;
     }
 
-    public void setPlayer(Human human) {
+    public void setHuman(Human human) {
         this.human = human;
     }
 
-    public void setEnemy(Bot bot) {
+    public void setBot(Bot bot) {
         this.bot = bot;
     }
 
-    public Human getPlayer() {
+    public Human getHuman() {
         return this.human;
     }
 
-    public Bot getEnemy() {
+    public Bot getBot() {
         return this.bot;
     }
 
