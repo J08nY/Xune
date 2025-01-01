@@ -20,8 +20,8 @@ public abstract class Building extends Entity.PlayableEntity {
     protected static final Map<Class<? extends Building>, List<Class<? extends Unit>>> producesMap = new HashMap<>();
     public int tileX, tileY;
 
-    public Building(int tileX, int tileY, Orientation orientation, Player owner, int maxHealth, int baseSpriteId) {
-        super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner, maxHealth);
+    public Building(int tileX, int tileY, Orientation orientation, Player owner, int baseSpriteId) {
+        super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner);
         this.tileX = tileX;
         this.tileY = tileY;
         this.orientation = orientation;

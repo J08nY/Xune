@@ -1,29 +1,33 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.building.Building;
-import sk.neuromancer.Xune.entity.unit.Buggy;
-import sk.neuromancer.Xune.entity.unit.Harvester;
-import sk.neuromancer.Xune.entity.unit.Heli;
-import sk.neuromancer.Xune.entity.unit.Soldier;
+import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.*;
 
+import static sk.neuromancer.Xune.level.Level.tileToCenterLevelX;
+import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
 public class Player implements Tickable, Renderable {
     protected final Game game;
     protected final Level level;
+    private final boolean[][] visible;
+    private final boolean[][] discovered;
+
     protected List<Entity.PlayableEntity> entities = new LinkedList<>();
     protected List<Entity.PlayableEntity> toAdd = new LinkedList<>();
     protected List<Entity.PlayableEntity> toRemove = new LinkedList<>();
+
     protected List<Effect> effects = new LinkedList<>();
     protected int money;
-    protected Flag flag;
+    protected final Flag flag;
     protected final Map<Class<? extends Entity.PlayableEntity>, CommandStrategy> commandStrategies = new HashMap<>();
 
     public Player(Game game, Level level, Flag flag, int money) {
@@ -31,6 +35,9 @@ public class Player implements Tickable, Renderable {
         this.level = level;
         this.flag = flag;
         this.money = money;
+
+        this.visible = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];
+        this.discovered = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];
 
         commandStrategies.put(Heli.class, new CommandStrategy.AirAttackStrategy());
         commandStrategies.put(Buggy.class, new CommandStrategy.GroundAttackStrategy());
@@ -86,7 +93,7 @@ public class Player implements Tickable, Renderable {
 
     @Override
     public void render() {
-        entities.stream().filter(e -> (e instanceof Building) || level.isTileVisible(level.tileAt(e))).sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
+        entities.stream().filter(e -> (e instanceof Building) || isTileVisible(level.tileAt(e))).sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
         for (Effect e : effects) {
             e.render();
         }
@@ -106,6 +113,7 @@ public class Player implements Tickable, Renderable {
         handleUnitBehavior();
         entities.removeAll(toRemove);
         toRemove.clear();
+        updateVisibility();
     }
 
     protected void handleDead() {
@@ -134,5 +142,66 @@ public class Player implements Tickable, Renderable {
                 }
             }
         }
+    }
+
+    private void updateVisibility() {
+        for (int x = 0; x < level.getWidthInTiles(); x++) {
+            for (int y = 0; y < this.level.getHeightInTiles(); y++) {
+                visible[x][y] = false;
+            }
+        }
+        for (Entity.PlayableEntity e : entities) {
+            updateVisibility(e);
+        }
+    }
+
+    private void updateVisibility(Entity.PlayableEntity entity) {
+        for (int x = 0; x < level.getWidthInTiles(); x++) {
+            for (int y = 0; y < this.level.getHeightInTiles(); y++) {
+                float cx = tileToCenterLevelX(x, y);
+                float cy = tileToCenterLevelY(x, y);
+                if (entity instanceof Unit unit) {
+                    if (unit.inSight(cx, cy)) {
+                        visible[x][y] = true;
+                        discovered[x][y] = true;
+                    }
+                } else if (entity instanceof Building building) {
+                    if (building.inSight(cx, cy)) {
+                        visible[x][y] = true;
+                        discovered[x][y] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean[][] getVisible() {
+        return visible;
+    }
+
+    public boolean isTileVisible(Tile tile) {
+        if (tile == null) {
+            return true;
+        }
+        return visible[tile.getX()][tile.getY()];
+    }
+
+    public boolean isTileVisible(int column, int row) {
+        return visible[column][row];
+    }
+
+    public boolean[][] getDiscovered() {
+        return discovered;
+    }
+
+    public boolean isTileDiscovered(Tile tile) {
+        if (tile == null) {
+            return true;
+        }
+        return discovered[tile.getX()][tile.getY()];
+    }
+
+    public boolean isTileDiscovered(int column, int row) {
+        return discovered[column][row];
     }
 }

@@ -4,8 +4,6 @@ import sk.neuromancer.Xune.ai.Bot;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
-import sk.neuromancer.Xune.entity.building.Building;
-import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
@@ -30,12 +28,9 @@ public class Level implements Renderable, Tickable {
     private List<Road> roads;
 
     private Tile[][] level;
-    private boolean[][] visible;
-    private boolean[][] discovered;
     private int width, height;
 
     public float zoom;
-
     public float xOff;
     public float yOff;
 
@@ -99,39 +94,8 @@ public class Level implements Renderable, Tickable {
             road.tick(tickCount);
         }
         pathfinder.tick(tickCount);
-        updateVisibility();
     }
 
-    private void updateVisibility() {
-        for (int x = 0; x < this.width; x++) {
-            for (int y = 0; y < this.height; y++) {
-                visible[x][y] = false;
-            }
-        }
-        for (Entity.PlayableEntity e : human.getEntities()) {
-            updateVisibility(e);
-        }
-    }
-
-    private void updateVisibility(Entity.PlayableEntity entity) {
-        for (int x = 0; x < this.width; x++) {
-            for (int y = 0; y < this.height; y++) {
-                float cx = tileToCenterLevelX(x, y);
-                float cy = tileToCenterLevelY(x, y);
-                if (entity instanceof Unit unit) {
-                    if (unit.inSight(cx, cy)) {
-                        visible[x][y] = true;
-                        discovered[x][y] = true;
-                    }
-                } else if (entity instanceof Building building) {
-                    if (building.inSight(cx, cy)) {
-                        visible[x][y] = true;
-                        discovered[x][y] = true;
-                    }
-                }
-            }
-        }
-    }
 
     public void zoomIn(float speed) {
         this.zoom *= 1 + speed;
@@ -176,6 +140,8 @@ public class Level implements Renderable, Tickable {
         glTranslatef(-centerX, -centerY, 0);
         glTranslatef(xOff, yOff, 0);
 
+        boolean[][] visible = human.getVisible();
+        boolean[][] discovered = human.getDiscovered();
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
                 if (discovered[x][y]) {
@@ -226,8 +192,6 @@ public class Level implements Renderable, Tickable {
             br.close();
 
             this.level = new Tile[this.width][this.height];
-            this.visible = new boolean[this.width][this.height];
-            this.discovered = new boolean[this.width][this.height];
 
             for (int i = 0; i < lines.size(); i++) {
                 String[] row = lines.get(i).split(",");
@@ -264,14 +228,19 @@ public class Level implements Renderable, Tickable {
         return this.pathfinder;
     }
 
-    public void addEntity(Entity.PlayableEntity e) {
-        pathfinder.addEntity(e);
-        if (e.getOwner() == human) {
-            updateVisibility(e);
-        }
+    public List<Entity> getEntities() {
+        List<Entity> entities = new LinkedList<>();
+        entities.addAll(worms);
+        entities.addAll(human.getEntities());
+        entities.addAll(bot.getEntities());
+        return entities;
     }
 
-    public void removeEntity(Entity.PlayableEntity e) {
+    public void addEntity(Entity e) {
+        pathfinder.addEntity(e);
+    }
+
+    public void removeEntity(Entity e) {
         pathfinder.removeEntity(e);
     }
 
@@ -292,28 +261,6 @@ public class Level implements Renderable, Tickable {
             }
         }
         return null;
-    }
-
-    public boolean isTileVisible(Tile tile) {
-        if (tile == null) {
-            return true;
-        }
-        return visible[tile.getX()][tile.getY()];
-    }
-
-    public boolean isTileVisible(int column, int row) {
-        return visible[column][row];
-    }
-
-    public boolean isTileDiscovered(Tile tile) {
-        if (tile == null) {
-            return true;
-        }
-        return discovered[tile.getX()][tile.getY()];
-    }
-
-    public boolean isTileDiscovered(int column, int row) {
-        return discovered[column][row];
     }
 
     public Tile[][] getTiles() {
@@ -507,10 +454,7 @@ public class Level implements Renderable, Tickable {
             this.condition = condition;
 
             //First merge entity lists from level
-            List<Entity> entities = new LinkedList<>();
-            entities.addAll(level.worms);
-            entities.addAll(level.human.getEntities());
-            entities.addAll(level.bot.getEntities());
+            List<Entity> entities = level.getEntities();
             filtered = entities.stream().filter(condition).sorted(Comparator.comparingDouble(e -> Math.hypot(e.x - startX, e.y - startY))).collect(Collectors.toList());
         }
 

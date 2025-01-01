@@ -237,13 +237,13 @@ public class HUD implements Tickable, Renderable {
                 }
             } else {
                 Entity entity = level.entityAt(level.getLevelX(mouseX), level.getLevelY(mouseY));
-                if (entity != null && level.isTileVisible(level.tileAt(entity))) {
+                if (entity != null && human.isTileVisible(level.tileAt(entity))) {
                     tooltip = new Text(entity.getClass().getSimpleName(), (float) mouseX, (float) mouseY + 20, true, 1f);
                 }
                 if (human.getSelected().isEmpty()) {
                     currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
                 } else {
-                    if (entity != null && level.isTileVisible(level.tileAt(entity))) {
+                    if (entity != null && human.isTileVisible(level.tileAt(entity))) {
                         if (entity instanceof Entity.PlayableEntity playable) {
                             if (playable.getOwner() == human) {
                                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);

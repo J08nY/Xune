@@ -189,7 +189,7 @@ public class Pathfinder implements Tickable, Renderable {
         return levelMap.isPassable(p) && !buildingMap.isPassable(p) && !entityMap.isPassable(p);
     }
 
-    public void addEntity(Entity.PlayableEntity e) {
+    public void addEntity(Entity e) {
         if (e instanceof Building building) {
             buildingMap.setTile(building.tileX, building.tileY, negate(building.getPassable()));
         } else if (e instanceof Unit unit) {
@@ -208,7 +208,7 @@ public class Pathfinder implements Tickable, Renderable {
         return negated;
     }
 
-    public void removeEntity(Entity.PlayableEntity e) {
+    public void removeEntity(Entity e) {
         if (e instanceof Building building) {
             buildingMap.resetTile(building.tileX, building.tileY);
         } else if (e instanceof Unit unit) {

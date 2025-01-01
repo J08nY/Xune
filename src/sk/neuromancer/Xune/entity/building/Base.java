@@ -9,12 +9,13 @@ import static sk.neuromancer.Xune.level.Tile.PASS_EDGES;
 public class Base extends Building {
 
     static {
+        setMaxHealth(Base.class, 1000);
         setCost(Base.class, 2000);
         setPower(Base.class, 20);
     }
 
     public Base(int x, int y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 1000, SpriteSheet.SPRITE_ID_BASE);
+        super(x, y, orientation, owner, SpriteSheet.SPRITE_ID_BASE);
     }
 
     @Override

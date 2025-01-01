@@ -12,6 +12,7 @@ import static sk.neuromancer.Xune.level.Tile.PASS_EDGES;
 public class Refinery extends Building {
 
     static {
+        setMaxHealth(Refinery.class, 500);
         setCost(Refinery.class, 1500);
         setPower(Refinery.class, -75);
         registerPrerequisites(Refinery.class, Arrays.asList(new Prerequisite(Powerplant.class)));
@@ -19,7 +20,7 @@ public class Refinery extends Building {
 
 
     public Refinery(int x, int y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 500, SpriteSheet.SPRITE_ID_REFINERY);
+        super(x, y, orientation, owner, SpriteSheet.SPRITE_ID_REFINERY);
     }
 
     @Override

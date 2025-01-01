@@ -118,7 +118,7 @@ public class Human extends Player {
             return;
         }
 
-        if (other != null && !level.isTileVisible(level.tileAt(other))) {
+        if (other != null && !isTileVisible(level.tileAt(other))) {
             return;
         }
 

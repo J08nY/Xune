@@ -14,6 +14,7 @@ import static sk.neuromancer.Xune.level.Tile.PASS_EDGES;
 public class Factory extends Building {
 
     static {
+        setMaxHealth(Factory.class, 500);
         setCost(Factory.class, 500);
         setPower(Factory.class, -125);
         setProduces(Factory.class, Arrays.asList(Buggy.class, Harvester.class));
@@ -21,7 +22,7 @@ public class Factory extends Building {
     }
 
     public Factory(int x, int y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 500, SpriteSheet.SPRITE_ID_FACTORY);
+        super(x, y, orientation, owner, SpriteSheet.SPRITE_ID_FACTORY);
     }
 
     @Override

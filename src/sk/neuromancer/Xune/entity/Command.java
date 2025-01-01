@@ -297,8 +297,8 @@ public abstract class Command {
                 if (tickCount - start >= duration) {
                     Unit result;
                     try {
-                        Constructor<? extends Unit> con = resultClass.getConstructor(float.class, float.class, Orientation.class, Player.class, Flag.class);
-                        result = con.newInstance(building.x, building.y + Tile.TILE_CENTER_Y, building.orientation, building.owner, building.flag);
+                        Constructor<? extends Unit> con = resultClass.getConstructor(float.class, float.class, Orientation.class, Player.class);
+                        result = con.newInstance(building.x, building.y + Tile.TILE_CENTER_Y, building.orientation, building.owner);
                     } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                              IllegalAccessException ex) {
                         System.out.println("Failed to create unit." + ex);

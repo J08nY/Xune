@@ -14,7 +14,7 @@ public class Road extends Entity {
     }
 
     public Road(int tileX, int tileY, Variant variant) {
-        super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), 0);
+        super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY));
         this.tileX = tileX;
         this.tileY = tileY;
         this.variant = variant;

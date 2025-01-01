@@ -11,12 +11,13 @@ import java.util.Arrays;
 public class Buggy extends Unit {
 
     static {
+        setMaxHealth(Buggy.class, 100);
         setCost(Buggy.class, 100);
         registerPrerequisites(Buggy.class, Arrays.asList(new Prerequisite(Factory.class)));
     }
 
     public Buggy(float x, float y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 100, 0.5f, 50f, 20f, 30, 10);
+        super(x, y, orientation, owner, 0.5f, 50f, 20f, 30, 10);
         updateSprite();
         this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, false));
     }

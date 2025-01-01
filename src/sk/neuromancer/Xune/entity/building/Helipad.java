@@ -13,6 +13,7 @@ import static sk.neuromancer.Xune.level.Tile.PASS_EDGES;
 public class Helipad extends Building {
 
     static {
+        setMaxHealth(Helipad.class, 500);
         setCost(Helipad.class, 500);
         setPower(Helipad.class, -100);
         setProduces(Helipad.class, Arrays.asList(Heli.class));
@@ -20,7 +21,7 @@ public class Helipad extends Building {
     }
 
     public Helipad(int x, int y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 500, SpriteSheet.SPRITE_ID_HELIPAD);
+        super(x, y, orientation, owner, SpriteSheet.SPRITE_ID_HELIPAD);
     }
 
     @Override

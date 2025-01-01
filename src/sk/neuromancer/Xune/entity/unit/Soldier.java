@@ -11,12 +11,13 @@ public class Soldier extends Unit {
     private int step;
 
     static {
+        setMaxHealth(Soldier.class, 50);
         setCost(Soldier.class, 50);
         registerPrerequisites(Soldier.class, Arrays.asList(new Prerequisite(Barracks.class)));
     }
 
     public Soldier(float x, float y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 20, 0.2f, 50f, 20f, 15, 2);
+        super(x, y, orientation, owner, 0.2f, 50f, 20f, 15, 2);
         updateSprite();
         this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 3, false));
     }

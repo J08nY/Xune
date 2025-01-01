@@ -96,6 +96,7 @@ public abstract class CommandStrategy {
         @Override
         public Command defaultBehavior(Entity entity, Level level) {
             if (entity instanceof Harvester harvester) {
+                Player owner = harvester.owner;
                 if (harvesters.containsKey(harvester)) {
                     int timeout = harvesters.get(harvester);
                     if (timeout > 0) {
@@ -116,7 +117,7 @@ public abstract class CommandStrategy {
                     }
                 } else {
                     Tile harvesterTile = level.tileAt(harvester.x, harvester.y);
-                    for (Iterator<Tile> it = level.findClosestTile(harvesterTile, tile -> level.isTileDiscovered(tile) && tile.isSpicy() && tile.getSpice() > 0); it.hasNext(); ) {
+                    for (Iterator<Tile> it = level.findClosestTile(harvesterTile, tile -> owner.isTileDiscovered(tile) && tile.isSpicy() && tile.getSpice() > 0); it.hasNext(); ) {
                         Tile tile = it.next();
                         try {
                             return new Command.CollectSpiceCommand(entity.x, entity.y, level.getPathfinder(), tile);

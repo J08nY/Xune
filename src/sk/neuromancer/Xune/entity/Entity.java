@@ -10,6 +10,8 @@ import java.util.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public abstract class Entity implements Renderable, Tickable, Clickable {
+    protected static final Map<Class<? extends Entity>, Integer> healthMap = new HashMap<>();
+
     protected Sprite sprite;
     public float x, y;
     public int health;
@@ -17,11 +19,11 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected Orientation orientation;
     protected List<Clickable> clickableAreas = new ArrayList<>();
 
-    public Entity(float x, float y, int maxHealth) {
+    public Entity(float x, float y) {
         this.x = x;
         this.y = y;
-        this.health = maxHealth;
-        this.maxHealth = maxHealth;
+        this.health = getMaxHealth(getClass());
+        this.maxHealth = getMaxHealth(getClass());;
     }
 
     public void setPosition(float x, float y) {
@@ -67,6 +69,15 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         glPopMatrix();
     }
 
+    protected static void setMaxHealth(Class<? extends Entity> klass, int health) {
+        healthMap.put(klass, health);
+    }
+
+    public static int getMaxHealth(Class<? extends Entity> klass) {
+        return healthMap.get(klass);
+    }
+
+
     public static abstract class PlayableEntity extends Entity {
         protected static final Map<Class<? extends PlayableEntity>, List<Prerequisite>> prerequisitesMap = new HashMap<>();
         protected static final Map<Class<? extends PlayableEntity>, Integer> costMap = new HashMap<>();
@@ -75,8 +86,8 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         protected Flag flag;
         protected boolean isSelected;
 
-        public PlayableEntity(float x, float y, Player owner, int maxHealth) {
-            super(x, y, maxHealth);
+        public PlayableEntity(float x, float y, Player owner) {
+            super(x, y);
             this.owner = owner;
             this.commands = new LinkedList<>();
             this.flag = owner.getFlag();

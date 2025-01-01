@@ -5,8 +5,12 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 public class Worm extends Entity {
     private int animation = 0;
 
+    static {
+        setMaxHealth(Worm.class, 1000);
+    }
+
     public Worm(float x, float y) {
-        super(x, y, 1000);
+        super(x, y);
         this.sprite = SpriteSheet.WORM_SHEET.getSprite(animation);
         this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), true));
     }
