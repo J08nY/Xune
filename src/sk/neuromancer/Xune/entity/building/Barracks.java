@@ -6,9 +6,10 @@ import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
-import java.util.Arrays;
+import java.util.List;
 
-import static sk.neuromancer.Xune.level.Tile.PASS_EDGES;
+import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.level.Tile.PASS_CORNERS;
 
 public class Barracks extends Building {
 
@@ -16,9 +17,10 @@ public class Barracks extends Building {
         setMaxHealth(Barracks.class, 500);
         setCost(Barracks.class, 225);
         setPower(Barracks.class, -30);
-        setProduces(Barracks.class, Arrays.asList(Soldier.class));
+        setProduces(Barracks.class, List.of(Soldier.class));
         setSight(Barracks.class, 60);
-        registerPrerequisites(Barracks.class, Arrays.asList(new Prerequisite(Powerplant.class)));
+        setBuildTime(Barracks.class, TPS * 12);
+        registerPrerequisites(Barracks.class, List.of(new Prerequisite(Powerplant.class)));
     }
 
     public Barracks(int x, int y, Orientation orientation, Player owner) {
@@ -27,6 +29,6 @@ public class Barracks extends Building {
 
     @Override
     public boolean[] getPassable() {
-        return PASS_EDGES;
+        return PASS_CORNERS;
     }
 }

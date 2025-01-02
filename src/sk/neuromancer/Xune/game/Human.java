@@ -8,6 +8,7 @@ import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,8 +25,8 @@ public class Human extends Player {
         this.addEntity(new Refinery(5, 6, Orientation.NORTH, this));
         this.addEntity(new Silo(5, 5, Orientation.NORTH, this));
         this.addEntity(new Helipad(4, 5, Orientation.NORTH, this));
-        this.addEntity(new Barracks(6, 4, Orientation.NORTH, this));
-        this.addEntity(new Powerplant(6, 3, Orientation.NORTH, this));
+        this.addEntity(new Powerplant(6, 4, Orientation.NORTH, this));
+        this.addEntity(new Barracks(6, 3, Orientation.NORTH, this));
         this.addEntity(new Powerplant(5, 4, Orientation.NORTH, this));
         this.addEntity(new Factory(6, 5, Orientation.NORTH, this));
         this.addEntity(new Buggy(tileToCenterLevelX(6, 8), tileToCenterLevelY(6, 8), Orientation.SOUTHEAST, this));
@@ -142,16 +143,16 @@ public class Human extends Player {
                     System.out.println("Build " + klass.getSimpleName());
                 } else if (Unit.class.isAssignableFrom(klass)) {
                     if (PlayableEntity.canBeBuilt(klass, this)) {
-                        for (PlayableEntity e : entities) {
-                            if (e instanceof Building building) {
-                                List<Class<? extends Unit>> produces = building.getProduces();
-                                if (produces != null && produces.contains(klass)) {
-                                    takeMoney(PlayableEntity.getCost(klass));
-                                    building.sendCommand(new Command.ProduceCommand(100, (Class<? extends Unit>) klass));
-                                    SoundManager.play(SoundManager.SOUND_BLIP_1, false, 0.5f);
-                                    return;
-                                }
-                            }
+                        List<Building> producers = entities.stream().filter(e -> e instanceof Building building && building.getProduces().contains(klass)).map(e -> (Building) e).sorted(Comparator.comparingInt(building -> building.getCommands().size())).toList();
+                        if (producers.isEmpty()) {
+                            System.out.println("No producers for " + klass.getSimpleName());
+                            return;
+                        } else {
+                            Building building = producers.getFirst();
+                            takeMoney(PlayableEntity.getCost(klass));
+                            building.sendCommand(new Command.ProduceCommand(PlayableEntity.getBuildTime(klass), (Class<? extends Unit>) klass, level.getPathfinder()));
+                            SoundManager.play(SoundManager.SOUND_BLIP_1, false, 0.5f);
+                            return;
                         }
                     } else {
                         System.out.println("Cannot build " + klass.getSimpleName());

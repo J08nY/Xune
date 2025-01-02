@@ -9,7 +9,7 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 
 import java.util.Arrays;
 
-import static sk.neuromancer.Xune.level.Tile.PASS_EDGES;
+import static sk.neuromancer.Xune.level.Tile.PASS_EAST_WEST;
 
 public class Factory extends Building {
 
@@ -28,6 +28,6 @@ public class Factory extends Building {
 
     @Override
     public boolean[] getPassable() {
-        return PASS_EDGES;
+        return PASS_EAST_WEST;
     }
 }

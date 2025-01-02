@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
+import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class Harvester extends Unit {
     private int spice;
@@ -20,6 +21,7 @@ public class Harvester extends Unit {
         setMaxHealth(Harvester.class, 300);
         setCost(Harvester.class, 1200);
         setSight(Harvester.class, 40);
+        setBuildTime(Harvester.class, TPS * 10);
         registerPrerequisites(Harvester.class, Arrays.asList(new Prerequisite(Refinery.class)));
     }
 

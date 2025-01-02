@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.gfx;
 
 import sk.neuromancer.Xune.entity.Clickable;
+import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.Buggy;
@@ -10,8 +11,10 @@ import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.level.Level;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -286,6 +289,8 @@ public class HUD implements Tickable, Renderable {
         private Sprite sprite;
         private int animation;
         private boolean enabled;
+        private Map<Building, Command.ProduceCommand> inProgress = new HashMap<>();
+        private int totalInProgress;
         private final int spriteOffset;
         private final int spriteRows, spriteCols;
         private float x;
@@ -318,6 +323,21 @@ public class HUD implements Tickable, Renderable {
                 int col = animation % spriteCols;
                 sprite = SpriteSheet.ENTITY_SHEET.getSprite(spriteOffset + row * SpriteSheet.SPRITE_ROW_LENGTH + col);
             }
+            inProgress = new HashMap<>();
+            totalInProgress = 0;
+            for (Entity.PlayableEntity entity : human.getEntities()) {
+                if (!(entity instanceof Building)) {
+                    continue;
+                }
+                for (Command cmd : entity.getCommands().reversed()) {
+                    if (cmd instanceof Command.ProduceCommand produce) {
+                        if (produce.getResultClass() == klass) {
+                            inProgress.put((Building) entity, produce);
+                            totalInProgress++;
+                        }
+                    }
+                }
+            }
         }
 
         @Override
@@ -336,6 +356,28 @@ public class HUD implements Tickable, Renderable {
                 glEnd();
             }
             sprite.render();
+            if (totalInProgress > 0) {
+                float textWidth = Text.widthOf(String.valueOf(totalInProgress), 0.4f);
+                float textHeight = Text.heightOf(String.valueOf(totalInProgress), 0.4f);
+                new Text(String.valueOf(totalInProgress), width - textWidth, height - textHeight, true, 0.4f).render();
+                int index = 0;
+                for (Map.Entry<Building, Command.ProduceCommand> producers : inProgress.entrySet()) {
+                    Command.ProduceCommand cmd = producers.getValue();
+                    float progress = (float) (Game.currentTick() - cmd.getStart()) / cmd.getDuration();
+                    if (progress <= 0) {
+                        continue;
+                    }
+                    glBegin(GL_QUADS);
+                    glColor4f(0, 1, 0, 0.5f);
+                    glVertex2f(0, height - 2 - index * 2);
+                    glVertex2f(width * progress, height - 2 - index * 2);
+                    glVertex2f(width * progress, height - index * 2);
+                    glVertex2f(0, height - index * 2);
+                    glColor4f(1, 1, 1, 1);
+                    glEnd();
+                    index++;
+                }
+            }
             glPopMatrix();
         }
 

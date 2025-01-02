@@ -8,6 +8,7 @@ import sk.neuromancer.Xune.level.paths.Point;
 import java.util.Arrays;
 
 import static org.lwjgl.opengl.GL11.*;
+import static sk.neuromancer.Xune.game.Game.TPS;
 
 
 public class Heli extends Unit {
@@ -17,6 +18,7 @@ public class Heli extends Unit {
         setMaxHealth(Heli.class, 100);
         setCost(Heli.class, 1000);
         setSight(Heli.class, 100);
+        setBuildTime(Heli.class, TPS * 6);
         registerPrerequisites(Heli.class, Arrays.asList(new Prerequisite(Helipad.class)));
     }
 

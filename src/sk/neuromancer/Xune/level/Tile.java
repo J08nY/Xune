@@ -32,8 +32,10 @@ public class Tile implements Renderable {
             {true, true, true, true, true, true, true, true, true, true, true, true, true};
     public static final boolean[] PASS_NONE =
             {false, false, false, false, false, false, false, false, false, false, false, false, false};
-    public static final boolean[] PASS_EDGES =
+    public static final boolean[] PASS_EAST_WEST =
             {false, false, true, false, false, false, true, false, false, false, false, false, false};
+    public static final boolean[] PASS_CORNERS =
+            {true, false, true, false, true, false, true, false, false, false, false, false, false};
     public static final boolean[][] PASS_START = {
             PASS_ALL, //0
             PASS_ALL, //1

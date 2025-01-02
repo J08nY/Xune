@@ -25,13 +25,20 @@ public class Text implements Renderable {
     }
 
     public float getWidth() {
-        return text.length() * SpriteSheet.TEXT_SHEET.getSpriteWidth() * scale;
+        return widthOf(text, scale);
     }
 
     public float getHeight() {
-        return SpriteSheet.TEXT_SHEET.getSpriteHeight() * scale;
+        return heightOf(text, scale);
     }
 
+    public static float widthOf(String text, float scale) {
+        return text.length() * SpriteSheet.TEXT_SHEET.getSpriteWidth() * scale;
+    }
+
+    public static float heightOf(String text, float scale) {
+        return SpriteSheet.TEXT_SHEET.getSpriteHeight() * scale;
+    }
 
     @Override
     public void render() {

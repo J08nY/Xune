@@ -3,6 +3,7 @@ package sk.neuromancer.Xune.entity;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.entity.unit.Harvester;
+import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
@@ -132,12 +133,13 @@ public abstract class Command {
             return new Path(Arrays.copyOfRange(points, next, points.length));
         }
 
-        private void update(float x, float y) {
+        private void update(Unit unit) {
             if (this.next == path.getPoints().length - 1) {
                 return;
             }
             Point next = path.getPoints()[this.next];
-            if (Math.abs(x - next.getLevelX()) <= 1.5 && Math.abs(y - next.getLevelY()) <= 1.5) {
+            float speed = unit.getSpeed();
+            if (Math.abs(unit.x - next.getLevelX()) <= speed && Math.abs(unit.y - next.getLevelY()) <= speed) {
                 this.next++;
             }
         }
@@ -156,7 +158,7 @@ public abstract class Command {
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
                 unit.move(getNext().getLevelX(), getNext().getLevelY());
-                update(unit.x, unit.y);
+                update(unit);
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
@@ -322,27 +324,46 @@ public abstract class Command {
         public AttackCommand getAttackCommand() {
             return attack;
         }
+
+        public FlyCommand getFlyCommand() {
+            return move;
+        }
     }
 
     public static class ProduceCommand extends Command {
         private final Class<? extends Unit> resultClass;
+        private final Pathfinder pathfinder;
         private int start;
-        private boolean started;
         private boolean finished;
         private final int duration;
 
-        public ProduceCommand(int duration, Class<? extends Unit> resultClass) {
+        public ProduceCommand(int duration, Class<? extends Unit> resultClass, Pathfinder pathFinder) {
             this.duration = duration;
             this.resultClass = resultClass;
+            this.pathfinder = pathFinder;
+        }
+
+        @Override
+        public void start(Entity entity, int tickCount) {
+            super.start(entity, tickCount);
+            start = tickCount;
+        }
+
+        public Class<? extends Unit> getResultClass() {
+            return resultClass;
+        }
+
+        public int getDuration() {
+            return duration;
+        }
+
+        public int getStart() {
+            return start;
         }
 
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Building building) {
-                if (!started) {
-                    start = tickCount;
-                    started = true;
-                }
                 if (tickCount - start >= duration) {
                     Unit result;
                     try {
@@ -356,6 +377,13 @@ public abstract class Command {
                     }
                     SoundManager.play(SoundManager.SOUND_TADA_1, false, 1.0f);
                     building.owner.addEntity(result);
+                    if (resultClass != Heli.class) {
+                        try {
+                            result.pushCommand(new MoveCommand(result.x, result.y, result.x, result.y, pathfinder));
+                        } catch (NoPathFound ignored) {
+
+                        }
+                    }
                     finished = true;
                 }
             } else {

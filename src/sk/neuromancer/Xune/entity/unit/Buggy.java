@@ -8,12 +8,15 @@ import sk.neuromancer.Xune.level.paths.Point;
 
 import java.util.Arrays;
 
+import static sk.neuromancer.Xune.game.Game.TPS;
+
 public class Buggy extends Unit {
 
     static {
         setMaxHealth(Buggy.class, 100);
         setCost(Buggy.class, 100);
         setSight(Buggy.class, 50);
+        setBuildTime(Buggy.class, TPS * 5);
         registerPrerequisites(Buggy.class, Arrays.asList(new Prerequisite(Factory.class)));
     }
 

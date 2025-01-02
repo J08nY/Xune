@@ -142,6 +142,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     public static abstract class PlayableEntity extends Entity {
         protected static final Map<Class<? extends PlayableEntity>, List<Prerequisite>> prerequisitesMap = new HashMap<>();
         protected static final Map<Class<? extends PlayableEntity>, Integer> costMap = new HashMap<>();
+        protected static final Map<Class<? extends PlayableEntity>, Integer> buildTimeMap = new HashMap<>();
         protected Player owner;
         protected List<Command> commands;
         protected Flag flag;
@@ -216,6 +217,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             return !this.commands.isEmpty();
         }
 
+        public List<Command> getCommands() {
+            return commands;
+        }
+
         public Command currentCommand() {
             return this.commands.isEmpty() ? null : this.commands.getFirst();
         }
@@ -236,6 +241,14 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
         public static int getCost(Class<? extends PlayableEntity> klass) {
             return costMap.get(klass);
+        }
+
+        protected static void setBuildTime(Class<? extends PlayableEntity> klass, int buildTime) {
+            buildTimeMap.put(klass, buildTime);
+        }
+
+        public static int getBuildTime(Class<? extends PlayableEntity> klass) {
+            return buildTimeMap.get(klass);
         }
 
         protected static void registerPrerequisites(Class<? extends PlayableEntity> klass, List<Prerequisite> prerequisites) {

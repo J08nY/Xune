@@ -67,7 +67,7 @@ public abstract class Building extends Entity.PlayableEntity {
     }
 
     public List<Class<? extends Unit>> getProduces() {
-        return producesMap.getOrDefault(this.getClass(), null);
+        return producesMap.getOrDefault(this.getClass(), List.of());
     }
 
     protected static void setPower(Class<? extends Building> klass, int cost) {

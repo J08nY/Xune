@@ -4,7 +4,7 @@ import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 
-import static sk.neuromancer.Xune.level.Tile.PASS_EDGES;
+import static sk.neuromancer.Xune.level.Tile.PASS_EAST_WEST;
 
 public class Powerplant extends Building {
 
@@ -21,6 +21,6 @@ public class Powerplant extends Building {
 
     @Override
     public boolean[] getPassable() {
-        return PASS_EDGES;
+        return PASS_EAST_WEST;
     }
 }

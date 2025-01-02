@@ -3,9 +3,12 @@ package sk.neuromancer.Xune.entity.unit;
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.Barracks;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 
 import java.util.Arrays;
+
+import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class Soldier extends Unit {
     private int step;
@@ -14,6 +17,7 @@ public class Soldier extends Unit {
         setMaxHealth(Soldier.class, 50);
         setCost(Soldier.class, 50);
         setSight(Soldier.class, 30);
+        setBuildTime(Soldier.class, TPS * 2);
         registerPrerequisites(Soldier.class, Arrays.asList(new Prerequisite(Barracks.class)));
     }
 
@@ -61,6 +65,6 @@ public class Soldier extends Unit {
 
     @Override
     public Point[] getOccupied() {
-        return new Point[0];
+        return new Point[]{new Point(Pathfinder.levelXToGrid(x), Pathfinder.levelYToGrid(y))};
     }
 }
