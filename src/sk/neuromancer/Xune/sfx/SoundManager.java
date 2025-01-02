@@ -35,6 +35,7 @@ public class SoundManager implements Tickable {
             "long_explosion_1.wav",
             "shot_1.wav",
             "tada_1.wav",
+            "wilhelm.wav",
             "duneshifter.wav"
     };
 
@@ -49,8 +50,9 @@ public class SoundManager implements Tickable {
     public static final int SOUND_LONG_EXPLOSION_1 = 8;
     public static final int SOUND_SHOT_1 = 9;
     public static final int SOUND_TADA_1 = 10;
+    public static final int SOUND_WILHELM = 11;
 
-    public static final int TRACK_DUNESHIFTER = 11;
+    public static final int TRACK_DUNESHIFTER = 12;
 
     private static SoundManager instance;
 

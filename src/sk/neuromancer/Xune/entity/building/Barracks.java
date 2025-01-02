@@ -5,6 +5,7 @@ import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class Barracks extends Building {
         setProduces(Barracks.class, List.of(Soldier.class));
         setSight(Barracks.class, 60);
         setBuildTime(Barracks.class, TPS * 12);
+        setDeathSound(Barracks.class, SoundManager.SOUND_LONG_EXPLOSION_1);
         registerPrerequisites(Barracks.class, List.of(new Prerequisite(Powerplant.class)));
     }
 

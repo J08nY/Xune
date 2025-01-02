@@ -1,28 +1,31 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.Command;
+import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.Player;
+import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
-import java.util.Arrays;
-import java.util.Random;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class Harvester extends Unit {
     private int spice;
-    private final Random rand = new Random();
 
     static {
         setMaxHealth(Harvester.class, 300);
         setCost(Harvester.class, 1200);
         setSight(Harvester.class, 40);
         setBuildTime(Harvester.class, TPS * 10);
-        registerPrerequisites(Harvester.class, Arrays.asList(new Prerequisite(Refinery.class)));
+        setDeathSound(Harvester.class, SoundManager.SOUND_EXPLOSION_2);
+        registerPrerequisites(Harvester.class, List.of(new Prerequisite(Refinery.class)));
     }
 
     public Harvester(float x, float y, Orientation orientation, Player owner) {

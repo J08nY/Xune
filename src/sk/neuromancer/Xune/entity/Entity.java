@@ -12,6 +12,7 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class Entity implements Renderable, Tickable, Clickable {
     protected static final Map<Class<? extends Entity>, Integer> healthMap = new HashMap<>();
     protected static final Map<Class<? extends Entity>, Integer> sightMap = new HashMap<>();
+    protected static final Map<Class<? extends Entity>, Integer> deathSoundMap = new HashMap<>();
 
     protected Sprite sprite;
     public float x, y;
@@ -62,7 +63,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         return false;
     }
 
-    public void repair(int health) {
+    public void heal(int health) {
         this.health += health;
         if (this.health > this.maxHealth) {
             this.health = this.maxHealth;
@@ -74,6 +75,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         if (this.health <= 0) {
             this.health = 0;
         }
+    }
+
+    public boolean isDead() {
+        return health <= 0;
     }
 
     public void setAttacking(boolean attacking, Entity target) {
@@ -116,6 +121,14 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
     public static int getMaxHealth(Class<? extends Entity> klass) {
         return healthMap.get(klass);
+    }
+
+    protected static void setDeathSound(Class<? extends PlayableEntity> klass, int sound) {
+        deathSoundMap.put(klass, sound);
+    }
+
+    public static int getDeathSound(Class<? extends PlayableEntity> klass) {
+        return deathSoundMap.get(klass);
     }
 
     protected static void setSight(Class<? extends Entity> klass, int sight) {

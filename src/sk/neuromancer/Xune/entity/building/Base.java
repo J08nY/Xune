@@ -3,6 +3,7 @@ package sk.neuromancer.Xune.entity.building;
 import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import static sk.neuromancer.Xune.level.Tile.PASS_EAST_WEST;
 
@@ -13,6 +14,7 @@ public class Base extends Building {
         setCost(Base.class, 2000);
         setPower(Base.class, 20);
         setSight(Base.class, 60);
+        setDeathSound(Base.class, SoundManager.SOUND_LONG_EXPLOSION_1);
     }
 
     public Base(int x, int y, Orientation orientation, Player owner) {

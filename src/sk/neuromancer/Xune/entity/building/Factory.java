@@ -6,8 +6,10 @@ import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static sk.neuromancer.Xune.level.Tile.PASS_EAST_WEST;
 
@@ -18,8 +20,9 @@ public class Factory extends Building {
         setCost(Factory.class, 500);
         setPower(Factory.class, -125);
         setSight(Factory.class, 60);
-        setProduces(Factory.class, Arrays.asList(Buggy.class, Harvester.class));
-        registerPrerequisites(Factory.class, Arrays.asList(new Prerequisite(Refinery.class)));
+        setDeathSound(Factory.class, SoundManager.SOUND_LONG_EXPLOSION_1);
+        setProduces(Factory.class, List.of(Buggy.class, Harvester.class));
+        registerPrerequisites(Factory.class, List.of(new Prerequisite(Refinery.class)));
     }
 
     public Factory(int x, int y, Orientation orientation, Player owner) {

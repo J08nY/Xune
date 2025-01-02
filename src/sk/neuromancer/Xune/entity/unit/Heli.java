@@ -4,8 +4,10 @@ import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.Helipad;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.game.Game.TPS;
@@ -19,11 +21,12 @@ public class Heli extends Unit {
         setCost(Heli.class, 1000);
         setSight(Heli.class, 100);
         setBuildTime(Heli.class, TPS * 6);
-        registerPrerequisites(Heli.class, Arrays.asList(new Prerequisite(Helipad.class)));
+        setDeathSound(Heli.class, SoundManager.SOUND_EXPLOSION_3);
+        registerPrerequisites(Heli.class, List.of(new Prerequisite(Helipad.class)));
     }
 
     public Heli(float x, float y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner,  1.2f, 30f, 10, 2);
+        super(x, y, orientation, owner,  1.2f, 30f, 10, 5);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
     }

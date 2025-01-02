@@ -5,6 +5,7 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.*;
+import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 
@@ -26,6 +27,7 @@ public class Level implements Renderable, Tickable {
     private Pathfinder pathfinder;
     private List<Worm> worms;
     private List<Road> roads;
+    private List<Effect> effects;
 
     private Tile[][] level;
     private int width, height;
@@ -46,6 +48,7 @@ public class Level implements Renderable, Tickable {
         this.game = game;
         this.worms = new LinkedList<>();
         this.roads = new LinkedList<>();
+        this.effects = new LinkedList<>();
     }
 
     @Override
@@ -93,7 +96,11 @@ public class Level implements Renderable, Tickable {
         for (Road road : roads) {
             road.tick(tickCount);
         }
+        for (Effect e : effects) {
+            e.tick(tickCount);
+        }
         pathfinder.tick(tickCount);
+        effects.removeIf(Effect::isFinished);
     }
 
 
@@ -157,6 +164,9 @@ public class Level implements Renderable, Tickable {
         human.render();
         for (Worm worm : worms) {
             worm.render();
+        }
+        for (Effect e : effects) {
+            e.render();
         }
         if (Config.DEBUG_PATH_GRID) {
             pathfinder.render();
@@ -261,6 +271,10 @@ public class Level implements Renderable, Tickable {
             }
         }
         return null;
+    }
+
+    public void addEffect(Effect effect) {
+        this.effects.add(effect);
     }
 
     public Tile[][] getTiles() {

@@ -5,8 +5,9 @@ import sk.neuromancer.Xune.entity.building.Barracks;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
-import java.util.Arrays;
+import java.util.List;
 
 import static sk.neuromancer.Xune.game.Game.TPS;
 
@@ -18,7 +19,8 @@ public class Soldier extends Unit {
         setCost(Soldier.class, 50);
         setSight(Soldier.class, 30);
         setBuildTime(Soldier.class, TPS * 2);
-        registerPrerequisites(Soldier.class, Arrays.asList(new Prerequisite(Barracks.class)));
+        setDeathSound(Soldier.class, SoundManager.SOUND_WILHELM);
+        registerPrerequisites(Soldier.class, List.of(new Prerequisite(Barracks.class)));
     }
 
     public Soldier(float x, float y, Orientation orientation, Player owner) {

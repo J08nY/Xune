@@ -1,10 +1,16 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.Player;
+import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.Game;
+import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
 import sk.neuromancer.Xune.sfx.SoundManager;
+
+import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -14,6 +20,7 @@ public abstract class Unit extends Entity.PlayableEntity {
     private int rate;
     private int damage;
     private int ready = 0;
+    protected final Random rand = new Random();
 
     public Unit(float x, float y, Orientation orientation, Player owner,
                 float speed,
@@ -57,6 +64,7 @@ public abstract class Unit extends Entity.PlayableEntity {
         }
         if (ready % rate == 0 && inRange(target)) {
             target.takeDamage(damage);
+            owner.getLevel().addEffect(new Effect.Hit(target.x + rand.nextFloat(3) * (rand.nextBoolean() ? 1 : -1), target.y + rand.nextFloat(3) * (rand.nextBoolean() ? 1 : -1)));
             SoundManager.play(SoundManager.SOUND_SHOT_1, false, 1.0f);
         }
     }
@@ -116,14 +124,16 @@ public abstract class Unit extends Entity.PlayableEntity {
             glPopMatrix();
         }
         glPopMatrix();
-        if (attackTarget != null) {
-            glLineWidth(5);
-            glColor4f(1, 0, 0, 0.5f);
-            glBegin(GL_LINES);
-            glVertex3f(x, y, 0);
-            glVertex3f(attackTarget.x, attackTarget.y, 0);
-            glEnd();
-            glColor4f(1, 1, 1, 1);
+        if (Config.DEBUG_ATTACK) {
+            if (attackTarget != null) {
+                glLineWidth(5);
+                glColor4f(1, 0, 0, 0.5f);
+                glBegin(GL_LINES);
+                glVertex3f(x, y, 0);
+                glVertex3f(attackTarget.x, attackTarget.y, 0);
+                glEnd();
+                glColor4f(1, 1, 1, 1);
+            }
         }
     }
 

@@ -25,7 +25,6 @@ public class Player implements Tickable, Renderable {
     protected List<Entity.PlayableEntity> toAdd = new LinkedList<>();
     protected List<Entity.PlayableEntity> toRemove = new LinkedList<>();
 
-    protected List<Effect> effects = new LinkedList<>();
     protected int money;
     protected final Flag flag;
     protected final Map<Class<? extends Entity.PlayableEntity>, CommandStrategy> commandStrategies = new HashMap<>();
@@ -94,9 +93,6 @@ public class Player implements Tickable, Renderable {
     @Override
     public void render() {
         entities.stream().filter(e -> (e instanceof Building) || isTileVisible(level.tileAt(e))).sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
-        for (Effect e : effects) {
-            e.render();
-        }
     }
 
     @Override
@@ -104,9 +100,6 @@ public class Player implements Tickable, Renderable {
         entities.addAll(toAdd);
         toAdd.clear();
         for (Entity e : entities) {
-            e.tick(tickCount);
-        }
-        for (Effect e : effects) {
             e.tick(tickCount);
         }
         handleDead();
@@ -119,22 +112,17 @@ public class Player implements Tickable, Renderable {
     protected void handleDead() {
         for (Entity.PlayableEntity e : entities) {
             if (e.health <= 0) {
-                //TODO: Handle command finalization here and also in case of command preemption properly.
                 if (!e.commands.isEmpty()) {
                     e.commands.forEach(c -> c.finish(e, Game.currentTick(), false));
                 }
                 removeEntity(e);
-                this.effects.add(new Effect.Explosion(e.x, e.y));
+                level.addEffect(new Effect.Explosion(e.x, e.y));
                 if (e instanceof Building) {
-                    this.effects.add(new Effect.Sparkle(e.x, e.y));
-                    SoundManager.play(SoundManager.SOUND_LONG_EXPLOSION_1, false, 1.0f);
-                } else {
-                    int id = new Random().nextInt(3);
-                    SoundManager.play(SoundManager.SOUND_EXPLOSION_1 + id, false, 1.0f);
+                    level.addEffect(new Effect.Sparkle(e.x, e.y));
                 }
+                SoundManager.play(Entity.getDeathSound(e.getClass()), false, 1.0f);
             }
         }
-        effects.removeIf(Effect::isFinished);
     }
 
     private void handleUnitBehavior() {

@@ -4,8 +4,10 @@ import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static sk.neuromancer.Xune.level.Tile.PASS_EAST_WEST;
 
@@ -16,7 +18,8 @@ public class Refinery extends Building {
         setCost(Refinery.class, 1500);
         setPower(Refinery.class, -75);
         setSight(Refinery.class, 60);
-        registerPrerequisites(Refinery.class, Arrays.asList(new Prerequisite(Powerplant.class)));
+        setDeathSound(Refinery.class, SoundManager.SOUND_LONG_EXPLOSION_1);
+        registerPrerequisites(Refinery.class, List.of(new Prerequisite(Powerplant.class)));
     }
 
 
