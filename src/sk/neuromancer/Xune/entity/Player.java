@@ -127,7 +127,7 @@ public class Player implements Tickable, Renderable {
 
     private void handleUnitBehavior() {
         for (Entity.PlayableEntity entity : entities) {
-            if (!entity.hasCommands()) {
+            if (!entity.hasCommands() && !toRemove.contains(entity)) {
                 CommandStrategy strategy = commandStrategies.get(entity.getClass());
                 if (strategy != null) {
                     Command defaultCommand = strategy.defaultBehavior(entity, level);

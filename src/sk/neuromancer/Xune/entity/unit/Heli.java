@@ -1,12 +1,14 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.Command;
+import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.Player;
+import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Helipad;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;

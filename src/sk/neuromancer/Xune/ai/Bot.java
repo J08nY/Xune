@@ -1,8 +1,8 @@
 package sk.neuromancer.Xune.ai;
 
-import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.building.Base;
 import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.entity.unit.Buggy;
