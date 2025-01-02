@@ -36,13 +36,16 @@ public abstract class CommandStrategy {
         @Override
         public Command defaultBehavior(Entity entity, Level level) {
             if (entity instanceof Unit unit) {
+                // If there is an enemy attacking us: respond
+                if (unit.isUnderAttack()) {
+                    return new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), unit.getAttacker());
+                }
                 // If there is an enemy in range: attack
-                for (Entity enemyEntity : level.getBot().entities) {
-                    if (unit.inRange(enemyEntity)) {
-                        return new Command.AttackCommand(enemyEntity);
+                for (Entity other : level.getEntities()) {
+                    if (unit.isEnemyOf(other) && unit.inRange(other)) {
+                        return new Command.AttackCommand(other, false);
                     }
                 }
-                // If there is an enemy attacking us: respond
             }
             return null;
         }
@@ -60,12 +63,18 @@ public abstract class CommandStrategy {
 
         @Override
         public Command defaultBehavior(Entity entity, Level level) {
-            // Example default behavior: hover around the current position
-            /*
-            float hoverX = entity.x + (float) (Math.random() * 100 - 50);
-            float hoverY = entity.y + (float) (Math.random() * 100 - 50);
-            return new Command.FlyCommand(entity.x, entity.y, hoverX, hoverY)
-             */
+            if (entity instanceof Unit unit) {
+                // If there is an enemy attacking us: respond
+                if (unit.isUnderAttack()) {
+                    return new Command.FlyAndAttackCommand(unit.x, unit.y, unit.getAttacker());
+                }
+                // If there is an enemy in range: attack
+                for (Entity other : level.getEntities()) {
+                    if (unit.isEnemyOf(other) && unit.inRange(other)) {
+                        return new Command.AttackCommand(other, false);
+                    }
+                }
+            }
             return null;
         }
     }
@@ -77,6 +86,7 @@ public abstract class CommandStrategy {
         public Command createCommand(Entity entity, Entity other, Level level, float levelX, float levelY) {
             try {
                 if (other instanceof Refinery refinery) {
+                    //TODO: This is never triggered due to the unit selection logic
                     return new Command.DropOffSpiceCommand(entity.x, entity.y, level.getPathfinder(), refinery);
                 }
 

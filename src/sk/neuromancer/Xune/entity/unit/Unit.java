@@ -123,22 +123,12 @@ public abstract class Unit extends Entity.PlayableEntity {
             glPopMatrix();
         }
         glPopMatrix();
-        Command current = currentCommand();
-        Command.AttackCommand attack = null;
-        if (current instanceof Command.AttackCommand atk) {
-            attack = atk;
-        } else if (current instanceof Command.MoveAndAttackCommand ma) {
-            attack = ma.getAttackCommand();
-        } else if (current instanceof Command.FlyAndAttackCommand fa) {
-            attack = fa.getAttackCommand();
-        }
-        if (attack != null) {
+        if (attackTarget != null) {
             glLineWidth(5);
             glColor4f(1, 0, 0, 0.5f);
             glBegin(GL_LINES);
-            Entity target = attack.getTarget();
             glVertex3f(x, y, 0);
-            glVertex3f(target.x, target.y, 0);
+            glVertex3f(attackTarget.x, attackTarget.y, 0);
             glEnd();
             glColor4f(1, 1, 1, 1);
         }

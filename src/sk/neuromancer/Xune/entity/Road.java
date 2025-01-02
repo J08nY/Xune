@@ -25,4 +25,10 @@ public class Road extends Entity {
     public void tick(int tickCount) {
 
     }
+
+    @Override
+    public boolean isEnemyOf(Entity other) {
+        return false;
+    }
+
 }

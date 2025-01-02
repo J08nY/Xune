@@ -21,6 +21,11 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected Orientation orientation;
     protected List<Clickable> clickableAreas = new ArrayList<>();
 
+    protected boolean attacking;
+    protected Entity attackTarget;
+    protected boolean underAttack;
+    protected Entity attacker;
+
     public Entity(float x, float y) {
         this.x = x;
         this.y = y;
@@ -71,6 +76,32 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
     }
 
+    public void setAttacking(boolean attacking, Entity target) {
+        this.attacking = attacking;
+        this.attackTarget = target;
+    }
+
+    public boolean isAttacking() {
+        return attacking;
+    }
+
+    public Entity getAttackTarget() {
+        return attackTarget;
+    }
+
+    public void setUnderAttack(boolean underAttack, Entity attacker) {
+        this.underAttack = underAttack;
+        this.attacker = attacker;
+    }
+
+    public boolean isUnderAttack() {
+        return underAttack;
+    }
+
+    public Entity getAttacker() {
+        return attacker;
+    }
+
     @Override
     public void render() {
         glPushMatrix();
@@ -104,6 +135,8 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     public boolean inSight(Entity target) {
         return inSight(target.x, target.y);
     }
+
+    public abstract boolean isEnemyOf(Entity other);
 
 
     public static abstract class PlayableEntity extends Entity {
@@ -161,6 +194,17 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             }
         }
 
+        @Override
+        public boolean isEnemyOf(Entity other) {
+            if (other instanceof Worm) {
+                return true;
+            }
+            if (other instanceof Road) {
+                return false;
+            }
+            return ((PlayableEntity) other).owner != this.owner;
+        }
+
         public Player getOwner() {
             return owner;
         }
@@ -178,6 +222,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
 
         public void pushCommand(Command c) {
+            //this.commands.forEach(cmd -> cmd.finalize(this));
             this.commands.clear();
             this.commands.add(c);
         }

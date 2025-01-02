@@ -118,13 +118,19 @@ public class Player implements Tickable, Renderable {
 
     protected void handleDead() {
         for (Entity.PlayableEntity e : entities) {
-            if (e.health == 0) {
+            if (e.health <= 0) {
+                if (!e.commands.isEmpty()) {
+                    e.commands.getFirst().finalize(e);
+                }
                 removeEntity(e);
                 this.effects.add(new Effect.Explosion(e.x, e.y));
                 if (e instanceof Building) {
                     this.effects.add(new Effect.Sparkle(e.x, e.y));
+                    SoundManager.play(SoundManager.SOUND_LONG_EXPLOSION_1, false, 1.0f);
+                } else {
+                    int id = new Random().nextInt(3);
+                    SoundManager.play(SoundManager.SOUND_EXPLOSION_1 + id, false, 1.0f);
                 }
-                SoundManager.play(SoundManager.SOUND_EXPLOSION_1, false, 1.0f);
             }
         }
         effects.removeIf(Effect::isFinished);

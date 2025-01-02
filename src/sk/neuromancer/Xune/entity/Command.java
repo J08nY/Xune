@@ -159,9 +159,15 @@ public abstract class Command {
 
     public static class AttackCommand extends Command {
         private final Entity target;
+        private final boolean keep;
+
+        public AttackCommand(Entity target, boolean keep) {
+            this.target = target;
+            this.keep = keep;
+        }
 
         public AttackCommand(Entity target) {
-            this.target = target;
+            this(target, true);
         }
 
         public Entity getTarget() {
@@ -170,7 +176,11 @@ public abstract class Command {
 
         @Override
         public boolean isFinished(Entity entity) {
-            return target.health == 0;
+            if (keep) {
+                return target.health <= 0;
+            } else {
+                return target.health <= 0 || !entity.inSight(target);
+            }
         }
 
         @Override
@@ -178,6 +188,8 @@ public abstract class Command {
             if (entity instanceof Unit unit) {
                 unit.face(target.x, target.y);
                 unit.attack(target);
+                unit.setAttacking(true, target);
+                target.setUnderAttack(true, unit);
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
@@ -185,6 +197,8 @@ public abstract class Command {
 
         @Override
         public void finalize(Entity entity) {
+            entity.setAttacking(false, null);
+            target.setUnderAttack(false, null);
         }
     }
 
@@ -234,6 +248,7 @@ public abstract class Command {
 
         @Override
         public void finalize(Entity entity) {
+            attack.finalize(entity);
         }
 
         public AttackCommand getAttackCommand() {
@@ -281,6 +296,7 @@ public abstract class Command {
 
         @Override
         public void finalize(Entity entity) {
+            attack.finalize(entity);
         }
 
         public AttackCommand getAttackCommand() {

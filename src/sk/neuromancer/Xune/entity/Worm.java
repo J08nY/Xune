@@ -31,4 +31,9 @@ public class Worm extends Entity {
         return false;
     }
 
+    @Override
+    public boolean isEnemyOf(Entity other) {
+        return !(other instanceof Worm);
+    }
+
 }
