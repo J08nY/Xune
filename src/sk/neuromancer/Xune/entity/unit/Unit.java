@@ -14,7 +14,6 @@ public abstract class Unit extends Entity.PlayableEntity {
     private int rate;
     private int damage;
     private int ready = 0;
-    private boolean moved;
 
     public Unit(float x, float y, Orientation orientation, Player owner,
                 float speed,
@@ -35,11 +34,6 @@ public abstract class Unit extends Entity.PlayableEntity {
         float angle = (float) Math.atan2(dy, dx);
         face(toX, toY);
         setPosition(x + (float) (speed * Math.cos(angle)), y + (float) (speed * Math.sin(angle)));
-        moved = true;
-    }
-
-    public boolean moved() {
-        return moved;
     }
 
     public void face(float toX, float toY) {
@@ -85,7 +79,6 @@ public abstract class Unit extends Entity.PlayableEntity {
 
     @Override
     public void tick(int tickCount) {
-        moved = false;
         super.tick(tickCount);
         ready++;
         if (rate != 0 && ready % rate == 0) {

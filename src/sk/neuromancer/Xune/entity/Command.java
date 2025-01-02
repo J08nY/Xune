@@ -17,12 +17,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 public abstract class Command {
+    private boolean started;
+
+    public boolean isStarted(Entity entity) {
+        return started;
+    }
+
+    public void start(Entity entity, int tickCount) {
+        started = true;
+    }
 
     public abstract void execute(Entity entity, int tickCount);
 
-    public abstract void finalize(Entity entity);
-
     public abstract boolean isFinished(Entity entity);
+
+    public abstract void finish(Entity entity, int tickCount, boolean done);
 
     public static class FlyCommand extends Command {
         private final float fromX, fromY, toX, toY;
@@ -61,6 +70,11 @@ public abstract class Command {
         }
 
         @Override
+        public void start(Entity entity, int tickCount) {
+            super.start(entity, tickCount);
+        }
+
+        @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
                 unit.move(toX, toY);
@@ -70,9 +84,10 @@ public abstract class Command {
         }
 
         @Override
-        public void finalize(Entity entity) {
+        public void finish(Entity entity, int tickCount, boolean done) {
             if (entity instanceof Unit unit) {
-                unit.setPosition(toX, toY);
+                if (done)
+                    unit.setPosition(toX, toY);
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
@@ -148,9 +163,10 @@ public abstract class Command {
         }
 
         @Override
-        public void finalize(Entity entity) {
+        public void finish(Entity entity, int tickCount, boolean done) {
             if (entity instanceof Unit unit) {
-                unit.setPosition(toX, toY);
+                if (done)
+                    unit.setPosition(toX, toY);
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
@@ -196,7 +212,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finalize(Entity entity) {
+        public void finish(Entity entity, int tickCount, boolean done) {
             entity.setAttacking(false, null);
             target.setUnderAttack(false, null);
         }
@@ -247,12 +263,16 @@ public abstract class Command {
         }
 
         @Override
-        public void finalize(Entity entity) {
-            attack.finalize(entity);
+        public void finish(Entity entity, int tickCount, boolean done) {
+            attack.finish(entity, tickCount, done);
         }
 
         public AttackCommand getAttackCommand() {
             return attack;
+        }
+
+        public MoveCommand getMoveCommand() {
+            return move;
         }
     }
 
@@ -295,8 +315,8 @@ public abstract class Command {
         }
 
         @Override
-        public void finalize(Entity entity) {
-            attack.finalize(entity);
+        public void finish(Entity entity, int tickCount, boolean done) {
+            attack.finish(entity, tickCount, done);
         }
 
         public AttackCommand getAttackCommand() {
@@ -349,7 +369,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finalize(Entity entity) {
+        public void finish(Entity entity, int tickCount, boolean done) {
         }
     }
 
@@ -395,7 +415,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finalize(Entity entity) {
+        public void finish(Entity entity, int tickCount, boolean done) {
         }
     }
 
@@ -444,7 +464,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finalize(Entity entity) {
+        public void finish(Entity entity, int tickCount, boolean done) {
 
         }
 

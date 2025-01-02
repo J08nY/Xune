@@ -119,8 +119,9 @@ public class Player implements Tickable, Renderable {
     protected void handleDead() {
         for (Entity.PlayableEntity e : entities) {
             if (e.health <= 0) {
+                //TODO: Handle command finalization here and also in case of command preemption properly.
                 if (!e.commands.isEmpty()) {
-                    e.commands.getFirst().finalize(e);
+                    e.commands.forEach(c -> c.finish(e, Game.currentTick(), false));
                 }
                 removeEntity(e);
                 this.effects.add(new Effect.Explosion(e.x, e.y));

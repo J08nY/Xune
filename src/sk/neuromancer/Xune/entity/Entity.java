@@ -166,10 +166,13 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         public void tick(int tickCount) {
             if (!commands.isEmpty()) {
                 Command current = commands.getFirst();
+                if (!current.isStarted(this)) {
+                    current.start(this, tickCount);
+                }
                 current.execute(this, tickCount);
                 if (current.isFinished(this)) {
                     commands.removeFirst();
-                    current.finalize(this);
+                    current.finish(this, tickCount, true);
                 }
             }
         }
@@ -222,7 +225,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         }
 
         public void pushCommand(Command c) {
-            //this.commands.forEach(cmd -> cmd.finalize(this));
+            this.commands.forEach(cmd -> cmd.finish(this, Game.currentTick(), false));
             this.commands.clear();
             this.commands.add(c);
         }

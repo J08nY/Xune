@@ -135,6 +135,7 @@ public abstract class CommandStrategy {
                         }
                     }
                 }
+                // If there is no spice to collect or refinery to dropoff to, wait for a bit
                 harvesters.put(harvester, TPS);
                 return null;
             } else {

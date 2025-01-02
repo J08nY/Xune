@@ -12,7 +12,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class Game implements Renderable {
 
     private boolean keepRunning = false;
-    private int tickCount = 0;
+    private static int tickCount = 0;
 
     private InputHandler input;
     private Window window;
@@ -146,12 +146,12 @@ public class Game implements Renderable {
         return level;
     }
 
-    public SoundManager getSound() {
-        return sound;
-    }
-
     public HUD getHud() {
         return hud;
+    }
+
+    public static int currentTick() {
+        return tickCount;
     }
 
     public static void main(String[] args) {
