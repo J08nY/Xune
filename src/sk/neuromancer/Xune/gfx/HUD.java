@@ -10,6 +10,7 @@ import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.level.Tile;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -82,10 +83,12 @@ public class HUD implements Tickable, Renderable {
 
     @Override
     public void render() {
+        glDisable(GL_DEPTH_TEST);
         renderPanel();
         renderCursor();
 
         logo.render();
+        glEnable(GL_DEPTH_TEST);
     }
 
     private void renderCursor() {
@@ -94,17 +97,17 @@ public class HUD implements Tickable, Renderable {
             glPushMatrix();
             glBegin(GL_QUADS);
             glColor4f(0f, 1f, 0f, 0.2f);
-            glVertex3d(fromX, fromY, 0);
-            glVertex3d(fromX, mouseY, 0);
-            glVertex3d(mouseX, mouseY, 0);
-            glVertex3d(mouseX, fromY, 0);
+            glVertex3d(fromX, fromY, 1);
+            glVertex3d(fromX, mouseY, 1);
+            glVertex3d(mouseX, mouseY, 1);
+            glVertex3d(mouseX, fromY, 1);
             glEnd();
             glColor4f(1.f, 1.f, 1.f, 1.f);
             glPopMatrix();
         }
         glPushMatrix();
-        glTranslated(mouseX - (currentCursor.getWidth() * cursorScale) / 2, mouseY - (currentCursor.getHeight() * cursorScale) / 2, 0);
-        glScalef(cursorScale, cursorScale, 0);
+        glTranslated(mouseX - (currentCursor.getWidth() * cursorScale) / 2, mouseY - (currentCursor.getHeight() * cursorScale) / 2, 1);
+        glScalef(cursorScale, cursorScale, 1);
         currentCursor.render();
         glPopMatrix();
         if (tooltip != null) {
@@ -116,7 +119,7 @@ public class HUD implements Tickable, Renderable {
         // Render HUD text
         glPushMatrix();
         glTranslatef(hudLeft, hudTop, 0);
-        glScalef(2f, 2f, 0);
+        glScalef(2f, 2f, 1);
 
         renderText(0, 30, "MONEY: " + human.getMoney() + "$");
         String selected = human.getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
@@ -138,8 +141,8 @@ public class HUD implements Tickable, Renderable {
     private void renderPower() {
         // Render power
         glPushMatrix();
-        glTranslated(0, hudTop, 0);
-        glScalef(hudScale, hudScale, 0);
+        glTranslated(0, hudTop, 0.99f);
+        glScalef(hudScale, hudScale, 1);
         glBegin(GL_QUADS);
         glColor3f(0.1f, 0.1f, 0.1f);
         glVertex2i(71, 4);
@@ -173,14 +176,67 @@ public class HUD implements Tickable, Renderable {
     private void renderPanel() {
         renderPower();
         renderPanelBackground();
+        renderMinimap();
         renderEntities();
         renderPanelText();
     }
 
+    private void renderMinimap() {
+        // Render minimap
+        glPushMatrix();
+        glTranslatef(0, hudTop, 0.99f);
+        glPointSize(1);
+        glScalef(hudScale, hudScale, 1);
+        glTranslatef(5, 5, 0);
+        glScalef((float) 50 / level.getWidthInTiles(), (float) 50 / level.getHeightInTiles(), 1);
+        glColor3f(0, 0, 0);
+        glBegin(GL_QUADS);
+        glVertex2f(0, 0);
+        glVertex2f(level.getWidthInTiles(), 0);
+        glVertex2f(level.getWidthInTiles(), level.getHeightInTiles());
+        glVertex2f(0, level.getHeightInTiles());
+        glEnd();
+        for (int x = 0; x < level.getWidthInTiles(); x++) {
+            for (int y = 0; y < level.getHeightInTiles(); y++) {
+                Tile tile = level.getTile(x, y);
+                glPushMatrix();
+                glTranslatef(x, y, 0);
+                Sprite sprite = SpriteSheet.MAP_SHEET.getSprite(tile.type);
+                if (human.isTileVisible(x, y)) {
+                    glColor4f(1,1,1,1);
+                } else if (human.isTileDiscovered(x, y)) {
+                    glColor4f(1,1,1, 0.5f);
+                } else {
+                    glColor4f(1,1,1, 1);
+                    sprite = SpriteSheet.MAP_SHEET.getSprite(2, 16);
+                }
+                sprite.render();
+                glPopMatrix();
+            }
+        }
+        glBegin(GL_QUADS);
+        for (Entity entity : level.getEntities()) {
+            if (entity instanceof Entity.PlayableEntity playable && human.isTileDiscovered(level.tileAt(entity))) {
+                glColor3fv(playable.getOwner().getFlag().getColor());
+                float lx = entity.x;
+                float ly = entity.y;
+                int tx = Level.levelToTileX(lx, ly);
+                int ty = Level.levelToTileY(lx, ly);
+                glVertex2f(tx, ty);
+                glVertex2f(tx + 1, ty);
+                glVertex2f(tx + 1, ty + 1);
+                glVertex2f(tx, ty + 1);
+            }
+        }
+        glColor3f(1, 1, 1);
+        glEnd();
+        glPopMatrix();
+    }
+
     private void renderPanelBackground() {
         glPushMatrix();
-        glTranslatef(0, hudTop, 0);
-        glScalef(hudScale, hudScale, 0);
+        glTranslatef(0, hudTop, 0.99f);
+        glScalef(hudScale, hudScale, 1);
         hudPanel.render();
         glPopMatrix();
     }
@@ -188,6 +244,7 @@ public class HUD implements Tickable, Renderable {
     private void renderEntities() {
         // Render entities
         glPushMatrix();
+        glTranslatef(0, 0, 0.99f);
         for (Button<?> button : buttons) {
             button.render();
         }
@@ -344,7 +401,7 @@ public class HUD implements Tickable, Renderable {
         public void render() {
             glPushMatrix();
             glTranslatef(x, y, 0);
-            glScalef(scale, scale, 0);
+            glScalef(scale, scale, 1);
             if (enabled) {
                 glBegin(GL_QUADS);
                 glColor4f(1, 1, 1, 0.2f);

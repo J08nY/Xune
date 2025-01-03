@@ -45,7 +45,9 @@ public class Harvester extends Unit {
         float sx = 0;
         float sy = 0;
         if (current instanceof Command.MoveCommand move) {
+            glDisable(GL_DEPTH_TEST);
             move.getNextPath().render();
+            glEnable(GL_DEPTH_TEST);
         } else if (current instanceof Command.CollectSpiceCommand collect) {
             Tile target = collect.getTarget();
             if (collect.collecting(this)) {

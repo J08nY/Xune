@@ -37,6 +37,7 @@ public class Heli extends Unit {
     public void render() {
         Command current = currentCommand();
         if (current instanceof Command.FlyCommand fly) {
+            glDisable(GL_DEPTH_TEST);
             glEnable(GL_POINT_SMOOTH);
             glPointSize(10);
             glBegin(GL_POINTS);
@@ -55,6 +56,7 @@ public class Heli extends Unit {
             glColor4f(1, 1, 1, 1);
             glEnd();
             glDisable(GL_POINT_SMOOTH);
+            glEnable(GL_DEPTH_TEST);
         }
         super.render();
     }

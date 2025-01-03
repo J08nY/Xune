@@ -9,6 +9,7 @@ import java.io.IOException;
 public class SpriteSheet {
     public static SpriteSheet ENTITY_SHEET = new SpriteSheet("entities.png", 24, 11);
     public static SpriteSheet TILE_SHEET = new SpriteSheet("tiles.png", 24, 11);
+    public static SpriteSheet MAP_SHEET = new SpriteSheet("minimap.png", 1, 1);
     public static SpriteSheet EFFECTS_SHEET = new SpriteSheet("effects.png", 24, 11);
     public static SpriteSheet MISC_SHEET = new SpriteSheet("misc.png", 24, 11);
     public static SpriteSheet CURSOR_SHEET = new SpriteSheet("cursors.png", 19, 19);
@@ -16,6 +17,7 @@ public class SpriteSheet {
     public static SpriteSheet HUD_PANEL = new SpriteSheet("gamepanel.png", 384, 60);
     public static SpriteSheet TEXT_SHEET = new SpriteSheet("text.png", 9, 9);
     public static SpriteSheet WORM_SHEET = new SpriteSheet("worm.png", 24, 11);
+
 
     protected int width, height;
     protected String imageName;
@@ -112,6 +114,7 @@ public class SpriteSheet {
     public static void initSheets() {
         SpriteSheet.ENTITY_SHEET.initSheet();
         SpriteSheet.TILE_SHEET.initSheet();
+        SpriteSheet.MAP_SHEET.initSheet();
         SpriteSheet.EFFECTS_SHEET.initSheet();
         SpriteSheet.MISC_SHEET.initSheet();
         SpriteSheet.CURSOR_SHEET.initSheet();
@@ -124,6 +127,7 @@ public class SpriteSheet {
     public static void destroySheets() {
         SpriteSheet.ENTITY_SHEET.destroySheet();
         SpriteSheet.TILE_SHEET.destroySheet();
+        SpriteSheet.MAP_SHEET.destroySheet();
         SpriteSheet.EFFECTS_SHEET.destroySheet();
         SpriteSheet.MISC_SHEET.destroySheet();
         SpriteSheet.CURSOR_SHEET.destroySheet();

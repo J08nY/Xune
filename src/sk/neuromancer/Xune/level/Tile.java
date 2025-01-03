@@ -178,7 +178,7 @@ public class Tile implements Renderable {
         if (Config.DEBUG_TILE_GRID) {
             String s = x + "," + y;
             glTranslatef(TILE_CENTER_X - s.length(), TILE_CENTER_Y - 1.5f, 0);
-            glScalef(0.2f, 0.2f, 0);
+            glScalef(0.2f, 0.2f, 1);
             new Text(s, true).render();
         }
         glPopMatrix();

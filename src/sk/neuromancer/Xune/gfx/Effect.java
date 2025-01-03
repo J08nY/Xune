@@ -33,7 +33,7 @@ public class Effect implements Tickable, Renderable {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
+        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0.99f);
         this.sprite.render();
         glPopMatrix();
     }

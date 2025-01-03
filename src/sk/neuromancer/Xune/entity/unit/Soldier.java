@@ -9,6 +9,7 @@ import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.List;
 
+import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class Soldier extends Unit {
@@ -42,7 +43,9 @@ public class Soldier extends Unit {
     public void render() {
         Command current = currentCommand();
         if (current instanceof Command.MoveCommand move) {
+            glDisable(GL_DEPTH_TEST);
             move.getNextPath().render();
+            glEnable(GL_DEPTH_TEST);
         }
         super.render();
     }

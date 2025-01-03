@@ -143,7 +143,7 @@ public class Level implements Renderable, Tickable {
         float centerX = (float) game.getWindow().getWidth() / 2;
         float centerY = (float) game.getWindow().getHeight() / 2;
         glTranslatef(centerX, centerY, 0);
-        glScalef(zoom, zoom, 0f);
+        glScalef(zoom, zoom, 1f);
         glTranslatef(-centerX, -centerY, 0);
         glTranslatef(xOff, yOff, 0);
 
@@ -172,6 +172,8 @@ public class Level implements Renderable, Tickable {
             pathfinder.render();
         }
 
+        glPushMatrix();
+        glTranslatef(0, 0, 0.99f);
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
                 if (!discovered[x][y]) {
@@ -183,6 +185,7 @@ public class Level implements Renderable, Tickable {
                 }
             }
         }
+        glPopMatrix();
         glPopMatrix();
     }
 
