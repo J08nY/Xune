@@ -176,9 +176,7 @@ public class Level implements Renderable, Tickable {
         glTranslatef(0, 0, 0.99f);
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                if (!discovered[x][y]) {
-                    //new Tile(50, x, y).render();
-                } else if (discovered[x][y] && !visible[x][y]) {
+                if (discovered[x][y] && !visible[x][y]) {
                     glColor4f(1, 1, 1, 0.5f);
                     new Tile(50, x, y).render();
                     glColor4f(1, 1, 1, 1);
@@ -242,7 +240,7 @@ public class Level implements Renderable, Tickable {
     }
 
     public List<Entity> getEntities() {
-        List<Entity> entities = new LinkedList<>();
+        List<Entity> entities = new ArrayList<>(worms.size() + human.getEntities().size() + bot.getEntities().size());
         entities.addAll(worms);
         entities.addAll(human.getEntities());
         entities.addAll(bot.getEntities());

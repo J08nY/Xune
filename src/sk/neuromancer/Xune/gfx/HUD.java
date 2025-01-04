@@ -117,20 +117,21 @@ public class HUD implements Tickable, Renderable {
         glTranslatef(hudLeft, hudTop, 0);
         glScalef(2f, 2f, 1);
 
-        renderText(0, 30, "MONEY: " + human.getMoney() + "$");
+        renderText(20, 40, "MONEY: " + human.getMoney() + "$");
+        renderText(20, 60, "POWER: " + human.getPowerProduction() + "/" + human.getPowerConsumption());
         String selected = human.getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
-        renderText(200, 110, selected);
+        renderText(20, 110, selected);
 
-        float levelX = level.getLevelX(mouseX);
-        float levelY = level.getLevelY(mouseY);
-
-        renderText(0, 70, String.format("X:      %.2f", mouseX));
-        renderText(0, 80, String.format("Y:      %.2f", mouseY));
-        renderText(0, 90, String.format("LEVELX: %.2f", levelX));
-        renderText(0, 100, String.format("LEVELY: %.2f", levelY));
-        renderText(0, 110, String.format("XOFF:   %.2f", level.xOff));
-        renderText(0, 120, String.format("YOFF:   %.2f", level.yOff));
-        renderText(200, 120, String.format("ZOOM:   %.2f", level.zoom));
+//        float levelX = level.getLevelX(mouseX);
+//        float levelY = level.getLevelY(mouseY);
+//
+//        renderText(0, 70, String.format("X:      %.2f", mouseX));
+//        renderText(0, 80, String.format("Y:      %.2f", mouseY));
+//        renderText(0, 90, String.format("LEVELX: %.2f", levelX));
+//        renderText(0, 100, String.format("LEVELY: %.2f", levelY));
+//        renderText(0, 110, String.format("XOFF:   %.2f", level.xOff));
+//        renderText(0, 120, String.format("YOFF:   %.2f", level.yOff));
+//        renderText(200, 120, String.format("ZOOM:   %.2f", level.zoom));
         glPopMatrix();
     }
 

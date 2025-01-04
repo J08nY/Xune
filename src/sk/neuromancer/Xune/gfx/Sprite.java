@@ -55,7 +55,6 @@ public class Sprite implements Renderable {
         glActiveTexture(TEXTURE_UNIT);
         glBindTexture(GL_TEXTURE_2D, textureId);
 
-        glPushMatrix();
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);
         glVertex2f(0, 0);
@@ -69,7 +68,6 @@ public class Sprite implements Renderable {
         glTexCoord2f(1.0f, 0.0f);
         glVertex2f(width, 0);
         glEnd();
-        glPopMatrix();
 
         glBindTexture(GL_TEXTURE_2D, 0);
         glDisable(GL_TEXTURE_2D);

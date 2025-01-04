@@ -1,7 +1,10 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.building.Building;
-import sk.neuromancer.Xune.entity.unit.*;
+import sk.neuromancer.Xune.entity.unit.Buggy;
+import sk.neuromancer.Xune.entity.unit.Harvester;
+import sk.neuromancer.Xune.entity.unit.Heli;
+import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Effect;
@@ -21,7 +24,7 @@ public class Player implements Tickable, Renderable {
     private final boolean[][] visible;
     private final boolean[][] discovered;
 
-    protected List<Entity.PlayableEntity> entities = new LinkedList<>();
+    protected List<Entity.PlayableEntity> entities = new ArrayList<>();
     protected List<Entity.PlayableEntity> toAdd = new LinkedList<>();
     protected List<Entity.PlayableEntity> toRemove = new LinkedList<>();
 
@@ -145,23 +148,17 @@ public class Player implements Tickable, Renderable {
                 visible[x][y] = false;
             }
         }
-        for (Entity.PlayableEntity e : entities) {
-            updateVisibility(e);
-        }
-    }
-
-    private void updateVisibility(Entity.PlayableEntity entity) {
-        for (int x = 0; x < level.getWidthInTiles(); x++) {
-            for (int y = 0; y < this.level.getHeightInTiles(); y++) {
+        int w = level.getWidthInTiles();
+        int h = level.getHeightInTiles();
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                if (visible[x][y]) {
+                    continue;
+                }
                 float cx = tileToCenterLevelX(x, y);
                 float cy = tileToCenterLevelY(x, y);
-                if (entity instanceof Unit unit) {
-                    if (unit.inSight(cx, cy)) {
-                        visible[x][y] = true;
-                        discovered[x][y] = true;
-                    }
-                } else if (entity instanceof Building building) {
-                    if (building.inSight(cx, cy)) {
+                for (Entity.PlayableEntity e : entities) {
+                    if (e.inSight(cx, cy)) {
                         visible[x][y] = true;
                         discovered[x][y] = true;
                     }
