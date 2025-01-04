@@ -303,6 +303,10 @@ public class Level implements Renderable, Tickable {
         return pathfinder.isTilePassable(tile.getX(), tile.getY());
     }
 
+    public boolean isTileClear(int tileX, int tileY) {
+        return pathfinder.isTilePassable(tileX, tileY);
+    }
+
     public Tile[] getNeighbors(Tile currentTile) {
         int x = currentTile.getX();
         int y = currentTile.getY();

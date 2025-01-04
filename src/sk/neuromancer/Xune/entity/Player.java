@@ -179,6 +179,9 @@ public class Player implements Tickable, Renderable {
     }
 
     public boolean isTileVisible(int column, int row) {
+        if (column < 0 || column >= level.getWidthInTiles() || row < 0 || row >= level.getHeightInTiles()) {
+            return false;
+        }
         return visible[column][row];
     }
 
@@ -194,6 +197,9 @@ public class Player implements Tickable, Renderable {
     }
 
     public boolean isTileDiscovered(int column, int row) {
+        if (column < 0 || column >= level.getWidthInTiles() || row < 0 || row >= level.getHeightInTiles()) {
+            return false;
+        }
         return discovered[column][row];
     }
 }
