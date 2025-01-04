@@ -18,6 +18,11 @@ public class Buggy extends Unit {
         setMaxHealth(Buggy.class, 100);
         setCost(Buggy.class, 100);
         setSight(Buggy.class, 50);
+        setSpeed(Buggy.class, 0.5f);
+        setRange(Buggy.class, 20f);
+        setRate(Buggy.class, 30);
+        setDamage(Buggy.class, 10);
+        setAccuracy(Buggy.class, 0.6f);
         setBuildTime(Buggy.class, TPS * 5);
         setDeathSound(Buggy.class, SoundManager.SOUND_EXPLOSION_1);
         setBaseSprite(Buggy.class, SpriteSheet.SPRITE_ID_BUGGY);
@@ -25,7 +30,7 @@ public class Buggy extends Unit {
     }
 
     public Buggy(float x, float y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 0.5f, 20f, 30, 10);
+        super(x, y, orientation, owner);
         updateSprite();
         this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, false));
     }

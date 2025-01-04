@@ -23,6 +23,11 @@ public class Harvester extends Unit {
         setMaxHealth(Harvester.class, 300);
         setCost(Harvester.class, 1200);
         setSight(Harvester.class, 40);
+        setSpeed(Harvester.class, 0.1f);
+        setRange(Harvester.class, 0);
+        setRate(Harvester.class, 0);
+        setDamage(Harvester.class, 0);
+        setAccuracy(Harvester.class, 0);
         setBuildTime(Harvester.class, TPS * 10);
         setDeathSound(Harvester.class, SoundManager.SOUND_EXPLOSION_2);
         setBaseSprite(Harvester.class, SpriteSheet.SPRITE_ID_HARVESTER);
@@ -30,7 +35,7 @@ public class Harvester extends Unit {
     }
 
     public Harvester(float x, float y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 0.1f, 0, 0, 0);
+        super(x, y, orientation, owner);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6, false));
     }

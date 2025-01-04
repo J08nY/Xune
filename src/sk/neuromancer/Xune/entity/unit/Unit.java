@@ -10,29 +10,36 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public abstract class Unit extends Entity.PlayableEntity {
+    protected static final Map<Class<? extends Unit>, Float> speedMap = new HashMap<>();
+    protected static final Map<Class<? extends Unit>, Float> rangeMap = new HashMap<>();
+    protected static final Map<Class<? extends Unit>, Integer> rateMap = new HashMap<>();
+    protected static final Map<Class<? extends Unit>, Integer> damageMap = new HashMap<>();
+    protected static final Map<Class<? extends Unit>, Float> accuracyMap = new HashMap<>();
+
     private float speed;
     private float range;
     private int rate;
     private int damage;
+    private float accuracy;
     private int ready = 0;
     protected final Random rand = new Random();
 
-    public Unit(float x, float y, Orientation orientation, Player owner,
-                float speed,
-                float range,
-                int rate,
-                int damage) {
+    public Unit(float x, float y, Orientation orientation, Player owner) {
         super(x, y, owner);
         this.orientation = orientation;
-        this.speed = speed;
-        this.range = range;
-        this.rate = rate;
-        this.damage = damage;
+        Class<? extends Unit> klass = getClass();
+        this.speed = getSpeed(klass);
+        this.range = getRange(klass);
+        this.rate = getRate(klass);
+        this.damage = getDamage(klass);
+        this.accuracy = getAccuracy(klass);
     }
 
     public void move(float toX, float toY) {
@@ -62,7 +69,7 @@ public abstract class Unit extends Entity.PlayableEntity {
         if (rate == 0) {
             return;
         }
-        if (ready % rate == 0 && inRange(target)) {
+        if (ready % rate == 0 && inRange(target) && rand.nextFloat() < this.accuracy) {
             target.takeDamage(damage);
             owner.getLevel().addEffect(new Effect.Hit(target.x + rand.nextFloat(3) * (rand.nextBoolean() ? 1 : -1), target.y + rand.nextFloat(3) * (rand.nextBoolean() ? 1 : -1)));
             SoundManager.play(SoundManager.SOUND_SHOT_1, false, 1.0f);
@@ -135,6 +142,46 @@ public abstract class Unit extends Entity.PlayableEntity {
                 glColor4f(1, 1, 1, 1);
             }
         }
+    }
+
+    protected static void setSpeed(Class<? extends Unit> klass, float speed) {
+        speedMap.put(klass, speed);
+    }
+
+    public static float getSpeed(Class<? extends Unit> klass) {
+        return speedMap.get(klass);
+    }
+
+    protected static void setRange(Class<? extends Unit> klass, float range) {
+        rangeMap.put(klass, range);
+    }
+
+    public static float getRange(Class<? extends Unit> klass) {
+        return rangeMap.get(klass);
+    }
+
+    protected static void setRate(Class<? extends Unit> klass, int rate) {
+        rateMap.put(klass, rate);
+    }
+
+    public static int getRate(Class<? extends Unit> klass) {
+        return rateMap.get(klass);
+    }
+
+    protected static void setDamage(Class<? extends Unit> klass, int damage) {
+        damageMap.put(klass, damage);
+    }
+
+    public static int getDamage(Class<? extends Unit> klass) {
+        return damageMap.get(klass);
+    }
+
+    protected static void setAccuracy(Class<? extends Unit> klass, float accuracy) {
+        accuracyMap.put(klass, accuracy);
+    }
+
+    public static float getAccuracy(Class<? extends Unit> klass) {
+        return accuracyMap.get(klass);
     }
 
     protected abstract void updateSprite();

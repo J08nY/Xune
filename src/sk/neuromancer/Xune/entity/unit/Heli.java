@@ -22,6 +22,11 @@ public class Heli extends Unit {
         setMaxHealth(Heli.class, 100);
         setCost(Heli.class, 1000);
         setSight(Heli.class, 100);
+        setSpeed(Heli.class, 1.2f);
+        setRange(Heli.class, 30f);
+        setRate(Heli.class, 10);
+        setDamage(Heli.class, 5);
+        setAccuracy(Heli.class, 0.9f);
         setBuildTime(Heli.class, TPS * 6);
         setDeathSound(Heli.class, SoundManager.SOUND_EXPLOSION_3);
         setBaseSprite(Heli.class, SpriteSheet.SPRITE_ID_HELI);
@@ -29,7 +34,7 @@ public class Heli extends Unit {
     }
 
     public Heli(float x, float y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner,  1.2f, 30f, 10, 5);
+        super(x, y, orientation, owner);
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
     }

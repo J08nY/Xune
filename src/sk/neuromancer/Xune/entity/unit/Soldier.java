@@ -19,6 +19,11 @@ public class Soldier extends Unit {
         setMaxHealth(Soldier.class, 50);
         setCost(Soldier.class, 50);
         setSight(Soldier.class, 30);
+        setSpeed(Soldier.class, 0.2f);
+        setRange(Soldier.class, 20f);
+        setRate(Soldier.class, 15);
+        setDamage(Soldier.class, 2);
+        setAccuracy(Soldier.class, 0.7f);
         setBuildTime(Soldier.class, TPS * 2);
         setDeathSound(Soldier.class, SoundManager.SOUND_WILHELM);
         setBaseSprite(Soldier.class, SpriteSheet.SPRITE_ID_SOLDIER);
@@ -26,7 +31,7 @@ public class Soldier extends Unit {
     }
 
     public Soldier(float x, float y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, 0.2f, 20f, 15, 2);
+        super(x, y, orientation, owner);
         updateSprite();
         this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 3, false));
     }
