@@ -25,6 +25,7 @@ public class Harvester extends Unit {
         setSight(Harvester.class, 40);
         setBuildTime(Harvester.class, TPS * 10);
         setDeathSound(Harvester.class, SoundManager.SOUND_EXPLOSION_2);
+        setBaseSprite(Harvester.class, SpriteSheet.SPRITE_ID_HARVESTER);
         registerPrerequisites(Harvester.class, List.of(new Prerequisite(Refinery.class)));
     }
 
@@ -70,7 +71,7 @@ public class Harvester extends Unit {
     protected void updateSprite() {
         int spriteRow = orientation.ordinal() / 4;
         int spriteOffset = orientation.ordinal() % 4;
-        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_HARVESTER + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH + spriteOffset);
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(getBaseSprite(getClass()) + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH + spriteOffset);
     }
 
     public boolean collectSpice(Tile target) {

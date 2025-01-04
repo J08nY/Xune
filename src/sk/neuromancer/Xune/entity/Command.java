@@ -376,7 +376,6 @@ public abstract class Command {
                         return;
                     }
                     SoundManager.play(SoundManager.SOUND_TADA_1, false, 1.0f);
-                    building.owner.addEntity(result);
                     if (resultClass != Heli.class) {
                         try {
                             result.pushCommand(new MoveCommand(result.x, result.y, result.x, result.y, pathfinder));
@@ -384,6 +383,7 @@ public abstract class Command {
 
                         }
                     }
+                    building.owner.addEntity(result);
                     finished = true;
                 }
             } else {

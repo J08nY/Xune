@@ -6,8 +6,10 @@ import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +19,10 @@ import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
 public class Human extends Player {
     private final List<PlayableEntity> selected = new LinkedList<>();
+    private Class<? extends Building> buildingToBuild;
+    private Class<? extends Building> buildingToPlace;
+    private int buildStartTime;
+    private int buildDuration;
 
     public Human(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
@@ -109,6 +115,20 @@ public class Human extends Player {
 
     private void handleLeftClick(float levelX, float levelY) {
         Entity other = level.entityAt(levelX, levelY);
+        if (buildingToPlace != null) {
+            Tile t = level.tileAt(levelX, levelY);
+            if (isTileDiscovered(t) && level.isTileClear(t)) {
+                try {
+                    Building building = buildingToPlace.getConstructor(int.class, int.class, Orientation.class, Player.class).newInstance(Level.levelToTileX(levelX, levelY), Level.levelToTileY(levelX, levelY), Orientation.NORTH, this);
+                    addEntity(building);
+                    buildingToPlace = null;
+                    buildingToBuild = null;
+                    SoundManager.play(SoundManager.SOUND_TADA_1, false, 0.5f);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
         if (other instanceof PlayableEntity playable && entities.contains(playable)) {
             if (selected.contains(playable)) {
                 selected.remove(playable);
@@ -140,26 +160,68 @@ public class Human extends Player {
             if (button.intersects(mouseX, mouseY)) {
                 Class<? extends PlayableEntity> klass = button.getKlass();
                 if (Building.class.isAssignableFrom(klass)) {
+                    if (buildingToBuild == null) {
+                        takeMoney(PlayableEntity.getCost(klass));
+                        buildingToBuild = klass.asSubclass(Building.class);
+                        buildStartTime = Game.currentTick();
+                        buildDuration = PlayableEntity.getBuildTime(klass);
+                    } else {
+                        if (buildingToBuild == klass && getBuildProgress() == 1.0f) {
+                            buildingToPlace = klass.asSubclass(Building.class);
+                        } else {
+                            //nothing
+                        }
+                    }
                     System.out.println("Build " + klass.getSimpleName());
                 } else if (Unit.class.isAssignableFrom(klass)) {
                     if (PlayableEntity.canBeBuilt(klass, this)) {
                         List<Building> producers = entities.stream().filter(e -> e instanceof Building building && building.getProduces().contains(klass)).map(e -> (Building) e).sorted(Comparator.comparingInt(building -> building.getCommands().size())).toList();
                         if (producers.isEmpty()) {
                             System.out.println("No producers for " + klass.getSimpleName());
-                            return;
                         } else {
                             Building building = producers.getFirst();
                             takeMoney(PlayableEntity.getCost(klass));
-                            building.sendCommand(new Command.ProduceCommand(PlayableEntity.getBuildTime(klass), (Class<? extends Unit>) klass, level.getPathfinder()));
+                            building.sendCommand(new Command.ProduceCommand(PlayableEntity.getBuildTime(klass), klass.asSubclass(Unit.class), level.getPathfinder()));
                             SoundManager.play(SoundManager.SOUND_BLIP_1, false, 0.5f);
-                            return;
                         }
+                        return;
                     } else {
                         System.out.println("Cannot build " + klass.getSimpleName());
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public void render() {
+        super.render();
+        if (buildingToPlace != null) {
+            //TODO: This needs to be done in a more performant way
+            float levelX = level.getLevelX(game.getInput().mouse.getX());
+            float levelY = level.getLevelY(game.getInput().mouse.getY());
+            int tileX = Level.levelToTileX(levelX, levelY);
+            int tileY = Level.levelToTileY(levelX, levelY);
+            try {
+                Building building = buildingToPlace.getConstructor(int.class, int.class, Orientation.class, Player.class).newInstance(tileX, tileY, Orientation.NORTH, this);
+                building.render();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public Class<? extends Building> getBuildingToBuild() {
+        return buildingToBuild;
+    }
+
+    public Class<? extends Building> getBuildingToPlace() {
+        return buildingToPlace;
+    }
+
+    public float getBuildProgress() {
+        return  Math.min((float) (Game.currentTick() - buildStartTime) / buildDuration, 1.0f);
     }
 
     public List<PlayableEntity> getSelected() {

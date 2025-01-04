@@ -45,7 +45,7 @@ public class Text implements Renderable {
         String charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ$ 0123456789.,!?'\"-+=/\\%()<>:;";
         float sw = SpriteSheet.TEXT_SHEET.getSpriteWidth() * scale;
         for (int i = 0; i < text.length(); i++) {
-            int spriteId = charset.indexOf(text.charAt(i)) + (outline ? SpriteSheet.TEXT_SHEET.width * 2 : 0);
+            int spriteId = charset.indexOf(text.charAt(i)) + (outline ? SpriteSheet.TEXT_SHEET.getWidth() * 2 : 0);
             glPushMatrix();
             glTranslated(x + sw * i, y, 0);
             glScalef(scale, scale, 0);

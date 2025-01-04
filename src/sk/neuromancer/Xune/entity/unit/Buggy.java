@@ -20,6 +20,7 @@ public class Buggy extends Unit {
         setSight(Buggy.class, 50);
         setBuildTime(Buggy.class, TPS * 5);
         setDeathSound(Buggy.class, SoundManager.SOUND_EXPLOSION_1);
+        setBaseSprite(Buggy.class, SpriteSheet.SPRITE_ID_BUGGY);
         registerPrerequisites(Buggy.class, List.of(new Prerequisite(Factory.class)));
     }
 
@@ -44,7 +45,7 @@ public class Buggy extends Unit {
     protected void updateSprite() {
         int spriteRow = orientation.ordinal() / 4;
         int spriteOffset = orientation.ordinal() % 4;
-        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_BUGGY + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH + spriteOffset);
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(getBaseSprite(getClass()) + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH + spriteOffset);
     }
 
     public Point[] getOccupied() {

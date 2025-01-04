@@ -8,6 +8,7 @@ import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.List;
 
+import static sk.neuromancer.Xune.game.Game.TPS;
 import static sk.neuromancer.Xune.level.Tile.PASS_EAST_WEST;
 
 public class Refinery extends Building {
@@ -17,13 +18,15 @@ public class Refinery extends Building {
         setCost(Refinery.class, 1500);
         setPower(Refinery.class, -75);
         setSight(Refinery.class, 60);
+        setBuildTime(Refinery.class, TPS * 10);
         setDeathSound(Refinery.class, SoundManager.SOUND_LONG_EXPLOSION_1);
+        setBaseSprite(Refinery.class, SpriteSheet.SPRITE_ID_REFINERY);
         registerPrerequisites(Refinery.class, List.of(new Prerequisite(Powerplant.class)));
     }
 
 
     public Refinery(int x, int y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, SpriteSheet.SPRITE_ID_REFINERY);
+        super(x, y, orientation, owner);
     }
 
     @Override

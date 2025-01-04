@@ -24,6 +24,7 @@ public class Heli extends Unit {
         setSight(Heli.class, 100);
         setBuildTime(Heli.class, TPS * 6);
         setDeathSound(Heli.class, SoundManager.SOUND_EXPLOSION_3);
+        setBaseSprite(Heli.class, SpriteSheet.SPRITE_ID_HELI);
         registerPrerequisites(Heli.class, List.of(new Prerequisite(Helipad.class)));
     }
 
@@ -79,7 +80,7 @@ public class Heli extends Unit {
         } else {
             animation = (i % 4) * 2 + SpriteSheet.SPRITE_ROW_LENGTH;
         }
-        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(SpriteSheet.SPRITE_ID_HELI + SpriteSheet.flagToOffset(flag) + (wing ? 1 : 0) + animation);
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(getBaseSprite(getClass()) + SpriteSheet.flagToOffset(flag) + (wing ? 1 : 0) + animation);
     }
 
     public Point[] getOccupied() {

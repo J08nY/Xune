@@ -4,10 +4,7 @@ import sk.neuromancer.Xune.entity.Clickable;
 import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.building.*;
-import sk.neuromancer.Xune.entity.unit.Buggy;
-import sk.neuromancer.Xune.entity.unit.Harvester;
-import sk.neuromancer.Xune.entity.unit.Heli;
-import sk.neuromancer.Xune.entity.unit.Soldier;
+import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
@@ -66,19 +63,18 @@ public class HUD implements Tickable, Renderable {
         this.hudLeft = 60 * hudScale;
 
         this.buttons = new LinkedList<>();
-        int playerOffset = SpriteSheet.flagToOffset(human.getFlag());
-        this.buttons.add(new Button<>(Base.class, human, SpriteSheet.SPRITE_ID_BASE + playerOffset, 2, 1, hudLeft + 400, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Powerplant.class, human, SpriteSheet.SPRITE_ID_POWERPLANT + playerOffset, 2, 1, hudLeft + 400 + 4 * 25, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Barracks.class, human, SpriteSheet.SPRITE_ID_BARRACKS + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Factory.class, human, SpriteSheet.SPRITE_ID_FACTORY + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Refinery.class, human, SpriteSheet.SPRITE_ID_REFINERY + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Silo.class, human, SpriteSheet.SPRITE_ID_SILO + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Base.class, human, SpriteSheet.SPRITE_ID_HELIPAD + playerOffset, 2, 1, hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Base.class, human, 2, 1, hudLeft + 400, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Powerplant.class, human, 2, 1, hudLeft + 400 + 4 * 25, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Barracks.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Factory.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Refinery.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Silo.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Helipad.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
 
-        this.buttons.add(new Button<>(Soldier.class, human, SpriteSheet.SPRITE_ID_SOLDIER + playerOffset, 2, 12, hudLeft + 400, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Buggy.class, human, SpriteSheet.SPRITE_ID_BUGGY + playerOffset, 2, 4, hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Heli.class, human, SpriteSheet.SPRITE_ID_HELI + playerOffset, 2, 8, hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Harvester.class, human, SpriteSheet.SPRITE_ID_HARVESTER + playerOffset, 2, 4, hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Soldier.class, human, 2, 12, hudLeft + 400, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Buggy.class, human, 2, 4, hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Heli.class, human, 2, 8, hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Harvester.class, human, 2, 4, hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
     }
 
     @Override
@@ -196,24 +192,31 @@ public class HUD implements Tickable, Renderable {
         glVertex2f(level.getWidthInTiles(), level.getHeightInTiles());
         glVertex2f(0, level.getHeightInTiles());
         glEnd();
+        glBegin(GL_QUADS);
         for (int x = 0; x < level.getWidthInTiles(); x++) {
             for (int y = 0; y < level.getHeightInTiles(); y++) {
                 Tile tile = level.getTile(x, y);
-                glPushMatrix();
-                glTranslatef(x, y, 0);
                 Sprite sprite = SpriteSheet.MAP_SHEET.getSprite(tile.type);
-                if (human.isTileVisible(x, y)) {
-                    glColor4f(1,1,1,1);
-                } else if (human.isTileDiscovered(x, y)) {
-                    glColor4f(1,1,1, 0.5f);
+                int[] pixels = sprite.getPixels();
+                byte red = (byte) (pixels[0] & 0xff);
+                byte green = (byte) (pixels[1] & 0xff);
+                byte blue = (byte) (pixels[2] & 0xff);
+                byte alpha;
+                if (human.isTileVisible(tile)) {
+                    alpha = (byte) 255;
+                } else if (human.isTileDiscovered(tile)) {
+                    alpha = (byte) 128;
                 } else {
-                    glColor4f(1,1,1, 1);
-                    sprite = SpriteSheet.MAP_SHEET.getSprite(2, 16);
+                    continue;
                 }
-                sprite.render();
-                glPopMatrix();
+                glColor4ub(red, green, blue, alpha);
+                glVertex2f(x, y);
+                glVertex2f(x + 1, y);
+                glVertex2f(x + 1, y + 1);
+                glVertex2f(x, y + 1);
             }
         }
+        glEnd();
         glBegin(GL_QUADS);
         for (Entity entity : level.getEntities()) {
             if (entity instanceof Entity.PlayableEntity playable && human.isTileDiscovered(level.tileAt(entity))) {
@@ -357,13 +360,13 @@ public class HUD implements Tickable, Renderable {
         private final float scale;
 
 
-        public Button(Class<T> klass, Human human, int spriteOffset, int spriteRows, int spriteCols, float x, float y, float scale) {
+        public Button(Class<T> klass, Human human, int spriteRows, int spriteCols, float x, float y, float scale) {
             this.klass = klass;
             this.human = human;
-            this.spriteOffset = spriteOffset;
+            this.spriteOffset = Entity.PlayableEntity.getBaseSprite(klass) + SpriteSheet.flagToOffset(human.getFlag());
             this.spriteRows = spriteRows;
             this.spriteCols = spriteCols;
-            this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(spriteOffset);
+            this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(this.spriteOffset);
             this.x = x;
             this.y = y;
             this.width = sprite.getWidth();
@@ -382,17 +385,23 @@ public class HUD implements Tickable, Renderable {
             }
             inProgress = new HashMap<>();
             totalInProgress = 0;
-            for (Entity.PlayableEntity entity : human.getEntities()) {
-                if (!(entity instanceof Building)) {
-                    continue;
-                }
-                for (Command cmd : entity.getCommands().reversed()) {
-                    if (cmd instanceof Command.ProduceCommand produce) {
-                        if (produce.getResultClass() == klass) {
-                            inProgress.put((Building) entity, produce);
-                            totalInProgress++;
+            if (Unit.class.isAssignableFrom(klass)) {
+                for (Entity.PlayableEntity entity : human.getEntities()) {
+                    if (!(entity instanceof Building)) {
+                        continue;
+                    }
+                    for (Command cmd : entity.getCommands().reversed()) {
+                        if (cmd instanceof Command.ProduceCommand produce) {
+                            if (produce.getResultClass() == klass) {
+                                inProgress.put((Building) entity, produce);
+                                totalInProgress++;
+                            }
                         }
                     }
+                }
+            } else if (Building.class.isAssignableFrom(klass)) {
+                if (human.getBuildingToBuild() == klass) {
+                    totalInProgress = 1;
                 }
             }
         }
@@ -418,24 +427,32 @@ public class HUD implements Tickable, Renderable {
                 float textHeight = Text.heightOf(String.valueOf(totalInProgress), 0.4f);
                 new Text(String.valueOf(totalInProgress), width - textWidth, height - textHeight, true, 0.4f).render();
                 int index = 0;
-                for (Map.Entry<Building, Command.ProduceCommand> producers : inProgress.entrySet()) {
-                    Command.ProduceCommand cmd = producers.getValue();
-                    float progress = (float) (Game.currentTick() - cmd.getStart()) / cmd.getDuration();
-                    if (progress <= 0) {
-                        continue;
+                if (Unit.class.isAssignableFrom(klass)) {
+                    for (Map.Entry<Building, Command.ProduceCommand> producers : inProgress.entrySet()) {
+                        Command.ProduceCommand cmd = producers.getValue();
+                        float progress = (float) (Game.currentTick() - cmd.getStart()) / cmd.getDuration();
+                        if (progress <= 0) {
+                            continue;
+                        }
+                        renderProgress(index, progress);
+                        index++;
                     }
-                    glBegin(GL_QUADS);
-                    glColor4f(0, 1, 0, 0.5f);
-                    glVertex2f(0, height - 2 - index * 2);
-                    glVertex2f(width * progress, height - 2 - index * 2);
-                    glVertex2f(width * progress, height - index * 2);
-                    glVertex2f(0, height - index * 2);
-                    glColor4f(1, 1, 1, 1);
-                    glEnd();
-                    index++;
+                } else if (Building.class.isAssignableFrom(klass)) {
+                    renderProgress(0, human.getBuildProgress());
                 }
             }
             glPopMatrix();
+        }
+
+        private void renderProgress(int index, float progress) {
+            glBegin(GL_QUADS);
+            glColor4f(0, 1, 0, 0.5f);
+            glVertex2f(0, height - 2 - index * 2);
+            glVertex2f(width * progress, height - 2 - index * 2);
+            glVertex2f(width * progress, height - index * 2);
+            glVertex2f(0, height - index * 2);
+            glColor4f(1, 1, 1, 1);
+            glEnd();
         }
 
         @Override

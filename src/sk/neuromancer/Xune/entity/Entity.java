@@ -156,6 +156,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         protected static final Map<Class<? extends PlayableEntity>, List<Prerequisite>> prerequisitesMap = new HashMap<>();
         protected static final Map<Class<? extends PlayableEntity>, Integer> costMap = new HashMap<>();
         protected static final Map<Class<? extends PlayableEntity>, Integer> buildTimeMap = new HashMap<>();
+        protected static final Map<Class<? extends Entity>, Integer> baseSpriteMap = new HashMap<>();
         protected Player owner;
         protected List<Command> commands;
         protected Flag flag;
@@ -166,6 +167,14 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             this.owner = owner;
             this.commands = new LinkedList<>();
             this.flag = owner.getFlag();
+        }
+
+        protected static void setBaseSprite(Class<? extends Entity> klass, int sprite) {
+            baseSpriteMap.put(klass, sprite);
+        }
+
+        public static int getBaseSprite(Class<? extends Entity> klass) {
+            return baseSpriteMap.get(klass);
         }
 
         public void select() {

@@ -9,7 +9,7 @@ import java.io.IOException;
 public class SpriteSheet {
     public static SpriteSheet ENTITY_SHEET = new SpriteSheet("entities.png", 24, 11);
     public static SpriteSheet TILE_SHEET = new SpriteSheet("tiles.png", 24, 11);
-    public static SpriteSheet MAP_SHEET = new SpriteSheet("minimap.png", 1, 1);
+    public static SpriteSheet MAP_SHEET = new SpriteSheet("minimap.png", 1, 1, true);
     public static SpriteSheet EFFECTS_SHEET = new SpriteSheet("effects.png", 24, 11);
     public static SpriteSheet MISC_SHEET = new SpriteSheet("misc.png", 24, 11);
     public static SpriteSheet CURSOR_SHEET = new SpriteSheet("cursors.png", 19, 19);
@@ -18,12 +18,12 @@ public class SpriteSheet {
     public static SpriteSheet TEXT_SHEET = new SpriteSheet("text.png", 9, 9);
     public static SpriteSheet WORM_SHEET = new SpriteSheet("worm.png", 24, 11);
 
-
-    protected int width, height;
-    protected String imageName;
-    protected int spriteWidth, spriteHeight;
-    protected Sprite[] sprites;
-    protected boolean isInitiated = false;
+    private int width, height;
+    private String imageName;
+    private int spriteWidth, spriteHeight;
+    private boolean keepData;
+    private Sprite[] sprites;
+    private boolean isInitialized;
 
     public static final int SPRITE_ID_BASE = 0;
     public static final int SPRITE_ID_FACTORY = 1;
@@ -43,11 +43,15 @@ public class SpriteSheet {
     public static final int SPRITE_OFFSET_GREEN = SPRITE_ROW_LENGTH * 2;
     public static final int SPRITE_OFFSET_BLUE = SPRITE_ROW_LENGTH * 4;
 
-
-    public SpriteSheet(String imageName, int spriteWidth, int spriteHeight) {
+    public SpriteSheet(String imageName, int spriteWidth, int spriteHeight, boolean keepData) {
         this.imageName = imageName;
         this.spriteWidth = spriteWidth;
         this.spriteHeight = spriteHeight;
+        this.keepData = keepData;
+    }
+
+    public SpriteSheet(String imageName, int spriteWidth, int spriteHeight) {
+        this(imageName, spriteWidth, spriteHeight, false);
     }
 
     public void initSheet() {
@@ -68,10 +72,10 @@ public class SpriteSheet {
             for (int y = 0; y < height; y++) {
                 int[] RGBAData = null;
                 RGBAData = img.getData().getPixels(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight, RGBAData);
-                sprites[y * width + x] = new Sprite(RGBAData, spriteWidth, spriteHeight);
+                sprites[y * width + x] = new Sprite(RGBAData, spriteWidth, spriteHeight, keepData);
             }
         }
-        isInitiated = true;
+        isInitialized = true;
     }
 
     public int numSprites() {
@@ -86,6 +90,14 @@ public class SpriteSheet {
         return getSprite(y * width + x);
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     public int getSpriteWidth() {
         return spriteWidth;
     }
@@ -95,7 +107,7 @@ public class SpriteSheet {
     }
 
     public void destroySheet() {
-        if (!isInitiated)
+        if (!isInitialized)
             return;
 
         for (Sprite s : sprites) {

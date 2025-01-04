@@ -185,8 +185,12 @@ public class Pathfinder implements Tickable, Renderable {
         return new Path(path.toArray(new Point[0]));
     }
 
-    private boolean isPassable(Point p) {
+    public boolean isPassable(Point p) {
         return levelMap.isPassable(p) && !buildingMap.isPassable(p) && !entityMap.isPassable(p);
+    }
+
+    public boolean isTilePassable(int tileX, int tileY) {
+        return levelMap.isTilePassable(tileX, tileY) && !buildingMap.isTilePassable(tileX, tileY) && !entityMap.isTilePassable(tileX, tileY);
     }
 
     public void addEntity(Entity e) {

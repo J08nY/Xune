@@ -177,8 +177,8 @@ public class Level implements Renderable, Tickable {
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
                 if (!discovered[x][y]) {
-                    new Tile(50, x, y).render();
-                } else if (!visible[x][y]) {
+                    //new Tile(50, x, y).render();
+                } else if (discovered[x][y] && !visible[x][y]) {
                     glColor4f(1, 1, 1, 0.5f);
                     new Tile(50, x, y).render();
                     glColor4f(1, 1, 1, 1);
@@ -299,6 +299,10 @@ public class Level implements Renderable, Tickable {
             return this.level[tileX][tileY];
         }
         return null;
+    }
+
+    public boolean isTileClear(Tile tile) {
+        return pathfinder.isTilePassable(tile.getX(), tile.getY());
     }
 
     public Tile[] getNeighbors(Tile currentTile) {

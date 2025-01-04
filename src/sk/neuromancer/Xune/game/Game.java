@@ -50,8 +50,8 @@ public class Game implements Renderable {
 
         level = new Level(this);
         level.loadLevel(Level.LEVEL_1);
-        human = new Human(this, level, Flag.RED, 100);
-        bot = new Bot(this, level, Flag.BLUE, 100);
+        human = new Human(this, level, Flag.RED, 1000);
+        bot = new Bot(this, level, Flag.BLUE, 1000);
 
         hud = new HUD(this);
 

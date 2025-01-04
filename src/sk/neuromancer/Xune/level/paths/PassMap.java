@@ -131,4 +131,14 @@ public class PassMap {
         }
         return pass[p.y][p.x];
     }
+
+    public boolean isTilePassable(int tileX, int tileY) {
+        boolean[] passArray = getTile(pass, tileX, tileY);
+        for (boolean b : passArray) {
+            if (!b) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

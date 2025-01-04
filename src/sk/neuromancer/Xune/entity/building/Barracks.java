@@ -22,11 +22,12 @@ public class Barracks extends Building {
         setSight(Barracks.class, 60);
         setBuildTime(Barracks.class, TPS * 12);
         setDeathSound(Barracks.class, SoundManager.SOUND_LONG_EXPLOSION_1);
+        setBaseSprite(Barracks.class, SpriteSheet.SPRITE_ID_BARRACKS);
         registerPrerequisites(Barracks.class, List.of(new Prerequisite(Powerplant.class)));
     }
 
     public Barracks(int x, int y, Orientation orientation, Player owner) {
-        super(x, y, orientation, owner, SpriteSheet.SPRITE_ID_BARRACKS);
+        super(x, y, orientation, owner);
     }
 
     @Override

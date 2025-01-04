@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.gfx;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -8,13 +9,14 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 public class Sprite implements Renderable {
-    protected int textureId;
-    protected int width;
-    protected int height;
+    private final int textureId;
+    private final int width;
+    private final int height;
+    private final int[] pixels;
 
     public static final int TEXTURE_UNIT = GL_TEXTURE0;
 
-    public Sprite(int[] pixels, int width, int height) {
+    public Sprite(int[] pixels, int width, int height, boolean keepData) {
         this.width = width;
         this.height = height;
         ByteBuffer buff = ByteBuffer.allocateDirect((width) * (height) * 4);
@@ -25,6 +27,11 @@ public class Sprite implements Renderable {
             buff.put((byte) pixels[i * 4 + 3]);
         }
         buff.flip();
+        if (keepData) {
+            this.pixels = Arrays.copyOf(pixels, pixels.length);
+        } else {
+            this.pixels = null;
+        }
 
         this.textureId = glGenTextures();
         glActiveTexture(TEXTURE_UNIT);
@@ -74,6 +81,10 @@ public class Sprite implements Renderable {
 
     public int getHeight() {
         return height;
+    }
+
+    public int[] getPixels() {
+        return pixels;
     }
 
     public void destroy() {

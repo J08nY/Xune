@@ -92,7 +92,7 @@ public class Player implements Tickable, Renderable {
 
     @Override
     public void render() {
-        entities.stream().filter(e -> (e instanceof Building) || isTileVisible(level.tileAt(e))).sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
+        entities.stream().filter(e -> level.getHuman().isTileDiscovered(level.tileAt(e))).sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
     }
 
     @Override
