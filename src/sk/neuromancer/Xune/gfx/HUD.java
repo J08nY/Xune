@@ -9,10 +9,7 @@ import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -62,7 +59,7 @@ public class HUD implements Tickable, Renderable {
         this.hudTop = height - (hudPanel.getHeight() * hudScale);
         this.hudLeft = 60 * hudScale;
 
-        this.buttons = new LinkedList<>();
+        this.buttons = new ArrayList<>(11);
         this.buttons.add(new Button<>(Base.class, human, 2, 1, hudLeft + 400, hudTop + 64, 4));
         this.buttons.add(new Button<>(Powerplant.class, human, 2, 1, hudLeft + 400 + 4 * 25, hudTop + 64, 4));
         this.buttons.add(new Button<>(Barracks.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));

@@ -143,24 +143,26 @@ public class Player implements Tickable, Renderable {
     }
 
     private void updateVisibility() {
-        for (int x = 0; x < level.getWidthInTiles(); x++) {
-            for (int y = 0; y < this.level.getHeightInTiles(); y++) {
+        int w = level.getWidthInTiles();
+        int h = level.getHeightInTiles();
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
                 visible[x][y] = false;
             }
         }
-        int w = level.getWidthInTiles();
-        int h = level.getHeightInTiles();
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
                 if (visible[x][y]) {
                     continue;
                 }
-                float cx = tileToCenterLevelX(x, y);
-                float cy = tileToCenterLevelY(x, y);
+                Tile t = level.getTile(x, y);
+                float cx = t.getCenterX();
+                float cy = t.getCenterY();
                 for (Entity.PlayableEntity e : entities) {
                     if (e.inSight(cx, cy)) {
                         visible[x][y] = true;
                         discovered[x][y] = true;
+                        break;
                     }
                 }
             }

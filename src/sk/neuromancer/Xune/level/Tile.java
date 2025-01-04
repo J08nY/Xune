@@ -9,11 +9,13 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Tile implements Renderable {
     public int type;
-    private final int x;    //GRID coordinates
+    private final int x;
     private final int y;
+    private final float levelX;
+    private final float levelY;
+    private final float centerX;
+    private final float centerY;
 
-    private final float px;    //POINT coordinates
-    private final float py;
     private final boolean[] pass;
     private int spice;
 
@@ -105,8 +107,10 @@ public class Tile implements Renderable {
     public Tile(int type, int x, int y) {
         this.x = x;
         this.y = y;
-        this.px = Level.tileToLevelX(x, y);
-        this.py = Level.tileToLevelY(x, y);
+        this.levelX = Level.tileToLevelX(x, y);
+        this.levelY = Level.tileToLevelY(x, y);
+        this.centerX = levelX + TILE_CENTER_X;
+        this.centerY = levelY + TILE_CENTER_Y;
 
         this.type = type;
         if (type < 3) {
@@ -136,11 +140,19 @@ public class Tile implements Renderable {
     }
 
     public float getLevelX() {
-        return this.px;
+        return this.levelX;
     }
 
     public float getLevelY() {
-        return this.py;
+        return this.levelY;
+    }
+
+    public float getCenterX() {
+        return this.centerX;
+    }
+
+    public float getCenterY() {
+        return this.centerY;
     }
 
     public boolean isSpicy() {
@@ -162,7 +174,7 @@ public class Tile implements Renderable {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(px, py, 0);
+        glTranslatef(levelX, levelY, 0);
         if (isSpicy() && spice == 0) {
             if (type == 1) {
                 SpriteSheet.TILE_SHEET.getSprite(0).render();
@@ -190,8 +202,8 @@ public class Tile implements Renderable {
                 "type=" + type +
                 ", x=" + x +
                 ", y=" + y +
-                ", px=" + px +
-                ", py=" + py +
+                ", px=" + levelX +
+                ", py=" + levelY +
                 '}';
     }
 }
