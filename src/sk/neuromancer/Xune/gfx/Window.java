@@ -29,8 +29,7 @@ public class Window {
         glfwInit();
 
         glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
         glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
@@ -39,8 +38,10 @@ public class Window {
         if (fullscreen) {
             this.width = vidmode.width();
             this.height = vidmode.height();
+            System.out.println("Fullscreen: " + width + "x" + height);
             handle = glfwCreateWindow(width, height, "Xune", monitor, NULL);
         } else {
+            glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
             handle = glfwCreateWindow(width, height, "Xune", NULL, NULL);
             glfwSetWindowPos(
                     handle,

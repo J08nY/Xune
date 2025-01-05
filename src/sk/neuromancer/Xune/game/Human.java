@@ -188,9 +188,7 @@ public class Human extends Player {
                 } else if (Unit.class.isAssignableFrom(klass)) {
                     if (PlayableEntity.canBeBuilt(klass, this)) {
                         List<Building> producers = entities.stream().filter(e -> e instanceof Building building && building.getProduces().contains(klass)).map(e -> (Building) e).sorted(Comparator.comparingInt(building -> building.getCommands().size())).toList();
-                        if (producers.isEmpty()) {
-
-                        } else {
+                        if (!producers.isEmpty()) {
                             Building building = producers.getFirst();
                             takeMoney(PlayableEntity.getCost(klass));
                             building.sendCommand(new Command.ProduceCommand(PlayableEntity.getBuildTime(klass), klass.asSubclass(Unit.class), level.getPathfinder()));
