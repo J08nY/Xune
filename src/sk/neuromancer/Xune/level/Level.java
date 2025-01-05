@@ -32,6 +32,9 @@ public class Level implements Renderable, Tickable {
     private Tile[][] level;
     private int width, height;
 
+    private final int screenWidth, screenHeight;
+    private final float screenCenterX, screenCenterY;
+
     public float zoom;
     public float xOff;
     public float yOff;
@@ -49,6 +52,11 @@ public class Level implements Renderable, Tickable {
         this.worms = new LinkedList<>();
         this.roads = new LinkedList<>();
         this.effects = new LinkedList<>();
+
+        this.screenWidth = game.getWindow().getWidth();
+        this.screenHeight = game.getWindow().getHeight();
+        this.screenCenterX = game.getWindow().getCenterX();
+        this.screenCenterY = game.getWindow().getCenterY();
     }
 
     @Override
@@ -215,8 +223,8 @@ public class Level implements Renderable, Tickable {
             e.printStackTrace();
         }
         this.zoom = 5.0f;
-        this.xOff = Game.CENTER_X - Game.CENTER_X / this.zoom;
-        this.yOff = Game.CENTER_Y - Game.CENTER_Y / this.zoom;
+        this.xOff = screenCenterX - (screenCenterX / this.zoom);
+        this.yOff = screenCenterY - (screenCenterY / this.zoom);
     }
 
     public void setHuman(Human human) {
@@ -371,19 +379,19 @@ public class Level implements Renderable, Tickable {
     }
 
     public float getLevelX(double screenPointX) {
-        return (((float) screenPointX - Game.CENTER_X) / this.zoom) - this.xOff + Game.CENTER_X;
+        return (((float) screenPointX - this.screenCenterX) / this.zoom) - this.xOff + this.screenCenterX;
     }
 
     public float getScreenX(float levelX) {
-        return (levelX + this.xOff - Game.CENTER_X) * this.zoom + Game.CENTER_X;
+        return (levelX + this.xOff - this.screenCenterX) * this.zoom + this.screenCenterX;
     }
 
     public float getLevelY(double screenPointY) {
-        return (((float) screenPointY - Game.CENTER_Y) / this.zoom) - this.yOff + Game.CENTER_Y;
+        return (((float) screenPointY - this.screenCenterY) / this.zoom) - this.yOff + this.screenCenterY;
     }
 
     public float getScreenY(float levelY) {
-        return (levelY + this.yOff - Game.CENTER_Y) * this.zoom + Game.CENTER_Y;
+        return (levelY + this.yOff - this.screenCenterY) * this.zoom + this.screenCenterY;
     }
 
     public static float tileToLevelX(int tileX, int tileY) {

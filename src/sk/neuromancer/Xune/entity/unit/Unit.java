@@ -4,7 +4,6 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.game.Config;
-import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
@@ -104,8 +103,7 @@ public abstract class Unit extends Entity.PlayableEntity {
     @Override
     public void render() {
         glPushMatrix();
-        float screenY = owner.getLevel().getScreenY(y);
-        float depth = screenY / Game.DEFAULT_HEIGHT;
+        float depth = computeDepth(owner.getGame());
         glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, depth);
         this.sprite.render();
         if (isSelected) {

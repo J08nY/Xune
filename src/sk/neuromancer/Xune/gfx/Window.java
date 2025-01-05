@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.GL_MAX_TEXTURE_IMAGE_UNITS;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
@@ -54,6 +55,9 @@ public class Window {
 
         GL.createCapabilities();
 
+        System.out.println("OpenGL: " + glGetString(GL_VERSION));
+        System.out.println("Max texture units: " + getMaxTextureUnits());
+
         glViewport(0, 0, width, height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -82,11 +86,25 @@ public class Window {
         return width;
     }
 
+    public float getCenterX() {
+        return width / 2.0f;
+    }
+
     public int getHeight() {
         return height;
     }
 
+    public float getCenterY() {
+        return height / 2.0f;
+    }
+
     public void quit() {
         glfwDestroyWindow(handle);
+    }
+
+    public static int getMaxTextureUnits() {
+        int[] maxTextureUnits = new int[1];
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, maxTextureUnits);
+        return maxTextureUnits[0];
     }
 }

@@ -15,9 +15,6 @@ import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.*;
 
-import static sk.neuromancer.Xune.level.Level.tileToCenterLevelX;
-import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
-
 public class Player implements Tickable, Renderable {
     protected final Game game;
     protected final Level level;

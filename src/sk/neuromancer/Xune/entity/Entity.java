@@ -152,6 +152,11 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     public abstract boolean isEnemyOf(Entity other);
 
 
+    protected float computeDepth(Game game) {
+        return game.getLevel().getScreenY(y) / game.getWindow().getHeight();
+
+    }
+
     public static abstract class PlayableEntity extends Entity {
         protected static final Map<Class<? extends PlayableEntity>, List<Prerequisite>> prerequisitesMap = new HashMap<>();
         protected static final Map<Class<? extends PlayableEntity>, Integer> costMap = new HashMap<>();
@@ -203,8 +208,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         @Override
         public void render() {
             glPushMatrix();
-            float screenY = owner.getLevel().getScreenY(y);
-            float depth = screenY / Game.DEFAULT_HEIGHT;
+            float depth = computeDepth(owner.game);
             glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, depth);
             this.sprite.render();
             glPopMatrix();
