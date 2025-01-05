@@ -44,7 +44,8 @@ public class Level implements Renderable, Tickable {
     public static final float SCROLL_SPEED = (float) 5 / TPS;
     public static final float MOVE_SPEED = (float) TPS / 4.5f;
     public static final float EDGE_MARGIN_X = Tile.TILE_WIDTH * 2;
-    public static final float EDGE_MARGIN_Y = Tile.TILE_HEIGHT * 4;
+    public static final float EDGE_MARGIN_Y_TOP = Tile.TILE_HEIGHT * 4;
+    public static final float EDGE_MARGIN_Y_BOTTOM = Tile.TILE_HEIGHT * 10;
 
 
     public Level(Game game) {
@@ -117,18 +118,18 @@ public class Level implements Renderable, Tickable {
     }
 
     public void zoomOut(float speed) {
-        if (getLevelY(0) > -EDGE_MARGIN_Y && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y + (float) Tile.TILE_WIDTH / 2))
+        if (getLevelY(0) > -EDGE_MARGIN_Y_TOP && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y_BOTTOM + (float) Tile.TILE_WIDTH / 2))
             this.zoom *= 1 - speed;
     }
 
     public void moveUp() {
-        if (getLevelY(0) > -EDGE_MARGIN_Y) {
+        if (getLevelY(0) > -EDGE_MARGIN_Y_TOP) {
             this.yOff += MOVE_SPEED * (1 / zoom);
         }
     }
 
     public void moveDown() {
-        if (getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
+        if (getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_Y_BOTTOM + (float) Tile.TILE_HEIGHT / 2)) {
             this.yOff -= MOVE_SPEED * (1 / zoom);
         }
     }
