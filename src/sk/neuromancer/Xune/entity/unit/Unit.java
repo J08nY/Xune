@@ -11,7 +11,6 @@ import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -28,7 +27,6 @@ public abstract class Unit extends Entity.PlayableEntity {
     private int damage;
     private float accuracy;
     private int ready = 0;
-    protected final Random rand = new Random();
 
     public Unit(float x, float y, Orientation orientation, Player owner) {
         super(x, y, owner);

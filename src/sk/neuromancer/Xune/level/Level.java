@@ -8,6 +8,7 @@ import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
+import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,6 +54,8 @@ public class Level implements Renderable, Tickable {
         this.worms = new LinkedList<>();
         this.roads = new LinkedList<>();
         this.effects = new LinkedList<>();
+
+        this.worms.add(new Worm(this, tileToCenterLevelX(0, 0), tileToCenterLevelY(0, 0)));
 
         this.screenWidth = game.getWindow().getWidth();
         this.screenHeight = game.getWindow().getHeight();
@@ -101,6 +104,11 @@ public class Level implements Renderable, Tickable {
         bot.tick(tickCount);
         for (Worm worm : worms) {
             worm.tick(tickCount);
+        }
+        List<Worm> toRemove = worms.stream().filter(Worm::isDead).toList();
+        for (Worm dead : toRemove) {
+            SoundManager.play(Entity.getDeathSound(dead.getClass()), false, 1.0f);
+            worms.remove(dead);
         }
         for (Road road : roads) {
             road.tick(tickCount);
@@ -172,10 +180,14 @@ public class Level implements Renderable, Tickable {
         bot.render();
         human.render();
         for (Worm worm : worms) {
-            worm.render();
+            if (human.isTileVisible(tileAt(worm))) {
+                worm.render();
+            }
         }
         for (Effect e : effects) {
-            e.render();
+            if (human.isTileVisible(tileAt(e))) {
+                e.render();
+            }
         }
         if (Config.DEBUG_PATH_GRID) {
             pathfinder.render();
@@ -293,6 +305,10 @@ public class Level implements Renderable, Tickable {
 
     public Tile getTile(int column, int row) {
         return this.level[column][row];
+    }
+
+    public Tile tileAt(Effect effect) {
+        return tileAt(effect.getX(), effect.getY());
     }
 
     public Tile tileAt(Entity entity) {

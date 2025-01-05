@@ -13,6 +13,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected static final Map<Class<? extends Entity>, Integer> healthMap = new HashMap<>();
     protected static final Map<Class<? extends Entity>, Integer> sightMap = new HashMap<>();
     protected static final Map<Class<? extends Entity>, Integer> deathSoundMap = new HashMap<>();
+    protected final Random rand = new Random();
 
     protected Sprite sprite;
     public float x, y;
@@ -123,11 +124,11 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         return healthMap.get(klass);
     }
 
-    protected static void setDeathSound(Class<? extends PlayableEntity> klass, int sound) {
+    protected static void setDeathSound(Class<? extends Entity> klass, int sound) {
         deathSoundMap.put(klass, sound);
     }
 
-    public static int getDeathSound(Class<? extends PlayableEntity> klass) {
+    public static int getDeathSound(Class<? extends Entity> klass) {
         return deathSoundMap.get(klass);
     }
 

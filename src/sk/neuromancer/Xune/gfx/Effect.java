@@ -53,6 +53,14 @@ public class Effect implements Tickable, Renderable {
         return step == duration;
     }
 
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
     public static class Explosion extends Effect {
         public Explosion(float x, float y) {
             super(x, y, EXPLOSION, 8, 100, Ease::easeOutSine);
