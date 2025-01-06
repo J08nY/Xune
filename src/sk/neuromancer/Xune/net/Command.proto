@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package sk.neuromancer.Xune.net.proto;
+
+option java_outer_classname = "CommandProto";
+
+import "Base.proto";
+
+message CommandFly {
+  Position from = 1;
+  Position to = 2;
+}
+
+message CommandMove {
+  Position from = 1;
+  Position to = 2;
+  Path points = 3;
+  uint32 next = 4;
+}
+
+message CommandAttack {
+  uint64 targetId = 1;
+  bool keep = 2;
+}
+
+message CommandMoveAndAttack {
+  CommandMove move = 1;
+  CommandAttack attack = 2;
+  uint64 targetId = 3;
+  Position targetPos = 4;
+}
+
+message CommandFlyAndAttack {
+  CommandFly move = 1;
+  CommandAttack attack = 2;
+  uint64 targetId = 3;
+  Position targetPos = 4;
+}
+
+message CommandProduce {
+  EntityClass resultClass = 1;
+  uint32 start = 2;
+  uint32 duration = 3;
+  //TODO: consider the finished bool?
+}
+
+message CommandCollectSpice {
+  CommandMove move = 1;
+  Tile target = 2;
+}
+
+message CommandDropOffSpice {
+  CommandMove move = 1;
+  uint64 targetId = 2;
+}
+
+message Command {
+  oneof cmd {
+    CommandMove move = 1;
+    CommandFly fly = 2;
+    CommandAttack attack = 3;
+    CommandMoveAndAttack moveAndAttack = 4;
+    CommandFlyAndAttack flyAndAttack = 5;
+    CommandCollectSpice collectSpice = 6;
+    CommandDropOffSpice dropOffSpice = 7;
+  }
+}

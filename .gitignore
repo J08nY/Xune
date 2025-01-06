@@ -1,3 +1,4 @@
 /classes
 .idea/
 lib/
+/src/sk/neuromancer/Xune/net/proto/*.java

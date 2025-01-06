@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package sk.neuromancer.Xune.net.proto;
+
+option java_outer_classname = "EntityStateProto";
+
+import "Base.proto";
+import "Command.proto";
+
+message EntityState {
+  uint64 id = 1;
+  uint32 klass = 2;
+
+  Position position = 3;
+  Orientation orientation = 4;
+  uint32 health = 5;
+
+  message AttackingState {
+    uint64 targetId = 1;
+    bool attacking = 2;
+  }
+
+  message AttackedState {
+    uint64 attackerId = 1;
+    bool underAttack = 2;
+  }
+
+  AttackingState attackingState = 6;
+  AttackedState attackedState = 7;
+}
+
+message PlayableEntityState {
+  EntityState entity = 1;
+  Flag flag = 2;
+  uint64 ownerId = 3;
+  repeated Command commands = 4;
+}
+
+message UnitState {
+  PlayableEntityState playable = 1;
+  uint32 ready = 2;
+  bool immobile = 3;
+}
+
+message BuildingState {
+  PlayableEntityState entity = 1;
+}

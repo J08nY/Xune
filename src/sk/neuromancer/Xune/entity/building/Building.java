@@ -17,7 +17,7 @@ import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 public abstract class Building extends Entity.PlayableEntity {
     protected static final Map<Class<? extends Building>, Integer> powerMap = new HashMap<>();
     protected static final Map<Class<? extends Building>, List<Class<? extends Unit>>> producesMap = new HashMap<>();
-    public int tileX, tileY;
+    public final int tileX, tileY;
 
     public Building(int tileX, int tileY, Orientation orientation, Player owner) {
         super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner);

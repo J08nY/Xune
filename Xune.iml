@@ -12,5 +12,6 @@
     <orderEntry type="library" name="lwjgl-glfw" level="project" />
     <orderEntry type="library" name="lwjgl-openal" level="project" />
     <orderEntry type="library" name="lwjgl-opengl" level="project" />
+    <orderEntry type="library" name="google.protobuf.java" level="project" />
   </component>
 </module>

@@ -18,10 +18,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected Sprite sprite;
     public float x, y;
     public int health;
-    protected int maxHealth;
-    protected int sight;
+    protected final int maxHealth;
+    protected final int sight;
     protected Orientation orientation;
-    protected List<Clickable> clickableAreas = new ArrayList<>();
+    protected final List<Clickable> clickableAreas = new ArrayList<>();
 
     protected boolean attacking;
     protected Entity attackTarget;

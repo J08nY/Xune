@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package sk.neuromancer.Xune.net.proto;
+
+option java_outer_classname = "BaseProto";
+
+message Position {
+  float x = 1;
+  float y = 2;
+}
+
+enum Orientation {
+  NORTH = 0;
+  NORTHEAST = 1;
+  EAST = 2;
+  SOUTHEAST = 3;
+  SOUTH = 4;
+  SOUTHWEST = 5;
+  WEST = 6;
+  NORTHWEST = 7;
+}
+
+enum Flag {
+  RED = 0;
+  GREEN = 1;
+  BLUE = 2;
+}
+
+message Point {
+  uint32 x = 1;
+  uint32 y = 2;
+}
+
+message Path {
+  repeated Point points = 1;
+}
+
+enum EntityClass {
+  WORM = 0;
+  BARRACKS = 1;
+  BASE = 2;
+  FACTORY = 3;
+  HELIPAD = 4;
+  POWERPLANT = 5;
+  REFINERY = 6;
+  SILO = 7;
+  BUGGY = 8;
+  HARVESTER = 9;
+  HELI = 10;
+  SOLDIER = 11;
+}
+
+message Tile {
+  uint32 x = 1;
+  uint32 y = 2;
+}

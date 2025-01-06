@@ -23,11 +23,11 @@ public abstract class Unit extends Entity.PlayableEntity implements Moveable {
     protected static final Map<Class<? extends Unit>, Float> accuracyMap = new HashMap<>();
     protected static final Map<Class<? extends Unit>, Integer> shotSoundMap = new HashMap<>();
 
-    private float speed;
-    private float range;
-    private int rate;
-    private int damage;
-    private float accuracy;
+    private final float speed;
+    private final float range;
+    private final int rate;
+    private final int damage;
+    private final float accuracy;
     private int ready = 0;
     private boolean immobile;
 
