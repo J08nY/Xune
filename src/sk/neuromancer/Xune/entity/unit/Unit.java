@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.entity.unit;
 
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Moveable;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.game.Config;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public abstract class Unit extends Entity.PlayableEntity {
+public abstract class Unit extends Entity.PlayableEntity implements Moveable {
     protected static final Map<Class<? extends Unit>, Float> speedMap = new HashMap<>();
     protected static final Map<Class<? extends Unit>, Float> rangeMap = new HashMap<>();
     protected static final Map<Class<? extends Unit>, Integer> rateMap = new HashMap<>();
@@ -59,7 +60,7 @@ public abstract class Unit extends Entity.PlayableEntity {
     public void face(float toX, float toY) {
         float angle = angleTo(toX, toY);
         float azimuth = (float) ((angle < 0 ? angle + 2 * (float) Math.PI : angle) + (Math.PI / 2));
-        this.orientation = Orientation.fromAngle(azimuth);
+        this.orientation = Orientation.fromAzimuth(azimuth);
         updateSprite();
     }
 
@@ -98,6 +99,10 @@ public abstract class Unit extends Entity.PlayableEntity {
 
     public void setImmobile(boolean immobile) {
         this.immobile = immobile;
+    }
+
+    public boolean isImmobile() {
+        return immobile;
     }
 
     @Override

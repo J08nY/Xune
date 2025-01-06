@@ -30,7 +30,20 @@ public enum Orientation {
         };
     }
 
-    public static Orientation fromAngle(float radians) {
+    public Orientation opposite() {
+        return switch (this) {
+            case NORTH -> SOUTH;
+            case NORTHEAST -> SOUTHWEST;
+            case EAST -> WEST;
+            case SOUTHEAST -> NORTHWEST;
+            case SOUTH -> NORTH;
+            case SOUTHWEST -> NORTHEAST;
+            case WEST -> EAST;
+            case NORTHWEST -> SOUTHEAST;
+        };
+    }
+
+    public static Orientation fromAzimuth(float radians) {
         double degrees = Math.toDegrees(radians);
         if (degrees < 0) {
             degrees += 360;
@@ -48,5 +61,22 @@ public enum Orientation {
             case 7 -> NORTHWEST;
             default -> throw new IllegalStateException("Unexpected value: " + index);
         };
+    }
+
+    public int toAzimuthDegrees() {
+        return switch (this) {
+            case NORTH -> 0;
+            case NORTHEAST -> 45;
+            case EAST -> 90;
+            case SOUTHEAST -> 135;
+            case SOUTH -> 180;
+            case SOUTHWEST -> 225;
+            case WEST -> 270;
+            case NORTHWEST -> 315;
+        };
+    }
+
+    public float toAzimuthRadians() {
+        return (float) Math.toRadians(toAzimuthDegrees());
     }
 }

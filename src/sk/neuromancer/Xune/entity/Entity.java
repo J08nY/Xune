@@ -217,8 +217,8 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
                 glPushMatrix();
                 glTranslatef(x, y, 0);
                 for (Clickable area : clickableAreas) {
-                    if (area instanceof Renderable) {
-                        ((Renderable) area).render();
+                    if (area instanceof Renderable renderable) {
+                        renderable.render();
                     }
                 }
                 glPopMatrix();

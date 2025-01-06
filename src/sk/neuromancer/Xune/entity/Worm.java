@@ -7,7 +7,6 @@ import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
-import sk.neuromancer.Xune.sfx.Sound;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.Iterator;
@@ -17,14 +16,16 @@ import java.util.Queue;
 import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.game.Game.TPS;
 
-public class Worm extends Entity {
+public class Worm extends Entity implements Moveable {
     private final Level level;
     private int animation = 0;
+    private int dir = 1;
     private Queue<Path> plan = new LinkedList<>();
     private Path current;
     private int nextPoint;
     private float speed = 0.3f;
     private State state;
+    private Position position;
 
     private Unit target;
     private float scale = 1f;
@@ -32,7 +33,11 @@ public class Worm extends Entity {
     private enum State {
         WANDERING,
         HUNTING,
-        EATING
+        EATING;
+    }
+
+    private enum Position {
+        ABOVE, BELOW;
     }
 
     static {
@@ -44,6 +49,7 @@ public class Worm extends Entity {
     public Worm(Level level, float x, float y) {
         super(x, y);
         this.state = State.WANDERING;
+        this.position = Position.BELOW;
         this.level = level;
         this.orientation = Orientation.SOUTH;
         this.sprite = SpriteSheet.WORM_SHEET.getSprite(animation);
@@ -73,10 +79,15 @@ public class Worm extends Entity {
     }
 
     private void eating(int tickCount) {
-        setPosition(target.x, target.y);
         target.setImmobile(true);
         scale = 2f;
+        position = Position.ABOVE;
         if (tickCount % 25 == 0) {
+            float angleFrom = orientation.opposite().toAzimuthRadians();
+            float dx = -(float) Math.sin(angleFrom);
+            float dy = (float) Math.cos(angleFrom);
+            setPosition(target.x + dx * (animation - 3), target.y + dy * (animation - 3));
+
             if (animation == 0) {
                 SoundManager.play(SoundManager.SOUND_WORM_KILL, false, 1.0f);
             }
@@ -95,8 +106,14 @@ public class Worm extends Entity {
 
     private void hunting(int tickCount) {
         scale = 1f;
+        position = Position.BELOW;
         if (tickCount % 10 == 0) {
-            animation = (animation + 1) % 3;
+            animation = (animation + dir) % 5;
+            if (animation == 4) {
+                dir = -1;
+            } else if (animation == 0) {
+                dir = 1;
+            }
         }
 
         Point targetGrid = new Point(Pathfinder.levelXToGrid(target.x), Pathfinder.levelYToGrid(target.y));
@@ -126,12 +143,18 @@ public class Worm extends Entity {
 
     private void wandering(int tickCount) {
         scale = 1f;
+        position = Position.BELOW;
         if (tickCount % 10 == 0) {
-            animation = (animation + 1) % 3;
+            animation = (animation + dir) % 5;
+            if (animation == 4) {
+                dir = -1;
+            } else if (animation == 0) {
+                dir = 1;
+            }
         }
 
         if (tickCount % (TPS * 15) == 0) {
-            Iterator<Entity> closeBy = level.findClosestEntity(x, y,e -> e instanceof Unit && !(e instanceof Heli) && isEnemyOf(e));
+            Iterator<Entity> closeBy = level.findClosestEntity(x, y, e -> e instanceof Unit && !(e instanceof Heli) && isEnemyOf(e));
             if (closeBy.hasNext()) {
                 Entity close = closeBy.next();
                 Point src = new Point(Pathfinder.levelXToGrid(x), Pathfinder.levelYToGrid(y));
@@ -210,12 +233,17 @@ public class Worm extends Entity {
         float dy = toY - y;
         float angle = (float) Math.atan2(dy, dx);
         float azimuth = (float) ((angle < 0 ? angle + 2 * (float) Math.PI : angle) + (Math.PI / 2));
-        this.orientation = Orientation.fromAngle(azimuth);
+        this.orientation = Orientation.fromAzimuth(azimuth);
         setPosition(x + (float) (speed * Math.cos(angle)), y + (float) (speed * Math.sin(angle)));
     }
 
+    public float getSpeed() {
+        return speed;
+    }
+
     private void updateSprite() {
-        this.sprite = SpriteSheet.WORM_SHEET.getSprite(orientation.ordinal() * SpriteSheet.WORM_SHEET.getWidth() + animation);
+        int width = SpriteSheet.WORM_SHEET.getWidth();
+        this.sprite = SpriteSheet.WORM_SHEET.getSprite(orientation.ordinal() * width + (position == Position.BELOW ? width * 8 : 0) + animation);
     }
 
     @Override

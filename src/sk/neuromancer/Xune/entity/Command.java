@@ -138,6 +138,19 @@ public abstract class Command {
                 return;
             }
             Point next = path.getPoints()[this.next];
+            if (this.next == 0) {
+                Point nextNext = path.getPoints()[this.next + 1];
+                int pathAngle = next.angleToNeighbor(nextNext);
+                float dx = next.getLevelX() - unit.x;
+                float dy = next.getLevelY() - unit.y;
+                float angle = (float) Math.atan2(dy, dx);
+                float azimuth = (float) ((angle < 0 ? angle + 2 * (float) Math.PI : angle) + (Math.PI / 2));
+                float azimuthDeg = (float) Math.toDegrees(azimuth);
+                if (Math.abs(azimuthDeg - pathAngle) >= 90) {
+                    this.next++;
+                    next = path.getPoints()[this.next];
+                }
+            }
             float speed = unit.getSpeed();
             if (Math.abs(unit.x - next.getLevelX()) <= speed && Math.abs(unit.y - next.getLevelY()) <= speed) {
                 this.next++;
