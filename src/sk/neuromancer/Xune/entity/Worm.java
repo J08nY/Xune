@@ -25,8 +25,8 @@ public class Worm extends Entity implements Moveable {
     private int nextPoint;
     private float speed = 0.3f;
     private State state;
+    private int stateSince;
     private Position position;
-
     private Unit target;
     private float scale = 1f;
 
@@ -69,16 +69,21 @@ public class Worm extends Entity implements Moveable {
 
     @Override
     public void tick(int tickCount) {
-        switch (state) {
+        State newState = switch (state) {
             case WANDERING -> wandering(tickCount);
             case HUNTING -> hunting(tickCount);
             case EATING -> eating(tickCount);
+        };
+        if (newState != state) {
+            stateSince = tickCount;
+            state = newState;
         }
         speed = ((float) health / maxHealth) * 0.3f;
         updateSprite();
     }
 
-    private void eating(int tickCount) {
+
+    private State eating(int tickCount) {
         target.setImmobile(true);
         scale = 2f;
         position = Position.ABOVE;
@@ -92,19 +97,21 @@ public class Worm extends Entity implements Moveable {
                 SoundManager.play(SoundManager.SOUND_WORM_KILL, false, 1.0f);
             }
 
-            animation = (animation + 1) % 8;
-
             if (animation == 3) {
                 target.takeDamage(target.health);
             }
 
             if (animation == 7) {
-                state = State.WANDERING;
+                target = null;
+                return State.WANDERING;
             }
+
+            animation = (animation + 1) % 8;
         }
+        return State.EATING;
     }
 
-    private void hunting(int tickCount) {
+    private State hunting(int tickCount) {
         scale = 1f;
         position = Position.BELOW;
         if (tickCount % 10 == 0) {
@@ -125,23 +132,23 @@ public class Worm extends Entity implements Moveable {
                 current = next;
                 nextPoint = 0;
             } else {
-                state = State.WANDERING;
                 target = null;
                 current = null;
                 nextPoint = 0;
-                return;
+                return State.WANDERING;
             }
         }
 
         walkCurrent();
 
         if (current == null) {
-            state = State.EATING;
             animation = 0;
+            return State.EATING;
         }
+        return State.HUNTING;
     }
 
-    private void wandering(int tickCount) {
+    private State wandering(int tickCount) {
         scale = 1f;
         position = Position.BELOW;
         if (tickCount % 10 == 0) {
@@ -153,7 +160,7 @@ public class Worm extends Entity implements Moveable {
             }
         }
 
-        if (tickCount % (TPS * 15) == 0) {
+        if ((tickCount - stateSince) % (TPS * 15) == 0) {
             Iterator<Entity> closeBy = level.findClosestEntity(x, y, e -> e instanceof Unit && !(e instanceof Heli) && isEnemyOf(e));
             if (closeBy.hasNext()) {
                 Entity close = closeBy.next();
@@ -165,8 +172,7 @@ public class Worm extends Entity implements Moveable {
                     current = next;
                     nextPoint = 0;
                     target = (Unit) close;
-                    state = State.HUNTING;
-                    return;
+                    return State.HUNTING;
                 }
             }
         }
@@ -192,7 +198,7 @@ public class Worm extends Entity implements Moveable {
             }
             limit--;
             if (limit <= 0) {
-                return;
+                return State.WANDERING;
             }
         }
 
@@ -202,6 +208,8 @@ public class Worm extends Entity implements Moveable {
         }
 
         walkCurrent();
+
+        return State.WANDERING;
     }
 
     private void walkCurrent() {
