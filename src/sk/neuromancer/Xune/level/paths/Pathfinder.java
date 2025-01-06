@@ -44,8 +44,8 @@ public class Pathfinder implements Tickable, Renderable {
         }
     }
 
-    private boolean validDestination(Point dest, List<Point> ends) {
-        if (!isPassable(dest)) {
+    private boolean validDestination(Point dest, List<Point> ends, boolean ignoreEntities) {
+        if (!isPassable(dest, ignoreEntities)) {
             return false;
         }
         for (Point end : ends) {
@@ -56,7 +56,7 @@ public class Pathfinder implements Tickable, Renderable {
         return true;
     }
 
-    private Point findValidDestination(Point original, int bound) {
+    private Point findValidDestination(Point original, int bound, boolean ignoreEntities) {
         List<Point> ends = paths.stream().map(Path::getEnd).toList();
         int x = original.x;
         int y = original.y;
@@ -68,7 +68,7 @@ public class Pathfinder implements Tickable, Renderable {
 
         for (int i = 0; i < bound; i++) {
             Point pt = new Point(x, y);
-            if (validDestination(pt, ends)) {
+            if (validDestination(pt, ends, ignoreEntities)) {
                 return pt;
             }
 
@@ -90,8 +90,8 @@ public class Pathfinder implements Tickable, Renderable {
         return null;
     }
 
-    public Path find(Point src, Point dest) {
-        dest = findValidDestination(dest, 100);
+    public Path find(Point src, Point dest, boolean ignoreEntities) {
+        dest = findValidDestination(dest, 100, ignoreEntities);
         if (Config.DEBUG_PATHS) {
             System.out.println("Source: " + src);
             System.out.println("Destination: " + dest);
@@ -125,7 +125,7 @@ public class Pathfinder implements Tickable, Renderable {
             }
 
             for (Point neighbor : current.point.getNeighbors()) {
-                if (!isPassable(neighbor)) continue;
+                if (!isPassable(neighbor, ignoreEntities)) continue;
 
                 double tentativeG = current.g + current.point.distance(neighbor);
                 Node neighborNode = allNodes.getOrDefault(neighbor, new Node(neighbor));
@@ -185,8 +185,8 @@ public class Pathfinder implements Tickable, Renderable {
         return new Path(path.toArray(new Point[0]));
     }
 
-    public boolean isPassable(Point p) {
-        return levelMap.isPassable(p) && !buildingMap.isPassable(p) && !entityMap.isPassable(p);
+    public boolean isPassable(Point p, boolean ignoreEntities) {
+        return levelMap.isPassable(p) && !buildingMap.isPassable(p) && (ignoreEntities || !entityMap.isPassable(p));
     }
 
     public boolean isTilePassable(int tileX, int tileY) {

@@ -68,6 +68,45 @@ public class Point {
         }
     }
 
+    public int angleToNeighbor(Point b) {
+        if (!isNextTo(b)) {
+            throw new IllegalArgumentException("Points are not neighbors.");
+        }
+        /*
+         *        315             0               45
+         *      (-1,-1)         (0,-1)          (1,-1)
+         *            \           |            /
+         *                  \     |      /
+         *  270 (-1, 0) -------- this --------- (1, 0)  90
+         *                  /     |      \
+         *            /           |            \
+         *      (-1, 1)         (0, 1)          (1, 1)
+         *        225            180             135
+         */
+        int dx = b.x - x;
+        int dy = b.y - y;
+        return switch (dx) {
+            case -1 -> switch (dy) {
+                case -1 -> 315;
+                case 0 -> 270;
+                case 1 -> 180;
+                default -> throw new IllegalArgumentException("Invalid dy.");
+            };
+            case 0 -> switch (dy) {
+                case -1 -> 0;
+                case 1 -> 180;
+                default -> throw new IllegalArgumentException("Invalid dy.");
+            };
+            case 1 -> switch (dy) {
+                case -1 -> 45;
+                case 0 -> 90;
+                case 1 -> 135;
+                default -> throw new IllegalArgumentException("Invalid dy.");
+            };
+            default -> throw new IllegalArgumentException("Invalid dx.");
+        };
+    }
+
     @Override
     public String toString() {
         return "Point{" + "x=" + x + ", y=" + y + '}';

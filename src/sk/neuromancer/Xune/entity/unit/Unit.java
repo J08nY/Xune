@@ -20,6 +20,7 @@ public abstract class Unit extends Entity.PlayableEntity {
     protected static final Map<Class<? extends Unit>, Integer> rateMap = new HashMap<>();
     protected static final Map<Class<? extends Unit>, Integer> damageMap = new HashMap<>();
     protected static final Map<Class<? extends Unit>, Float> accuracyMap = new HashMap<>();
+    protected static final Map<Class<? extends Unit>, Integer> shotSoundMap = new HashMap<>();
 
     private float speed;
     private float range;
@@ -27,6 +28,7 @@ public abstract class Unit extends Entity.PlayableEntity {
     private int damage;
     private float accuracy;
     private int ready = 0;
+    private boolean immobile;
 
     public Unit(float x, float y, Orientation orientation, Player owner) {
         super(x, y, owner);
@@ -40,17 +42,22 @@ public abstract class Unit extends Entity.PlayableEntity {
     }
 
     public void move(float toX, float toY) {
-        float dx = toX - x;
-        float dy = toY - y;
-        float angle = (float) Math.atan2(dy, dx);
+        float angle = angleTo(toX, toY);
         face(toX, toY);
+        if (immobile) {
+            return;
+        }
         setPosition(x + (float) (speed * Math.cos(angle)), y + (float) (speed * Math.sin(angle)));
     }
 
-    public void face(float toX, float toY) {
+    private float angleTo(float toX, float toY) {
         float dx = toX - x;
         float dy = toY - y;
-        float angle = (float) Math.atan2(dy, dx);
+        return (float) Math.atan2(dy, dx);
+    }
+
+    public void face(float toX, float toY) {
+        float angle = angleTo(toX, toY);
         float azimuth = (float) ((angle < 0 ? angle + 2 * (float) Math.PI : angle) + (Math.PI / 2));
         this.orientation = Orientation.fromAngle(azimuth);
         updateSprite();
@@ -69,7 +76,7 @@ public abstract class Unit extends Entity.PlayableEntity {
         if (ready % rate == 0 && inRange(target) && rand.nextFloat() < this.accuracy) {
             target.takeDamage(damage);
             owner.getLevel().addEffect(new Effect.Hit(target.x + rand.nextFloat(3) * (rand.nextBoolean() ? 1 : -1), target.y + rand.nextFloat(3) * (rand.nextBoolean() ? 1 : -1)));
-            SoundManager.play(SoundManager.SOUND_SHOT_1, false, 1.0f);
+            SoundManager.play(getShotSound(getClass()), false, 1.0f);
         }
     }
 
@@ -87,6 +94,10 @@ public abstract class Unit extends Entity.PlayableEntity {
 
     public int getRate() {
         return rate;
+    }
+
+    public void setImmobile(boolean immobile) {
+        this.immobile = immobile;
     }
 
     @Override
@@ -178,6 +189,14 @@ public abstract class Unit extends Entity.PlayableEntity {
 
     public static float getAccuracy(Class<? extends Unit> klass) {
         return accuracyMap.get(klass);
+    }
+
+    protected static void setShotSound(Class<? extends Unit> klass, int sound) {
+        shotSoundMap.put(klass, sound);
+    }
+
+    public static int getShotSound(Class<? extends Unit> klass) {
+        return shotSoundMap.get(klass);
     }
 
     protected abstract void updateSprite();

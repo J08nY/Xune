@@ -107,7 +107,7 @@ public abstract class Command {
             int stopY = Pathfinder.levelYToGrid(toY);
             Point start = new Point(startX, startY);
             Point stop = new Point(stopX, stopY);
-            this.path = pathFinder.find(start, stop);
+            this.path = pathFinder.find(start, stop, false);
             if (this.path == null) {
                 throw new NoPathFound("No path found");
             }

@@ -26,6 +26,7 @@ public class Soldier extends Unit {
         setAccuracy(Soldier.class, 0.7f);
         setBuildTime(Soldier.class, TPS * 2);
         setDeathSound(Soldier.class, SoundManager.SOUND_WILHELM);
+        setShotSound(Soldier.class, SoundManager.SOUND_SHOT_1);
         setBaseSprite(Soldier.class, SpriteSheet.SPRITE_ID_SOLDIER);
         registerPrerequisites(Soldier.class, List.of(new Prerequisite(Barracks.class)));
     }

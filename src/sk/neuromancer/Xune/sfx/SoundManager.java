@@ -12,6 +12,8 @@ import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.lwjgl.openal.AL10.AL_INVERSE_DISTANCE_CLAMPED;
+import static org.lwjgl.openal.AL10.alDistanceModel;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -34,12 +36,15 @@ public class SoundManager implements Tickable {
             "laser_1.wav",
             "long_explosion_1.wav",
             "shot_1.wav",
+            "shot_2.wav",
             "tada_1.wav",
             "wilhelm.wav",
             "worm_death.wav",
+            "worm_kill.wav",
             "duneshifter.wav"
     };
 
+    public static final int SOUND_NONE = -1;
     public static final int SOUND_BLIP_1 = 0;
     public static final int SOUND_EXPLOSION_1 = 1;
     public static final int SOUND_EXPLOSION_2 = 2;
@@ -50,11 +55,13 @@ public class SoundManager implements Tickable {
     public static final int SOUND_LASER_1 = 7;
     public static final int SOUND_LONG_EXPLOSION_1 = 8;
     public static final int SOUND_SHOT_1 = 9;
-    public static final int SOUND_TADA_1 = 10;
-    public static final int SOUND_WILHELM = 11;
-    public static final int SOUND_WORM_DEATH = 12;
+    public static final int SOUND_SHOT_2 = 10;
+    public static final int SOUND_TADA_1 = 11;
+    public static final int SOUND_WILHELM = 12;
+    public static final int SOUND_WORM_DEATH = 13;
+    public static final int SOUND_WORM_KILL = 14;
 
-    public static final int TRACK_DUNESHIFTER = 13;
+    public static final int TRACK_DUNESHIFTER = 15;
 
     private static SoundManager instance;
 
@@ -72,6 +79,8 @@ public class SoundManager implements Tickable {
         alcMakeContextCurrent(context);
         AL.createCapabilities(deviceCaps);
 
+        alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
+
         this.sounds = new Sound[SoundManager.soundNames.length];
         for (int i = 0; i < this.sounds.length; i++) {
             this.sounds[i] = new Sound(SoundManager.soundNames[i]);
@@ -87,6 +96,9 @@ public class SoundManager implements Tickable {
     }
 
     public static SoundPlayer play(int soundIndex, boolean loop, float gain) {
+        if (soundIndex == -1) {
+            return null;
+        }
         SoundPlayer player = new SoundPlayer(instance.sounds[soundIndex], loop, gain);
         instance.players.add(player);
         player.play();
@@ -100,6 +112,8 @@ public class SoundManager implements Tickable {
         for (Sound s : sounds) {
             s.destroy();
         }
+        alcDestroyContext(context);
+        alcCloseDevice(device);
     }
 
 }

@@ -2,6 +2,8 @@ package sk.neuromancer.Xune.level.paths;
 
 import sk.neuromancer.Xune.gfx.Renderable;
 
+import java.util.Arrays;
+
 import static org.lwjgl.opengl.GL11.*;
 
 public class Path implements Renderable {
@@ -37,5 +39,12 @@ public class Path implements Renderable {
         glColor4f(1, 1, 1, 1);
         glEnd();
         glDisable(GL_POINT_SMOOTH);
+    }
+
+    @Override
+    public String toString() {
+        return "Path{" +
+                "p=" + Arrays.toString(p) +
+                '}';
     }
 }

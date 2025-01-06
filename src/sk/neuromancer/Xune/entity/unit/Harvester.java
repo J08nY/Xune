@@ -30,6 +30,7 @@ public class Harvester extends Unit {
         setAccuracy(Harvester.class, 0);
         setBuildTime(Harvester.class, TPS * 10);
         setDeathSound(Harvester.class, SoundManager.SOUND_EXPLOSION_2);
+        setShotSound(Harvester.class, SoundManager.SOUND_NONE);
         setBaseSprite(Harvester.class, SpriteSheet.SPRITE_ID_HARVESTER);
         registerPrerequisites(Harvester.class, List.of(new Prerequisite(Refinery.class)));
     }

@@ -30,6 +30,7 @@ public class Heli extends Unit {
         setBuildTime(Heli.class, TPS * 6);
         setDeathSound(Heli.class, SoundManager.SOUND_EXPLOSION_3);
         setBaseSprite(Heli.class, SpriteSheet.SPRITE_ID_HELI);
+        setShotSound(Heli.class, SoundManager.SOUND_SHOT_1);
         registerPrerequisites(Heli.class, List.of(new Prerequisite(Helipad.class)));
     }
 

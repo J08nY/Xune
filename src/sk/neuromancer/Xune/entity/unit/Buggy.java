@@ -25,6 +25,7 @@ public class Buggy extends Unit {
         setAccuracy(Buggy.class, 0.6f);
         setBuildTime(Buggy.class, TPS * 5);
         setDeathSound(Buggy.class, SoundManager.SOUND_EXPLOSION_1);
+        setShotSound(Buggy.class, SoundManager.SOUND_SHOT_2);
         setBaseSprite(Buggy.class, SpriteSheet.SPRITE_ID_BUGGY);
         registerPrerequisites(Buggy.class, List.of(new Prerequisite(Factory.class)));
     }

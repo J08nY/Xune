@@ -314,6 +314,8 @@ public class HUD implements Tickable, Renderable {
                             } else {
                                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
                             }
+                        } else {
+                            currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(1);
                         }
                     } else {
                         currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(3);
