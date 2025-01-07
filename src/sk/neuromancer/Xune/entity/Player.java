@@ -34,6 +34,7 @@ public class Player implements Tickable, Renderable {
         this.level = level;
         this.flag = flag;
         this.money = money;
+        level.addPlayer(this);
 
         this.visible = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];
         this.discovered = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];

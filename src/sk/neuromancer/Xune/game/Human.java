@@ -27,7 +27,6 @@ public class Human extends Player {
 
     public Human(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
-        level.setHuman(this);
         this.addEntity(new Base(7, 2, Orientation.NORTH, this));
         this.addEntity(new Refinery(5, 6, Orientation.NORTH, this));
         this.addEntity(new Silo(5, 5, Orientation.NORTH, this));

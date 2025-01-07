@@ -15,7 +15,6 @@ public class Bot extends Player {
 
     public Bot(Game game, Level level, Flag flag, int money) {
         super(game, level, flag, money);
-        level.setBot(this);
         this.addEntity(new Base(16, 8, Orientation.NORTH, this));
         this.addEntity(new Refinery(16, 9, Orientation.NORTH, this));
         this.addEntity(new Heli(Level.tileToCenterLevelX(14, 10), Level.tileToCenterLevelY(14, 10), Orientation.WEST, this));

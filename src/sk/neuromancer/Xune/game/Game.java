@@ -29,8 +29,6 @@ public class Game implements Renderable {
 
     public static final int DEFAULT_WIDTH = 1920;
     public static final int DEFAULT_HEIGHT = 1080;
-    public static final int CENTER_X = DEFAULT_WIDTH / 2;
-    public static final int CENTER_Y = DEFAULT_HEIGHT / 2;
 
     public static final int TPS = 60;
 

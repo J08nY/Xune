@@ -1,7 +1,7 @@
 package sk.neuromancer.Xune.level;
 
-import sk.neuromancer.Xune.ai.Bot;
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.*;
@@ -24,7 +24,7 @@ public class Level implements Renderable, Tickable {
     private final Game game;
 
     private Human human;
-    private Bot bot;
+    private List<Player> players;
     private Pathfinder pathfinder;
     private List<Worm> worms;
     private List<Road> roads;
@@ -51,6 +51,7 @@ public class Level implements Renderable, Tickable {
 
     public Level(Game game) {
         this.game = game;
+        this.players = new ArrayList<>();
         this.worms = new LinkedList<>();
         this.roads = new LinkedList<>();
         this.effects = new LinkedList<>();
@@ -100,8 +101,9 @@ public class Level implements Renderable, Tickable {
             moveRight();
         }
 
-        human.tick(tickCount);
-        bot.tick(tickCount);
+        for (Player player : players) {
+            player.tick(tickCount);
+        }
         for (Worm worm : worms) {
             worm.tick(tickCount);
         }
@@ -177,8 +179,9 @@ public class Level implements Renderable, Tickable {
         for (Road road : roads) {
             road.render();
         }
-        bot.render();
-        human.render();
+        for (Player player : players) {
+            player.render();
+        }
         for (Worm worm : worms) {
             if (human.isTileVisible(tileAt(worm))) {
                 worm.render();
@@ -240,20 +243,19 @@ public class Level implements Renderable, Tickable {
         this.yOff = screenCenterY - (screenCenterY / this.zoom);
     }
 
-    public void setHuman(Human human) {
-        this.human = human;
-    }
-
-    public void setBot(Bot bot) {
-        this.bot = bot;
+    public void addPlayer(Player player) {
+        this.players.add(player);
+        if (player instanceof Human h) {
+            this.human = h;
+        }
     }
 
     public Human getHuman() {
         return this.human;
     }
 
-    public Bot getBot() {
-        return this.bot;
+    public List<Player> getPlayers() {
+        return this.players;
     }
 
     public Pathfinder getPathfinder() {
@@ -261,10 +263,15 @@ public class Level implements Renderable, Tickable {
     }
 
     public List<Entity> getEntities() {
-        List<Entity> entities = new ArrayList<>(worms.size() + human.getEntities().size() + bot.getEntities().size());
+        int size = worms.size() + human.getEntities().size();
+        for (Player player : players) {
+            size += player.getEntities().size();
+        }
+        List<Entity> entities = new ArrayList<>(size);
         entities.addAll(worms);
-        entities.addAll(human.getEntities());
-        entities.addAll(bot.getEntities());
+        for (Player player : players) {
+            entities.addAll(player.getEntities());
+        }
         return entities;
     }
 
@@ -282,14 +289,11 @@ public class Level implements Renderable, Tickable {
                 return worm;
             }
         }
-        for (Entity.PlayableEntity entity : human.getEntities()) {
-            if (entity.intersects(levelX, levelY)) {
-                return entity;
-            }
-        }
-        for (Entity.PlayableEntity entity : bot.getEntities()) {
-            if (entity.intersects(levelX, levelY)) {
-                return entity;
+        for (Player player : players) {
+            for (Entity.PlayableEntity entity : player.getEntities()) {
+                if (entity.intersects(levelX, levelY)) {
+                    return entity;
+                }
             }
         }
         return null;
