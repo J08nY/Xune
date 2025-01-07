@@ -1,5 +1,6 @@
-package sk.neuromancer.Xune.entity;
+package sk.neuromancer.Xune.game;
 
+import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.Base;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.building.Powerplant;
@@ -8,8 +9,6 @@ import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Soldier;
-import sk.neuromancer.Xune.game.Game;
-import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.Level;
@@ -176,8 +175,8 @@ public class Player implements Tickable, Renderable {
     private void handleDead() {
         for (Entity.PlayableEntity e : entities) {
             if (e.health <= 0) {
-                if (!e.commands.isEmpty()) {
-                    e.commands.forEach(c -> c.finish(e, Game.currentTick(), false));
+                if (e.hasCommands()) {
+                    e.getCommands().forEach(c -> c.finish(e, Game.currentTick(), false));
                 }
                 removeEntity(e);
                 if (!(e instanceof Soldier)) {

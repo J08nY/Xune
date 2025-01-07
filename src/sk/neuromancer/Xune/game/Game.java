@@ -49,8 +49,8 @@ public class Game implements Renderable {
         input = new InputHandler(this);
 
         level = new Level(this, Level.LEVEL_1);
-        human = new Human(this, level, Flag.GREEN, 1000);
-        bot = new Bot(this, level, Flag.BLUE, 1000);
+        human = new Human(this, level, Flag.RED, 1000);
+        bot = new Bot.BuggyBoy(this, level, Flag.GREEN, 1000);
 
         hud = new HUD(this);
 

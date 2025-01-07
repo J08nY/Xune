@@ -3,7 +3,7 @@ package sk.neuromancer.Xune.entity.unit;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Moveable;
 import sk.neuromancer.Xune.entity.Orientation;
-import sk.neuromancer.Xune.entity.Player;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.SpriteSheet;

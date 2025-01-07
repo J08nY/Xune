@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.game.Player;
 
 public class Prerequisite {
     private final Class<? extends Building> requiredBuilding;

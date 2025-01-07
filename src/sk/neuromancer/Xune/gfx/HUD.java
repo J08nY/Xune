@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.gfx;
 
-import sk.neuromancer.Xune.entity.Clickable;
+import sk.neuromancer.Xune.game.Clickable;
 import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.building.*;
@@ -83,7 +83,7 @@ public class HUD implements Tickable, Renderable {
         renderPanel();
         renderCursor();
 
-        logo.render();
+        //logo.render();
         glEnable(GL_DEPTH_TEST);
     }
 

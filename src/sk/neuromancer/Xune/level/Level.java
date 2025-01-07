@@ -1,7 +1,7 @@
 package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.Player;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.*;

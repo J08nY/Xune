@@ -5,6 +5,8 @@ import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Unit;
+import sk.neuromancer.Xune.game.Human;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.NoPathFound;
@@ -266,7 +268,7 @@ public abstract class Command {
                             move = new MoveCommand(entity.x, entity.y, target.x, target.y, pathfinder);
                             targetX = target.x;
                             targetY = target.y;
-                        } catch (IllegalArgumentException e) {
+                        } catch (NoPathFound e) {
                             return;
                         }
                     }
@@ -388,13 +390,15 @@ public abstract class Command {
                         finished = true;
                         return;
                     }
-                    SoundManager.play(SoundManager.SOUND_TADA_1, false, 1.0f);
                     if (resultClass != Heli.class) {
                         try {
                             result.pushCommand(new MoveCommand(result.x, result.y, result.x, result.y, pathfinder));
                         } catch (NoPathFound ignored) {
 
                         }
+                    }
+                    if (building.owner instanceof Human) {
+                        SoundManager.play(SoundManager.SOUND_TADA_1, false, 1.0f);
                     }
                     building.owner.addEntity(result);
                     finished = true;

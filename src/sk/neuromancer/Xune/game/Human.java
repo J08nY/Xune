@@ -3,7 +3,6 @@ package sk.neuromancer.Xune.game;
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.Building;
-import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.level.Level;
@@ -25,7 +24,6 @@ public class Human extends Player {
     public Human(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
         setupSpawn();
-        this.addEntity(new Heli(tileToCenterLevelX(7, 7), tileToCenterLevelY(7, 7), Orientation.EAST, this));
     }
 
     @Override

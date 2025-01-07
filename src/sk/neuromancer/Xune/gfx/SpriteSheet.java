@@ -14,6 +14,7 @@ public class SpriteSheet {
     public static SpriteSheet MISC_SHEET = new SpriteSheet("misc.png", 24, 11);
     public static SpriteSheet CURSOR_SHEET = new SpriteSheet("cursors.png", 19, 19);
     public static SpriteSheet LOGO = new SpriteSheet("logo.png", 160, 61);
+    public static SpriteSheet TITLE = new SpriteSheet("title.png", 464, 88);
     public static SpriteSheet HUD_PANEL = new SpriteSheet("gamepanel.png", 384, 60);
     public static SpriteSheet TEXT_SHEET = new SpriteSheet("text.png", 9, 9);
     public static SpriteSheet WORM_SHEET = new SpriteSheet("worm.png", 24, 11);
@@ -131,6 +132,7 @@ public class SpriteSheet {
         SpriteSheet.MISC_SHEET.initSheet();
         SpriteSheet.CURSOR_SHEET.initSheet();
         SpriteSheet.LOGO.initSheet();
+        SpriteSheet.TITLE.initSheet();
         SpriteSheet.HUD_PANEL.initSheet();
         SpriteSheet.TEXT_SHEET.initSheet();
         SpriteSheet.WORM_SHEET.initSheet();
@@ -144,6 +146,7 @@ public class SpriteSheet {
         SpriteSheet.MISC_SHEET.destroySheet();
         SpriteSheet.CURSOR_SHEET.destroySheet();
         SpriteSheet.LOGO.destroySheet();
+        SpriteSheet.TITLE.destroySheet();
         SpriteSheet.HUD_PANEL.destroySheet();
         SpriteSheet.TEXT_SHEET.destroySheet();
         SpriteSheet.WORM_SHEET.destroySheet();

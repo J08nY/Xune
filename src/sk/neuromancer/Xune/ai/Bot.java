@@ -3,12 +3,13 @@ package sk.neuromancer.Xune.ai;
 import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.entity.Player;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
+import sk.neuromancer.Xune.level.paths.NoPathFound;
 
 import java.util.*;
 
@@ -17,24 +18,24 @@ import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class Bot extends Player {
     private final Tile spawn;
-    private List<Class<? extends Building>> buildingPlan = new LinkedList<>();
-    private List<Class<? extends Unit>> unitPlan = new LinkedList<>();
+    protected List<Class<? extends Building>> buildingPlan = new LinkedList<>();
+    protected List<Class<? extends Unit>> unitPlan = new LinkedList<>();
+    protected int soldierPriority = 0;
+    protected int buggyPriority = 0;
+    protected int heliPriority = 0;
+
+    protected int buildInterval = 10;
+    protected int produceInterval = 2;
+    protected int attackGroupSize = 5;
+
     private Random rand = new Random();
     private int buildings;
     private int units;
     private int harvesters;
 
-    public Bot(Game game, Level level, Flag flag, int money) {
+    Bot(Game game, Level level, Flag flag, int money) {
         super(game, level, flag, money);
         this.spawn = setupSpawn();
-        buildingPlan.add(Barracks.class);
-        buildingPlan.add(Powerplant.class);
-        buildingPlan.add(Factory.class);
-        buildingPlan.add(Helipad.class);
-
-        unitPlan.add(Soldier.class);
-        unitPlan.add(Soldier.class);
-        unitPlan.add(Buggy.class);
     }
 
     @Override
@@ -44,6 +45,25 @@ public class Bot extends Player {
         units = entities.stream().filter(e -> e instanceof Unit).mapToInt(e -> 1).sum();
         harvesters = entities.stream().filter(e -> e instanceof Harvester).mapToInt(e -> 1).sum();
 
+        checkHarvesters();
+        if (tickCount % (TPS * buildInterval) == 0) {
+            build();
+        }
+        if (tickCount % (TPS * produceInterval) == 0) {
+            produce();
+            if (units >= attackGroupSize) {
+                attack();
+            }
+        }
+        if (isBuildDone()) {
+            placeBuild();
+        }
+        defend();
+        planUnitBuild();
+        planBuildingBuild();
+    }
+
+    private void checkHarvesters() {
         if (harvesters == 0) {
             // Bump up!
             if (unitPlan.contains(Harvester.class)) {
@@ -52,30 +72,9 @@ public class Bot extends Player {
             unitPlan.addFirst(Harvester.class);
             produce();
         }
-        if (tickCount % (TPS * 10) == 0) {
-            build();
-        }
-        if (tickCount % (TPS * 2) == 0) {
-            produce();
-            if (units > 5) {
-                attack();
-            }
-        }
-        if (isBuildDone()) {
-            placeBuild();
-        }
-        if (unitPlan.size() < 5) {
-            int r = rand.nextInt(100);
-            if (r < 50) {
-                unitPlan.add(Soldier.class);
-            } else if (r < 80) {
-                unitPlan.add(Buggy.class);
-            } else if (r < 95) {
-                unitPlan.add(Heli.class);
-            } else {
-                unitPlan.add(Harvester.class);
-            }
-        }
+    }
+
+    private void planBuildingBuild() {
         if (buildingPlan.isEmpty()) {
             // Check that we have all
             if (entities.stream().noneMatch(e -> e instanceof Powerplant)) {
@@ -88,6 +87,36 @@ public class Bot extends Player {
                 buildingPlan.add(Factory.class);
             } else if (entities.stream().noneMatch(e -> e instanceof Helipad)) {
                 buildingPlan.add(Helipad.class);
+            }
+        }
+    }
+
+    private void planUnitBuild() {
+        if (unitPlan.size() < 5) {
+            int r = rand.nextInt(100);
+            if (r < soldierPriority) {
+                unitPlan.add(Soldier.class);
+            } else if (r < soldierPriority + buggyPriority) {
+                unitPlan.add(Buggy.class);
+            } else if (r < soldierPriority + buggyPriority + heliPriority) {
+                unitPlan.add(Heli.class);
+            } else {
+                unitPlan.add(Harvester.class);
+            }
+        }
+    }
+
+    private void defend() {
+        List<Entity.PlayableEntity> underAttack = entities.stream().filter(e -> e instanceof Building && e.isUnderAttack()).toList();
+        if (!underAttack.isEmpty()) {
+            List<Unit> freeUnits = entities.stream().filter(e -> e instanceof Unit unit && !(e instanceof Harvester) && unit.getCommands().isEmpty()).map(e -> (Unit) e).toList();
+            for (int i = 0; i < freeUnits.size(); i++) {
+                Entity.PlayableEntity building = underAttack.get(i % underAttack.size());
+                Unit unit = freeUnits.get(i);
+                try {
+                    unit.sendCommand(new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), building.getAttacker()));
+                } catch (NoPathFound ignored) {
+                }
             }
         }
     }
@@ -113,7 +142,10 @@ public class Bot extends Player {
                     if (attacker instanceof Heli) {
                         attacker.sendCommand(new Command.FlyAndAttackCommand(attacker.x, attacker.y, target));
                     } else {
-                        attacker.sendCommand(new Command.MoveAndAttackCommand(attacker.x, attacker.y, level.getPathfinder(), target));
+                        try {
+                            attacker.sendCommand(new Command.MoveAndAttackCommand(attacker.x, attacker.y, level.getPathfinder(), target));
+                        } catch (NoPathFound ignored) {
+                        }
                     }
                 }
             }
@@ -152,7 +184,7 @@ public class Bot extends Player {
 
     private void placeBuild() {
         Iterator<Tile> close = level.findClosestTile(spawn, level::isTileBuildable);
-        int pos = rand.nextInt(5 + buildings);
+        int pos = rand.nextInt(3 + buildings);
         Tile last = null;
         try {
             for (int i = 0; i < pos; i++) {
@@ -164,6 +196,72 @@ public class Bot extends Player {
         if (last != null) {
             Building result = getBuildResult(last.getX(), last.getY());
             finishBuild(result);
+        }
+    }
+
+    public static class ArmyGeneral extends Bot {
+        public ArmyGeneral(Game game, Level level, Flag flag, int money) {
+            super(game, level, flag, money);
+            buildingPlan.add(Barracks.class);
+            buildingPlan.add(Powerplant.class);
+            buildingPlan.add(Barracks.class);
+
+            unitPlan.add(Soldier.class);
+            unitPlan.add(Soldier.class);
+
+            soldierPriority = 95;
+            buggyPriority = 0;
+            heliPriority = 0;
+        }
+    }
+
+    public static class BuggyBoy extends Bot {
+        public BuggyBoy(Game game, Level level, Flag flag, int money) {
+            super(game, level, flag, money);
+            buildingPlan.add(Factory.class);
+            buildingPlan.add(Powerplant.class);
+            buildingPlan.add(Factory.class);
+
+            unitPlan.add(Buggy.class);
+            unitPlan.add(Buggy.class);
+
+            soldierPriority = 0;
+            buggyPriority = 95;
+            heliPriority = 0;
+        }
+    }
+
+    public static class HeliMaster extends Bot {
+        public HeliMaster(Game game, Level level, Flag flag, int money) {
+            super(game, level, flag, money);
+            buildingPlan.add(Helipad.class);
+            buildingPlan.add(Powerplant.class);
+            buildingPlan.add(Helipad.class);
+
+            unitPlan.add(Heli.class);
+            unitPlan.add(Heli.class);
+
+            soldierPriority = 0;
+            buggyPriority = 0;
+            heliPriority = 95;
+        }
+    }
+
+    public static class JackOfAllTrades extends Bot {
+        public JackOfAllTrades(Game game, Level level, Flag flag, int money) {
+            super(game, level, flag, money);
+            buildingPlan.add(Powerplant.class);
+            buildingPlan.add(Barracks.class);
+            buildingPlan.add(Factory.class);
+            buildingPlan.add(Helipad.class);
+
+            unitPlan.add(Soldier.class);
+            unitPlan.add(Buggy.class);
+            unitPlan.add(Heli.class);
+
+            soldierPriority = 30;
+            buggyPriority = 30;
+            heliPriority = 30;
         }
     }
 }
