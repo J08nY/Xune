@@ -9,7 +9,7 @@ import sk.neuromancer.Xune.sfx.SoundManager;
 import java.util.List;
 
 import static sk.neuromancer.Xune.game.Game.TPS;
-import static sk.neuromancer.Xune.level.Tile.PASS_EAST_WEST;
+import static sk.neuromancer.Xune.level.Tile.EAST_WEST;
 
 public class Refinery extends Building {
 
@@ -31,6 +31,6 @@ public class Refinery extends Building {
 
     @Override
     public boolean[] getPassable() {
-        return PASS_EAST_WEST;
+        return EAST_WEST;
     }
 }

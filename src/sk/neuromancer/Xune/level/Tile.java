@@ -17,6 +17,7 @@ public class Tile implements Renderable {
     private final float centerY;
 
     private final boolean[] pass;
+    private final boolean[] solid;
     private int spice;
 
     /*
@@ -30,26 +31,32 @@ public class Tile implements Renderable {
      *       \     /
      *        \ 4 /
      */
-    public static final boolean[] PASS_ALL =
+    public static final boolean[] ALL =
             {true, true, true, true, true, true, true, true, true, true, true, true, true};
-    public static final boolean[] PASS_NONE =
+    public static final boolean[] NONE =
             {false, false, false, false, false, false, false, false, false, false, false, false, false};
-    public static final boolean[] PASS_EAST_WEST =
+    public static final boolean[] EAST_WEST =
             {false, false, true, false, false, false, true, false, false, false, false, false, false};
-    public static final boolean[] PASS_CORNERS =
+    public static final boolean[] CORNERS =
             {true, false, true, false, true, false, true, false, false, false, false, false, false};
     public static final boolean[][] PASS_START = {
-            PASS_ALL, //0
-            PASS_ALL, //1
-            PASS_ALL  //2
+            ALL, //0
+            ALL, //1
+            ALL  //2
     };
+    public static final boolean[][] SOLID_START = {
+            NONE, //0
+            NONE, //1
+            ALL   //2
+    };
+
     public static final boolean[][] PASS_LOW = {
             //0     1      2     3     4     5      6     7     8      9    10     11   12
             {true, false, true, true, true, false, true, true, false, true, true, true, true}, //3
             {true, true, true, false, true, false, true, true, false, true, true, true, true}, //4
             {true, true, true, false, true, true, true, false, false, true, true, true, true}, //5
             {true, false, true, false, true, true, true, true, false, true, true, true, true}, //6
-            PASS_ALL,                                                                          //7
+            ALL,                                                                          //7
             {true, true, true, true, true, false, true, false, false, true, true, true, true}, //8
             {true, true, true, false, true, true, true, false, false, true, true, true, true}, //9
             {true, false, true, true, true, true, true, false, false, true, true, true, true}, //10
@@ -59,15 +66,34 @@ public class Tile implements Renderable {
             {true, false, true, false, true, true, true, true, false, false, true, true, true}, //14
             {true, true, true, true, true, false, true, false, false, true, true, true, false}, //15
             {true, true, true, true, true, true, true, true, false, false, false, false, false},//16
-            PASS_ALL                                                   //17
+            ALL                                                   //17
     };
+    public static final boolean[][] SOLID_LOW = {
+            //0     1      2     3     4     5      6     7     8      9    10     11   12
+            {false, true, true, true, true, true, false, false, true, false, true, true, false}, //3
+            {false, false, false, true, true, true, false, false, true, false, false, true, false}, //4
+            {false, false, false, true, true, true, true, true, true, false, false, true, true}, //5
+            {false, true, true, true, false, false, false, false, false, false, true, false, false}, //6
+            ALL,                                                                          //7
+            {false, false, false, false, false, true, true, true, false, false, false, false, true}, //8
+            {true, true, true, true, false, false, false, true, true, true, true, false, false}, //9
+            {true, true, false, false, false, false, false, true, true, true, false, false, false}, //10
+            {true, true, false, false, false, true, true, true, true, true, false, false, true}, //11
+            {true, true, true, true, false, true, true, true, true, true, true, false, true}, //12
+            {false, true, true, true, true, true, true, true, true, false, true, true, true}, //13
+            {true, true, false, true, true, true, true, true, true, true, true, true, true}, //14
+            {true, true, true, true, true, true, false, true, true, true, true, true, true}, //15
+            {false, false, false, false, false, false, false, false, true, true, true, true, true},//16
+            NONE                                                   //17
+    };
+
     public static final boolean[][] PASS_HIGH = {
             //0     1      2     3     4     5      6     7     8      9    10     11   12
             {true, false, true, true, true, false, true, true, false, true, true, true, true}, //18
             {true, true, true, false, true, false, true, true, false, true, true, true, true}, //19
             {true, true, true, false, true, true, true, false, false, true, true, true, true}, //20
             {true, false, true, false, true, true, true, true, false, true, true, false, true}, //21
-            PASS_ALL,                                                                          //22
+            ALL,                                                                          //22
             {true, true, true, true, true, false, true, false, false, true, true, false, true}, //23
             {true, true, true, false, true, true, true, false, false, true, true, false, false},//24
             {true, false, true, true, true, true, true, false, false, true, false, false, false}, //25
@@ -77,7 +103,7 @@ public class Tile implements Renderable {
             {true, false, true, false, true, true, true, true, false, false, true, true, true}, //29
             {true, true, true, true, true, false, true, false, true, true, true, true, false}, //30
             {true, true, true, true, true, true, true, true, false, false, false, false, false},//31
-            PASS_ALL                                                                            //32
+            ALL                                                                            //32
     };
 
     public static final boolean[][] PASS_OPEN = {
@@ -86,7 +112,7 @@ public class Tile implements Renderable {
             {true, true, true, false, true, false, true, true, true, true, true, true, true}, //34
             {true, true, true, false, true, true, true, false, true, true, true, true, true}, //35
             {true, false, true, false, true, true, true, true, true, true, true, true, true}, //36
-            PASS_ALL,                                                                         //37
+            ALL,                                                                         //37
             {true, true, true, true, true, false, true, false, true, true, true, true, true}, //38
             {true, true, true, false, true, true, true, false, true, true, true, true, true}, //39
             {true, false, false, true, true, true, false, false, true, true, false, true, false}, //40
@@ -96,7 +122,7 @@ public class Tile implements Renderable {
             {true, false, true, false, true, true, true, true, true, true, true, true, true}, //44
             {true, true, true, true, true, false, true, false, true, true, true, true, true}, //45
             {true, true, true, true, true, true, true, true, false, true, true, true, true}, //46
-            PASS_ALL                                                                          //47
+            ALL                                                                          //47
     };
 
     public static final int TILE_WIDTH = 24;
@@ -115,14 +141,19 @@ public class Tile implements Renderable {
         this.type = type;
         if (type < 3) {
             this.pass = PASS_START[type];
+            this.solid = SOLID_START[type];
         } else if (type < 18) {
-            this.pass = PASS_ALL; //PASS_LOW[type - 3];
+            this.pass = ALL;
+            this.solid = SOLID_LOW[type - 3];
         } else if (type < 33) {
             this.pass = PASS_HIGH[type - 18];
+            this.solid = SOLID_LOW[type - 18];
         } else if (type < 48) {
             this.pass = PASS_OPEN[type - 33];
+            this.solid = SOLID_LOW[type - 33];
         } else if (type < 51) {
-            this.pass = PASS_ALL;
+            this.pass = ALL;
+            this.solid = ALL;
         } else {
             throw new IllegalStateException("Invalid tile type: " + type);
         }
@@ -169,6 +200,10 @@ public class Tile implements Renderable {
 
     public boolean[] getPassable() {
         return this.pass;
+    }
+
+    public boolean[] getSolid() {
+        return this.solid;
     }
 
     @Override

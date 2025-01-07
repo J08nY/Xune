@@ -127,7 +127,7 @@ public class Worm extends Entity implements Moveable {
         Point currentEnd = current.getEnd();
         if (!targetGrid.equals(currentEnd)) {
             Point src = new Point(Pathfinder.levelXToGrid(x), Pathfinder.levelYToGrid(y));
-            Path next = level.getPathfinder().find(src, targetGrid, true);
+            Path next = level.getPathfinder().find(src, targetGrid, Pathfinder.Walkability.WORM);
             if (next != null) {
                 current = next;
                 nextPoint = 0;
@@ -170,7 +170,7 @@ public class Worm extends Entity implements Moveable {
                 Entity close = closeBy.next();
                 Point src = new Point(Pathfinder.levelXToGrid(x), Pathfinder.levelYToGrid(y));
                 Point dest = new Point(Pathfinder.levelXToGrid(close.x), Pathfinder.levelYToGrid(close.y));
-                Path next = level.getPathfinder().find(src, dest, true);
+                Path next = level.getPathfinder().find(src, dest, Pathfinder.Walkability.WORM);
                 if (next != null) {
                     plan.clear();
                     current = next;
@@ -196,7 +196,7 @@ public class Worm extends Entity implements Moveable {
                 src = new Point(Pathfinder.levelXToGrid(x), Pathfinder.levelYToGrid(y));
             }
             Point dest = new Point(targetGridX, targetGridY);
-            Path next = level.getPathfinder().find(src, dest, true);
+            Path next = level.getPathfinder().find(src, dest, Pathfinder.Walkability.WORM);
             if (next != null) {
                 plan.add(next);
             }

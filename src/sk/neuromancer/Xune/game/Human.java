@@ -65,7 +65,7 @@ public class Human extends Player {
             float levelCenterX = tileToCenterLevelX(tileX, tileY);
             float levelCenterY = tileToCenterLevelY(tileX, tileY);
             buildingToPlace.setPosition(levelCenterX, levelCenterY);
-            canPlace = isTileDiscovered(tileX, tileY) && level.isTileClear(tileX, tileY);
+            canPlace = isTileDiscovered(tileX, tileY) && level.isTileBuildable(tileX, tileY, buildingToPlace.getPassable());
         }
 
         if (game.getInput().mouse.isLeftReleased()) {

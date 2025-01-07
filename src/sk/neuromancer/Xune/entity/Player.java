@@ -94,8 +94,7 @@ public class Player implements Tickable, Renderable {
     protected Tile setupSpawn() {
         Tile spawn = level.spawnOf(this);
         addEntity(new Base(spawn.getX(), spawn.getY(), Orientation.NORTH, this));
-        Iterator<Tile> closest = level.findClosestTile(spawn, level::isTileClear);
-        closest.next(); // Skip spawn
+        Iterator<Tile> closest = level.findClosestTile(spawn, level::isTileBuildable);
         Tile powerplantTile = closest.next();
         Tile refineryTile = closest.next();
         Tile harvesterTile = closest.next();

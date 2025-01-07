@@ -198,7 +198,7 @@ public class Level implements Renderable, Tickable {
                 e.render();
             }
         }
-        if (Config.DEBUG_PATH_GRID) {
+        if (Config.DEBUG_PATH_GRID_LEVEL || Config.DEBUG_PATH_GRID_SOLID || Config.DEBUG_PATH_GRID_BUILDING || Config.DEBUG_PATH_GRID_ENTITY) {
             pathfinder.render();
         }
 
@@ -363,11 +363,23 @@ public class Level implements Renderable, Tickable {
     }
 
     public boolean isTileClear(Tile tile) {
-        return pathfinder.isTilePassable(tile.getX(), tile.getY());
+        return pathfinder.isTileClear(tile.getX(), tile.getY());
     }
 
     public boolean isTileClear(int tileX, int tileY) {
-        return pathfinder.isTilePassable(tileX, tileY);
+        return pathfinder.isTileClear(tileX, tileY);
+    }
+
+    public boolean isTileBuildable(Tile tile) {
+        return pathfinder.isTileBuildable(tile.getX(), tile.getY());
+    }
+
+    public boolean isTileBuildable(int tileX, int tileY) {
+        return pathfinder.isTileBuildable(tileX, tileY);
+    }
+
+    public boolean isTileBuildable(int tileX, int tileY, boolean[] footprint) {
+        return pathfinder.isTileBuildable(tileX, tileY, footprint);
     }
 
     public Tile[] getNeighbors(Tile currentTile) {

@@ -17,17 +17,19 @@ import static sk.neuromancer.Xune.level.Tile.TILE_WIDTH;
 
 public class Pathfinder implements Tickable, Renderable {
     private final Level l;
-    private final PassMap levelMap;
-    private final PassMap buildingMap;
-    private final PassMap entityMap;
+    private final BoolMap levelMap;
+    private final BoolMap solidMap;
+    private final BoolMap buildingMap;
+    private final BoolMap entityMap;
     private final List<Entity> entities;
     private final List<Path> paths;
 
     public Pathfinder(Level l) {
         this.l = l;
-        this.levelMap = new PassMap(l.getWidthInTiles(), l.getHeightInTiles());
-        this.buildingMap = new PassMap(l.getWidthInTiles(), l.getHeightInTiles());
-        this.entityMap = new PassMap(l.getWidthInTiles(), l.getHeightInTiles());
+        this.levelMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
+        this.solidMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
+        this.buildingMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
+        this.entityMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
         this.entities = new LinkedList<>();
         this.paths = new LinkedList<>();
 
@@ -38,14 +40,14 @@ public class Pathfinder implements Tickable, Renderable {
         for (int row = 0; row < l.getHeightInTiles(); row++) {
             for (int col = 0; col < l.getWidthInTiles(); col++) {
                 Tile tile = l.getTile(col, row);
-                boolean[] passable = tile.getPassable();
-                levelMap.setTile(col, row, passable);
+                levelMap.setTile(col, row, tile.getPassable());
+                solidMap.setTile(col, row, tile.getSolid());
             }
         }
     }
 
-    private boolean validDestination(Point dest, List<Point> ends, boolean ignoreEntities) {
-        if (!isPassable(dest, ignoreEntities)) {
+    private boolean validDestination(Point dest, List<Point> ends, Walkability w) {
+        if (!isPassable(dest, w)) {
             return false;
         }
         for (Point end : ends) {
@@ -56,7 +58,7 @@ public class Pathfinder implements Tickable, Renderable {
         return true;
     }
 
-    private Point findValidDestination(Point original, int bound, boolean ignoreEntities) {
+    private Point findValidDestination(Point original, int bound, Walkability w) {
         List<Point> ends = paths.stream().map(Path::getEnd).toList();
         int x = original.x;
         int y = original.y;
@@ -68,7 +70,7 @@ public class Pathfinder implements Tickable, Renderable {
 
         for (int i = 0; i < bound; i++) {
             Point pt = new Point(x, y);
-            if (validDestination(pt, ends, ignoreEntities)) {
+            if (validDestination(pt, ends, w)) {
                 return pt;
             }
 
@@ -90,8 +92,15 @@ public class Pathfinder implements Tickable, Renderable {
         return null;
     }
 
-    public Path find(Point src, Point dest, boolean ignoreEntities) {
-        dest = findValidDestination(dest, 100, ignoreEntities);
+    public Path find(Point src, Point dest, Walkability w) {
+        if (w.allowRedirect) {
+            dest = findValidDestination(dest, 100, w);
+        } else {
+            List<Point> ends = paths.stream().map(Path::getEnd).toList();
+            if (!validDestination(dest, ends, w)) {
+                return null;
+            }
+        }
         if (Config.DEBUG_PATHS) {
             System.out.println("Source: " + src);
             System.out.println("Destination: " + dest);
@@ -125,7 +134,7 @@ public class Pathfinder implements Tickable, Renderable {
             }
 
             for (Point neighbor : current.point.getNeighbors()) {
-                if (!isPassable(neighbor, ignoreEntities)) continue;
+                if (!isPassable(neighbor, w)) continue;
 
                 double tentativeG = current.g + current.point.distance(neighbor);
                 Node neighborNode = allNodes.getOrDefault(neighbor, new Node(neighbor));
@@ -146,9 +155,10 @@ public class Pathfinder implements Tickable, Renderable {
     }
 
     private void printPass(Path path) {
-        boolean[][] levelMap = this.levelMap.getPassMap();
-        boolean[][] buildingMap = this.buildingMap.getPassMap();
-        boolean[][] entityMap = this.entityMap.getPassMap();
+        boolean[][] levelMap = this.levelMap.getValMap();
+        boolean[][] buildingMap = this.buildingMap.getValMap();
+        boolean[][] entityMap = this.entityMap.getValMap();
+        boolean[][] solidMap = this.solidMap.getValMap();
         for (int i = 0; i < levelMap.length; i++) {
             for (int j = 0; j < levelMap[i].length; j++) {
                 char v = ' ';
@@ -156,8 +166,10 @@ public class Pathfinder implements Tickable, Renderable {
                     v = '░';
                 } else if (entityMap[i][j]) {
                     v = 'E';
-                } else if (levelMap[i][j]) {
+                } else if (!levelMap[i][j]) {
                     v = '#';
+                } else if (solidMap[i][j]){
+                    v = '*';
                 } else {
                     v = '-';
                 }
@@ -185,12 +197,31 @@ public class Pathfinder implements Tickable, Renderable {
         return new Path(path.toArray(new Point[0]));
     }
 
-    public boolean isPassable(Point p, boolean ignoreEntities) {
-        return levelMap.isPassable(p) && !buildingMap.isPassable(p) && (ignoreEntities || !entityMap.isPassable(p));
+    public boolean isPassable(Point p, Walkability w) {
+        return (!w.requiresPassable || levelMap.isTrue(p)) &&
+                (!w.requiresNoBuilding || !buildingMap.isTrue(p)) &&
+                (!w.requiresNoEntity || !entityMap.isTrue(p)) &&
+                (!w.requiresNotSolid || !solidMap.isTrue(p));
     }
 
-    public boolean isTilePassable(int tileX, int tileY) {
-        return levelMap.isTileAllPassable(tileX, tileY) && !buildingMap.isTilePartiallyPassable(tileX, tileY) && !entityMap.isTilePartiallyPassable(tileX, tileY);
+    public boolean isTileClear(int tileX, int tileY) {
+        return levelMap.isTileAllTrue(tileX, tileY) &&
+                !buildingMap.isTilePartiallyTrue(tileX, tileY) &&
+                !entityMap.isTilePartiallyTrue(tileX, tileY);
+    }
+
+    public boolean isTileClear(int tileX, int tileY, boolean[] footprint) {
+        return levelMap.isTileTrue(tileX, tileY, footprint) &&
+                !buildingMap.isTileTrue(tileX, tileY, footprint) &&
+                !entityMap.isTileTrue(tileX, tileY, footprint);
+    }
+
+    public boolean isTileBuildable(int tileX, int tileY) {
+        return isTileClear(tileX, tileY) && solidMap.isTileAllTrue(tileX, tileY);
+    }
+
+    public boolean isTileBuildable(int tileX, int tileY, boolean[] footprint) {
+        return isTileClear(tileX, tileY) && solidMap.isTileTrue(tileX, tileY, footprint);
     }
 
     public void addEntity(Entity e) {
@@ -254,14 +285,24 @@ public class Pathfinder implements Tickable, Renderable {
 
     @Override
     public void render() {
+        boolean[][] map;
+        if (Config.DEBUG_PATH_GRID_LEVEL) {
+            map = levelMap.getValMap();
+        } else if (Config.DEBUG_PATH_GRID_BUILDING) {
+            map = buildingMap.getValMap();
+        } else if (Config.DEBUG_PATH_GRID_ENTITY) {
+            map = entityMap.getValMap();
+        } else if (Config.DEBUG_PATH_GRID_SOLID) {
+            map = solidMap.getValMap();
+        } else {
+            return;
+        }
         glPointSize(5);
+        glDisable(GL_DEPTH_TEST);
         glBegin(GL_POINTS);
-
-        boolean[][] levelMap = this.levelMap.getPassMap();
-        boolean[][] buildingMap = this.buildingMap.getPassMap();
-        for (int i = 0; i < levelMap.length; i++) {
-            for (int j = 0; j < levelMap[i].length; j++) {
-                if (levelMap[i][j] && !buildingMap[i][j]) {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                if (map[i][j]) {
                     if ((i + j) % 2 == 0) {
                         glColor4f(1, 0, 0, 0.9f);
                     } else {
@@ -275,6 +316,7 @@ public class Pathfinder implements Tickable, Renderable {
         }
         glColor4f(1, 1, 1, 1);
         glEnd();
+        glEnable(GL_DEPTH_TEST);
     }
 
     private static class Node {
@@ -295,5 +337,11 @@ public class Pathfinder implements Tickable, Renderable {
             this.g = g;
             this.f = f;
         }
+    }
+
+    public record Walkability(boolean requiresPassable, boolean requiresNotSolid, boolean requiresNoBuilding,
+                              boolean requiresNoEntity, boolean allowRedirect) {
+        public static final Walkability WORM = new Walkability(true, true, true, false, false);
+        public static final Walkability UNIT = new Walkability(true, false, true, true, true);
     }
 }

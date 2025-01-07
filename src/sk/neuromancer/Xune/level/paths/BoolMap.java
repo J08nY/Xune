@@ -1,14 +1,14 @@
 package sk.neuromancer.Xune.level.paths;
 
-import static sk.neuromancer.Xune.level.Tile.PASS_ALL;
-import static sk.neuromancer.Xune.level.Tile.PASS_NONE;
+import static sk.neuromancer.Xune.level.Tile.ALL;
+import static sk.neuromancer.Xune.level.Tile.NONE;
 
-public class PassMap {
-    private final boolean[][] pass;
+public class BoolMap {
+    private final boolean[][] val;
     private final boolean[][] set;
 
-    public PassMap(int widthInTiles, int heightInTiles) {
-        this.pass = new boolean[5 + (heightInTiles - 1) * 2][5 + (widthInTiles - 1) * 4 + 2];
+    public BoolMap(int widthInTiles, int heightInTiles) {
+        this.val = new boolean[5 + (heightInTiles - 1) * 2][5 + (widthInTiles - 1) * 4 + 2];
         this.set = new boolean[5 + (heightInTiles - 1) * 2][5 + (widthInTiles - 1) * 4 + 2];
     }
 
@@ -64,7 +64,7 @@ public class PassMap {
     }
 
     public void setTile(int col, int row, boolean[] passable) {
-        boolean[] currentTile = getTile(pass, col, row);
+        boolean[] currentTile = getTile(val, col, row);
         boolean[] setTile = getTile(set, col, row);
         boolean[] corrected = passable.clone();
         for (int i = 0; i < passable.length; i++) {
@@ -72,13 +72,13 @@ public class PassMap {
                 corrected[i] &= currentTile[i];
             }
         }
-        fillTile(pass, col, row, corrected);
-        fillTile(set, col, row, PASS_ALL);
+        fillTile(val, col, row, corrected);
+        fillTile(set, col, row, ALL);
     }
 
     public void resetTile(int col, int row) {
-        fillTile(pass, col, row, PASS_NONE);
-        fillTile(set, col, row, PASS_NONE);
+        fillTile(val, col, row, NONE);
+        fillTile(set, col, row, NONE);
     }
 
     public void set(Point p) {
@@ -90,50 +90,60 @@ public class PassMap {
     }
 
     public void set(int col, int row) {
-        pass[row][col] = true;
+        val[row][col] = true;
         set[row][col] = true;
     }
 
     public void reset(int col, int row) {
-        pass[row][col] = false;
+        val[row][col] = false;
         set[row][col] = false;
     }
 
     public void setAll() {
-        for (int i = 0; i < pass.length; i++) {
-            for (int j = 0; j < pass[i].length; j++) {
-                pass[i][j] = true;
+        for (int i = 0; i < val.length; i++) {
+            for (int j = 0; j < val[i].length; j++) {
+                val[i][j] = true;
                 set[i][j] = true;
             }
         }
     }
 
     public void resetAll() {
-        for (int i = 0; i < pass.length; i++) {
-            for (int j = 0; j < pass[i].length; j++) {
-                pass[i][j] = false;
+        for (int i = 0; i < val.length; i++) {
+            for (int j = 0; j < val[i].length; j++) {
+                val[i][j] = false;
                 set[i][j] = false;
             }
         }
     }
 
-    public boolean[][] getPassMap() {
-        return pass;
+    public boolean[][] getValMap() {
+        return val;
     }
 
     public boolean[][] getSetMap() {
         return set;
     }
 
-    public boolean isPassable(Point p) {
-        if (p.y < 0 || p.y >= pass.length || p.x < 0 || p.x >= pass[0].length) {
+    public boolean isTrue(Point p) {
+        if (p.y < 0 || p.y >= val.length || p.x < 0 || p.x >= val[0].length) {
             return false;
         }
-        return pass[p.y][p.x];
+        return val[p.y][p.x];
     }
 
-    public boolean isTileAllPassable(int tileX, int tileY) {
-        boolean[] passArray = getTile(pass, tileX, tileY);
+    public boolean isTileTrue(int tileX, int tileY, boolean[] mask) {
+        boolean[] passArray = getTile(val, tileX, tileY);
+        for (int i = 0; i < passArray.length; i++) {
+            if (mask[i] && !passArray[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isTileAllTrue(int tileX, int tileY) {
+        boolean[] passArray = getTile(val, tileX, tileY);
         for (boolean b : passArray) {
             if (!b) {
                 return false;
@@ -142,8 +152,8 @@ public class PassMap {
         return true;
     }
 
-    public boolean isTilePartiallyPassable(int tileX, int tileY) {
-        boolean[] passArray = getTile(pass, tileX, tileY);
+    public boolean isTilePartiallyTrue(int tileX, int tileY) {
+        boolean[] passArray = getTile(val, tileX, tileY);
         for (boolean b : passArray) {
             if (b) {
                 return true;
