@@ -152,10 +152,32 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
     public abstract boolean isEnemyOf(Entity other);
 
-
     protected float computeDepth(Game game) {
         return game.getLevel().getScreenY(y) / game.getWindow().getHeight();
 
+    }
+
+    public static void initClasses() {
+        String[] classes = new String[] {
+                "sk.neuromancer.Xune.entity.building.Base",
+                "sk.neuromancer.Xune.entity.building.Barracks",
+                "sk.neuromancer.Xune.entity.building.Factory",
+                "sk.neuromancer.Xune.entity.building.Helipad",
+                "sk.neuromancer.Xune.entity.building.Powerplant",
+                "sk.neuromancer.Xune.entity.building.Refinery",
+                "sk.neuromancer.Xune.entity.building.Silo",
+                "sk.neuromancer.Xune.entity.unit.Buggy",
+                "sk.neuromancer.Xune.entity.unit.Harvester",
+                "sk.neuromancer.Xune.entity.unit.Heli",
+                "sk.neuromancer.Xune.entity.unit.Soldier",
+        };
+        try {
+            for (String klass : classes) {
+                Class.forName(klass);
+            }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static abstract class PlayableEntity extends Entity {

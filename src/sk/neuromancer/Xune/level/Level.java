@@ -32,6 +32,7 @@ public class Level implements Renderable, Tickable {
 
     private Tile[][] level;
     private int width, height;
+    private List<Tile> spawns;
 
     private final int screenWidth, screenHeight;
     private final float screenCenterX, screenCenterY;
@@ -49,19 +50,18 @@ public class Level implements Renderable, Tickable {
     public static final float EDGE_MARGIN_Y_BOTTOM = Tile.TILE_HEIGHT * 10;
 
 
-    public Level(Game game) {
+    public Level(Game game, String levelName) {
         this.game = game;
         this.players = new ArrayList<>();
         this.worms = new LinkedList<>();
         this.roads = new LinkedList<>();
         this.effects = new LinkedList<>();
 
-        this.worms.add(new Worm(this, tileToCenterLevelX(0, 0), tileToCenterLevelY(0, 0)));
-
         this.screenWidth = game.getWindow().getWidth();
         this.screenHeight = game.getWindow().getHeight();
         this.screenCenterX = game.getWindow().getCenterX();
         this.screenCenterY = game.getWindow().getCenterY();
+        loadLevel(levelName);
     }
 
     @Override
@@ -172,6 +172,12 @@ public class Level implements Renderable, Tickable {
             for (int y = 0; y < this.height; y++) {
                 if (discovered[x][y]) {
                     Tile t = this.level[x][y];
+                    float screenX = getScreenX(t.getLevelX());
+                    float screenY = getScreenY(t.getLevelY());
+                    if (screenX + Tile.TILE_WIDTH * zoom < 0 || screenX > screenWidth ||
+                            screenY + Tile.TILE_HEIGHT * zoom < 0 || screenY > screenHeight) {
+                        continue;
+                    }
                     t.render();
                 }
             }
@@ -211,12 +217,13 @@ public class Level implements Renderable, Tickable {
         glPopMatrix();
     }
 
-    public void loadLevel(String levelName) {
+    private void loadLevel(String levelName) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/sk/neuromancer/Xune/lvl/" + levelName)));
             String line = br.readLine();
-            this.width = Integer.parseInt(line.split("x")[0]);
-            this.height = Integer.parseInt(line.split("x")[1]);
+            String[] dimensions = line.split("x");
+            this.width = Integer.parseInt(dimensions[0]);
+            this.height = Integer.parseInt(dimensions[1]);
             line = br.readLine();
 
             List<String> lines = new LinkedList<>();
@@ -227,13 +234,36 @@ public class Level implements Renderable, Tickable {
             br.close();
 
             this.level = new Tile[this.width][this.height];
+            this.spawns = new LinkedList<>();
 
-            for (int i = 0; i < lines.size(); i++) {
+            int i = 0;
+            for (; i < this.height; i++) {
                 String[] row = lines.get(i).split(",");
-                for (int j = 0; j < row.length; j++) {
-                    this.level[j][i] = new Tile(Byte.parseByte(row[j]), j, i);
+                for (int j = 0; j < this.width; j++) {
+                    String entry = row[j].strip();
+                    this.level[j][i] = new Tile(Byte.parseByte(entry), j, i);
                 }
             }
+            if (i < lines.size() - 1) {
+                for (; i < lines.size(); i++) {
+                    String entry = lines.get(i).strip();
+                    if (entry.startsWith("spawn")) {
+                        String[] parts = entry.substring(6).split(",");
+                        int x = Integer.parseInt(parts[0]);
+                        int y = Integer.parseInt(parts[1]);
+                        Tile spawn = new Tile(48, x, y);
+                        this.level[x][y] = spawn;
+                        this.spawns.add(spawn);
+                    } else if (entry.startsWith("worm")) {
+                        String[] parts = entry.substring(5).split(",");
+                        int x = Integer.parseInt(parts[0]);
+                        int y = Integer.parseInt(parts[1]);
+                        LevelPoint point = new TilePoint(x, y).toLevelPoint();
+                        this.worms.add(new Worm(this, point.x, point.y));
+                    }
+                }
+            }
+
             this.pathfinder = new Pathfinder(this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -256,6 +286,10 @@ public class Level implements Renderable, Tickable {
 
     public List<Player> getPlayers() {
         return this.players;
+    }
+
+    public Tile spawnOf(Player player) {
+        return this.spawns.get(this.players.indexOf(player));
     }
 
     public Pathfinder getPathfinder() {
@@ -463,10 +497,11 @@ public class Level implements Renderable, Tickable {
 
 
         private Tile findOne() {
+            Tile result = null;
             while (!queue.isEmpty()) {
                 Tile currentTile = queue.poll();
                 if (condition.test(currentTile)) {
-                    return currentTile;
+                    result = currentTile;
                 }
 
                 for (Tile neighbor : level.getNeighbors(currentTile)) {
@@ -474,6 +509,9 @@ public class Level implements Renderable, Tickable {
                         queue.add(neighbor);
                         visited[neighbor.getY()][neighbor.getX()] = true;
                     }
+                }
+                if (result != null) {
+                    return result;
                 }
             }
             return null;
@@ -505,7 +543,6 @@ public class Level implements Renderable, Tickable {
             this.startY = startY;
             this.condition = condition;
 
-            //First merge entity lists from level
             List<Entity> entities = level.getEntities();
             filtered = entities.stream().filter(condition).sorted(Comparator.comparingDouble(e -> Math.hypot(e.x - startX, e.y - startY))).collect(Collectors.toList());
         }
@@ -518,6 +555,22 @@ public class Level implements Renderable, Tickable {
         @Override
         public Entity next() {
             return filtered.removeFirst();
+        }
+    }
+
+    public record TilePoint(int x, int y) {
+        public LevelPoint toLevelPoint() {
+            return new LevelPoint(tileToLevelX(x, y), tileToLevelY(x, y));
+        }
+
+        public LevelPoint toCenterLevelPoint() {
+            return new LevelPoint(tileToCenterLevelX(x, y), tileToCenterLevelY(x, y));
+        }
+    }
+
+    public record LevelPoint(float x, float y) {
+        public TilePoint toTilePoint() {
+            return new TilePoint(levelToTileX(x, y), levelToTileY(x, y));
         }
     }
 }

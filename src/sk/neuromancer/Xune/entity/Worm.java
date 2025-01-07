@@ -160,7 +160,11 @@ public class Worm extends Entity implements Moveable {
             }
         }
 
-        if ((tickCount - stateSince) % (TPS * 15) == 0) {
+        if ((tickCount - stateSince) % (TPS * 30) == 0) {
+            if (rand.nextFloat() > 0.25f) {
+                // Keep on wandering...
+                return State.WANDERING;
+            }
             Iterator<Entity> closeBy = level.findClosestEntity(x, y, e -> e instanceof Unit && !(e instanceof Heli) && isEnemyOf(e));
             if (closeBy.hasNext()) {
                 Entity close = closeBy.next();
@@ -214,7 +218,7 @@ public class Worm extends Entity implements Moveable {
 
     private void walkCurrent() {
         Point next = current.getPoints()[nextPoint];
-        if (nextPoint == 0) {
+        if (nextPoint == 0 && current.getPoints().length > 1) {
             Point nextNext = current.getPoints()[nextPoint + 1];
             int pathAngle = next.angleToNeighbor(nextNext);
             float dx = next.getLevelX() - x;

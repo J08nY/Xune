@@ -2,13 +2,13 @@ package sk.neuromancer.Xune.game;
 
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
-import sk.neuromancer.Xune.entity.building.*;
-import sk.neuromancer.Xune.entity.unit.*;
+import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.entity.unit.Heli;
+import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,28 +19,13 @@ import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
 public class Human extends Player {
     private final List<PlayableEntity> selected = new LinkedList<>();
-    private Class<? extends Building> buildingToBuild;
     private Building buildingToPlace;
     private boolean canPlace;
-    private int buildStartTime;
-    private int buildDuration;
 
     public Human(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
-        this.addEntity(new Base(7, 2, Orientation.NORTH, this));
-        this.addEntity(new Refinery(5, 6, Orientation.NORTH, this));
-        this.addEntity(new Silo(5, 5, Orientation.NORTH, this));
-        this.addEntity(new Helipad(4, 5, Orientation.NORTH, this));
-        this.addEntity(new Powerplant(6, 4, Orientation.NORTH, this));
-        this.addEntity(new Barracks(6, 3, Orientation.NORTH, this));
-        this.addEntity(new Powerplant(5, 4, Orientation.NORTH, this));
-        this.addEntity(new Factory(6, 5, Orientation.NORTH, this));
-        this.addEntity(new Buggy(tileToCenterLevelX(6, 8), tileToCenterLevelY(6, 8), Orientation.SOUTHEAST, this));
-        this.addEntity(new Buggy(tileToCenterLevelX(8, 4), tileToCenterLevelY(8, 4), Orientation.EAST, this));
+        setupSpawn();
         this.addEntity(new Heli(tileToCenterLevelX(7, 7), tileToCenterLevelY(7, 7), Orientation.EAST, this));
-        this.addEntity(new Harvester(tileToCenterLevelX(11, 8), tileToCenterLevelY(11, 8), Orientation.SOUTHEAST, this));
-        this.addEntity(new Soldier(tileToCenterLevelX(10, 7), tileToCenterLevelY(10, 7), Orientation.SOUTHEAST, this));
-
     }
 
     @Override
@@ -100,6 +85,10 @@ public class Human extends Player {
     }
 
     private void handleRightClick() {
+        if (buildingToPlace != null) {
+            buildingToPlace = null;
+            return;
+        }
         for (PlayableEntity e : entities) {
             selected.remove(e);
             e.unselect();
@@ -126,10 +115,8 @@ public class Human extends Player {
         Entity other = level.entityAt(levelX, levelY);
         if (buildingToPlace != null) {
             if (canPlace) {
-                addEntity(buildingToPlace);
-                buildStartTime = 0;
+                finishBuild(buildingToPlace);
                 buildingToPlace = null;
-                buildingToBuild = null;
                 SoundManager.play(SoundManager.SOUND_TADA_1, false, 0.5f);
             }
         }
@@ -165,23 +152,16 @@ public class Human extends Player {
                 Class<? extends PlayableEntity> klass = button.getKlass();
                 if (Building.class.isAssignableFrom(klass)) {
                     if (buildingToBuild == null) {
-                        takeMoney(PlayableEntity.getCost(klass));
-                        buildingToBuild = klass.asSubclass(Building.class);
-                        buildStartTime = Game.currentTick();
-                        buildDuration = PlayableEntity.getBuildTime(klass);
+                        if (PlayableEntity.canBeBuilt(klass, this)) {
+                            startBuild(klass);
+                        }
                     } else {
-                        if (buildingToBuild == klass && getBuildProgress() == 1.0f) {
+                        if (buildingToBuild == klass && isBuildDone()) {
                             float levelX = level.getLevelX(mouseX);
                             float levelY = level.getLevelY(mouseY);
                             int tileX = Level.levelToTileX(levelX, levelY);
                             int tileY = Level.levelToTileY(levelX, levelY);
-                            try {
-                                buildingToPlace = buildingToBuild.getConstructor(int.class, int.class, Orientation.class, Player.class).newInstance(tileX, tileY, Orientation.NORTH, this);
-                            } catch (InstantiationException | NoSuchMethodException | InvocationTargetException |
-                                     IllegalAccessException e) {
-                                throw new RuntimeException(e);
-                            }
-
+                            buildingToPlace = getBuildResult(tileX, tileY);
                         }
                     }
                 } else if (Unit.class.isAssignableFrom(klass)) {
@@ -215,10 +195,6 @@ public class Human extends Player {
 
     public Class<? extends Building> getBuildingToBuild() {
         return buildingToBuild;
-    }
-
-    public float getBuildProgress() {
-        return Math.min((float) (Game.currentTick() - buildStartTime) / buildDuration, 1.0f);
     }
 
     public List<PlayableEntity> getSelected() {

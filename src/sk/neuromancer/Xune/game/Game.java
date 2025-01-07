@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.game;
 
 import sk.neuromancer.Xune.ai.Bot;
+import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.gfx.Renderable;
@@ -43,11 +44,11 @@ public class Game implements Renderable {
         window = new Window(); //DEFAULT_WIDTH, DEFAULT_HEIGHT
 
         SpriteSheet.initSheets();
+        Entity.initClasses();
 
         input = new InputHandler(this);
 
-        level = new Level(this);
-        level.loadLevel(Level.LEVEL_1);
+        level = new Level(this, Level.LEVEL_1);
         human = new Human(this, level, Flag.GREEN, 1000);
         bot = new Bot(this, level, Flag.BLUE, 1000);
 

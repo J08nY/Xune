@@ -4,6 +4,7 @@ import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Player;
 import sk.neuromancer.Xune.entity.Prerequisite;
+import sk.neuromancer.Xune.entity.building.Factory;
 import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.Tile;
@@ -32,7 +33,7 @@ public class Harvester extends Unit {
         setDeathSound(Harvester.class, SoundManager.SOUND_EXPLOSION_2);
         setShotSound(Harvester.class, SoundManager.SOUND_NONE);
         setBaseSprite(Harvester.class, SpriteSheet.SPRITE_ID_HARVESTER);
-        registerPrerequisites(Harvester.class, List.of(new Prerequisite(Refinery.class)));
+        registerPrerequisites(Harvester.class, List.of(new Prerequisite(Factory.class)));
     }
 
     public Harvester(float x, float y, Orientation orientation, Player owner) {

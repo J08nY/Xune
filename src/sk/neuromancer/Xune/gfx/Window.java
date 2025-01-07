@@ -30,6 +30,7 @@ public class Window {
         glfwInit();
 
         glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
         glfwWindowHint(GLFW_DEPTH_BITS, 24);

@@ -11,4 +11,8 @@ public class Remote extends Player {
 
     //Use commandstrategies?
 
+    @Override
+    public void tick(int tickCount) {
+        //Nothing
+    }
 }

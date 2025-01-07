@@ -132,7 +132,7 @@ public class PassMap {
         return pass[p.y][p.x];
     }
 
-    public boolean isTilePassable(int tileX, int tileY) {
+    public boolean isTileAllPassable(int tileX, int tileY) {
         boolean[] passArray = getTile(pass, tileX, tileY);
         for (boolean b : passArray) {
             if (!b) {
@@ -140,5 +140,15 @@ public class PassMap {
             }
         }
         return true;
+    }
+
+    public boolean isTilePartiallyPassable(int tileX, int tileY) {
+        boolean[] passArray = getTile(pass, tileX, tileY);
+        for (boolean b : passArray) {
+            if (b) {
+                return true;
+            }
+        }
+        return false;
     }
 }
