@@ -1,6 +1,5 @@
 package sk.neuromancer.Xune.game;
 
-import sk.neuromancer.Xune.ai.Bot;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.gfx.HUD;
@@ -17,16 +16,18 @@ public class Game implements Renderable {
 
     private boolean keepRunning = false;
     private static int tickCount = 0;
+    private boolean playing = false;
 
     private InputHandler input;
+    private SoundManager sound;
     private Window window;
+
+    private Intro intro;
+
     private Level level;
     private Human human;
     private Bot bot;
-
     private HUD hud;
-
-    private SoundManager sound;
 
     public static final int DEFAULT_WIDTH = 1920;
     public static final int DEFAULT_HEIGHT = 1080;
@@ -47,14 +48,15 @@ public class Game implements Renderable {
         Entity.initClasses();
 
         input = new InputHandler(this);
+        sound = new SoundManager(this);
+
+        intro = new Intro(this);
 
         level = new Level(this, Level.LEVEL_1);
         human = new Human(this, level, Flag.RED, 1000);
         bot = new Bot.BuggyBoy(this, level, Flag.GREEN, 1000);
 
         hud = new HUD(this);
-
-        sound = new SoundManager(this);
         SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
 
         window.show();
@@ -104,8 +106,12 @@ public class Game implements Renderable {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        level.render();
-        hud.render();
+        if (playing) {
+            level.render();
+            hud.render();
+        } else {
+            intro.render();
+        }
 
         glfwSwapBuffers(window.getHandle());
     }
@@ -114,10 +120,17 @@ public class Game implements Renderable {
         tickCount++;
         glfwPollEvents();
 
-        level.tick(tickCount);
-        hud.tick(tickCount);
-        input.tick(tickCount);
-        sound.tick(tickCount);
+        if (playing) {
+            level.tick(tickCount);
+            hud.tick(tickCount);
+            input.tick(tickCount);
+            sound.tick(tickCount);
+        } else {
+            intro.tick(tickCount);
+            input.tick(tickCount);
+            sound.tick(tickCount);
+            playing = intro.isDone();
+        }
 
         if (input.ESC.isPressed() || glfwWindowShouldClose(window.getHandle()))
             stop();
