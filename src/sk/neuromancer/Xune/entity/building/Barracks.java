@@ -1,9 +1,9 @@
 package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Orientation;
-import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.unit.Soldier;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
@@ -23,6 +23,7 @@ public class Barracks extends Building {
         setBuildTime(Barracks.class, TPS * 12);
         setDeathSound(Barracks.class, SoundManager.SOUND_LONG_EXPLOSION_1);
         setBaseSprite(Barracks.class, SpriteSheet.SPRITE_ID_BARRACKS);
+        setPassable(Barracks.class, CORNERS);
         registerPrerequisites(Barracks.class, List.of(new Prerequisite(Powerplant.class)));
     }
 
@@ -30,8 +31,4 @@ public class Barracks extends Building {
         super(x, y, orientation, owner);
     }
 
-    @Override
-    public boolean[] getPassable() {
-        return CORNERS;
-    }
 }

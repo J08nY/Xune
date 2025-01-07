@@ -53,8 +53,8 @@ public class Game implements Renderable {
         intro = new Intro(this);
 
         level = new Level(this, Level.LEVEL_1);
-        human = new Human(this, level, Flag.RED, 1000);
-        bot = new Bot.BuggyBoy(this, level, Flag.GREEN, 1000);
+        human = new Human(this, level, Flag.BLUE, 1000);
+        bot = new Bot.JackOfAllTrades(this, level, Flag.RED, 1000);
 
         hud = new HUD(this);
         SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
@@ -125,6 +125,9 @@ public class Game implements Renderable {
             hud.tick(tickCount);
             input.tick(tickCount);
             sound.tick(tickCount);
+            if (human.isEliminated()) {
+                stop();
+            }
         } else {
             intro.tick(tickCount);
             input.tick(tickCount);

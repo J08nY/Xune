@@ -1,10 +1,10 @@
 package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Orientation;
-import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
@@ -23,6 +23,7 @@ public class Factory extends Building {
         setBuildTime(Factory.class, TPS * 12);
         setDeathSound(Factory.class, SoundManager.SOUND_LONG_EXPLOSION_1);
         setBaseSprite(Factory.class, SpriteSheet.SPRITE_ID_FACTORY);
+        setPassable(Factory.class, EAST_WEST);
         setProduces(Factory.class, List.of(Buggy.class, Harvester.class));
         registerPrerequisites(Factory.class, List.of(new Prerequisite(Refinery.class)));
     }
@@ -31,8 +32,4 @@ public class Factory extends Building {
         super(x, y, orientation, owner);
     }
 
-    @Override
-    public boolean[] getPassable() {
-        return EAST_WEST;
-    }
 }

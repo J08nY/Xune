@@ -43,7 +43,7 @@ public class Bot extends Player {
         units = entities.stream().filter(e -> e instanceof Unit).mapToInt(e -> 1).sum();
         harvesters = entities.stream().filter(e -> e instanceof Harvester).mapToInt(e -> 1).sum();
 
-        checkHarvesters();
+        checkSpiceCollection();
         if (tickCount % (TPS * buildInterval) == 0) {
             build();
         }
@@ -61,14 +61,16 @@ public class Bot extends Player {
         planBuildingBuild();
     }
 
-    private void checkHarvesters() {
+    private void checkSpiceCollection() {
         if (harvesters == 0) {
-            // Bump up!
-            if (unitPlan.contains(Harvester.class)) {
-                unitPlan.removeIf(klass -> klass == Harvester.class);
-            }
+            unitPlan.removeIf(klass -> klass == Harvester.class);
             unitPlan.addFirst(Harvester.class);
             produce();
+        }
+        if (entities.stream().noneMatch(e -> e instanceof Refinery)) {
+            buildingPlan.removeIf(klass -> klass == Refinery.class);
+            buildingPlan.addFirst(Refinery.class);
+            build();
         }
     }
 
@@ -77,8 +79,6 @@ public class Bot extends Player {
             // Check that we have all
             if (entities.stream().noneMatch(e -> e instanceof Powerplant)) {
                 buildingPlan.add(Powerplant.class);
-            } else if (entities.stream().noneMatch(e -> e instanceof Refinery)) {
-                buildingPlan.add(Refinery.class);
             } else if (entities.stream().noneMatch(e -> e instanceof Barracks)) {
                 buildingPlan.add(Barracks.class);
             } else if (entities.stream().noneMatch(e -> e instanceof Factory)) {
@@ -257,9 +257,9 @@ public class Bot extends Player {
             unitPlan.add(Buggy.class);
             unitPlan.add(Heli.class);
 
-            soldierPriority = 30;
+            soldierPriority = 50;
             buggyPriority = 30;
-            heliPriority = 30;
+            heliPriority = 10;
         }
     }
 }

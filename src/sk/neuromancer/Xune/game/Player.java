@@ -90,6 +90,10 @@ public class Player implements Tickable, Renderable {
         this.money -= money;
     }
 
+    public boolean isEliminated() {
+        return entities.isEmpty();
+    }
+
     protected Tile setupSpawn() {
         Tile spawn = level.spawnOf(this);
         addEntity(new Base(spawn.getX(), spawn.getY(), Orientation.NORTH, this));
@@ -153,9 +157,19 @@ public class Player implements Tickable, Renderable {
         buildingToBuild = null;
     }
 
+    private boolean renderFilter(Entity e) {
+        Tile at = level.tileAt(e);
+        Human human = level.getHuman();
+        if (e instanceof Building) {
+            return human.isTileDiscovered(at);
+        } else {
+            return human.isTileVisible(at);
+        }
+    }
+
     @Override
     public void render() {
-        entities.stream().filter(e -> level.getHuman().isTileDiscovered(level.tileAt(e))).sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
+        entities.stream().filter(this::renderFilter).sorted(Comparator.comparingDouble(e -> e.y)).forEach(Entity::render);
     }
 
     @Override

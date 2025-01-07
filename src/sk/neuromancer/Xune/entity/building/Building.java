@@ -2,9 +2,10 @@ package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Orientation;
-import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.entity.unit.Unit;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.level.Level;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,9 @@ import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 public abstract class Building extends Entity.PlayableEntity {
     protected static final Map<Class<? extends Building>, Integer> powerMap = new HashMap<>();
     protected static final Map<Class<? extends Building>, List<Class<? extends Unit>>> producesMap = new HashMap<>();
-    public final int tileX, tileY;
+    protected static final Map<Class<? extends Building>, boolean[]> passableMap = new HashMap<>();
+
+    public int tileX, tileY;
 
     public Building(int tileX, int tileY, Orientation orientation, Player owner) {
         super(tileToCenterLevelX(tileX, tileY), tileToCenterLevelY(tileX, tileY), owner);
@@ -26,7 +29,7 @@ public abstract class Building extends Entity.PlayableEntity {
         this.orientation = orientation;
         int spriteRow = this.orientation.ordinal() % 2 == 0 ? 1 : 0;
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(getBaseSprite(getClass()) + SpriteSheet.flagToOffset(owner.getFlag()) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH);
-        this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), true));
+        this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), false));
     }
 
     @Override
@@ -60,12 +63,23 @@ public abstract class Building extends Entity.PlayableEntity {
         glPopMatrix();
     }
 
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
+        this.tileX = Level.levelToTileX(x, y);
+        this.tileY = Level.levelToTileY(x, y);
+    }
+
     public int getPower() {
         return powerMap.getOrDefault(this.getClass(), 0);
     }
 
     public List<Class<? extends Unit>> getProduces() {
         return producesMap.getOrDefault(this.getClass(), List.of());
+    }
+
+    public boolean[] getPassable() {
+        return passableMap.getOrDefault(this.getClass(), new boolean[0]);
     }
 
     protected static void setPower(Class<? extends Building> klass, int cost) {
@@ -76,5 +90,7 @@ public abstract class Building extends Entity.PlayableEntity {
         producesMap.put(klass, units);
     }
 
-    public abstract boolean[] getPassable();
+    protected static void setPassable(Class<? extends Building> klass, boolean[] passable) {
+        passableMap.put(klass, passable);
+    }
 }

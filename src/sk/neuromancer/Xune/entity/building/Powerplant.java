@@ -18,14 +18,11 @@ public class Powerplant extends Building {
         setBuildTime(Powerplant.class, TPS * 8);
         setDeathSound(Powerplant.class, SoundManager.SOUND_LONG_EXPLOSION_1);
         setBaseSprite(Powerplant.class, SpriteSheet.SPRITE_ID_POWERPLANT);
+        setPassable(Powerplant.class, new boolean[] {true, false, true, false, false, false, true, false, false, false, false, false, false});
     }
 
     public Powerplant(int x, int y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
     }
 
-    @Override
-    public boolean[] getPassable() {
-        return EAST_WEST;
-    }
 }

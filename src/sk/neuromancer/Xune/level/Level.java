@@ -41,7 +41,7 @@ public class Level implements Renderable, Tickable {
     public float xOff;
     public float yOff;
 
-    public static final String LEVEL_1 = "newlevel.lvl";
+    public static final String LEVEL_1 = "level1.lvl";
     public static final float ZOOM_SPEED = (float) 3 / TPS;
     public static final float SCROLL_SPEED = (float) 5 / TPS;
     public static final float MOVE_SPEED = (float) TPS / 4.5f;
@@ -379,6 +379,7 @@ public class Level implements Renderable, Tickable {
     }
 
     public boolean isTileBuildable(int tileX, int tileY, boolean[] footprint) {
+        System.out.println("isTileBuildable" + tileX + " " + tileY + " " + Arrays.toString(footprint));
         return pathfinder.isTileBuildable(tileX, tileY, footprint);
     }
 

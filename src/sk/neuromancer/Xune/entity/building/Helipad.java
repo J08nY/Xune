@@ -22,6 +22,7 @@ public class Helipad extends Building {
         setBuildTime(Helipad.class, TPS * 10);
         setDeathSound(Helipad.class, SoundManager.SOUND_LONG_EXPLOSION_1);
         setBaseSprite(Helipad.class, SpriteSheet.SPRITE_ID_HELIPAD);
+        setPassable(Helipad.class, EAST_WEST);
         setProduces(Helipad.class, List.of(Heli.class));
         registerPrerequisites(Helipad.class, List.of(new Prerequisite(Refinery.class)));
     }
@@ -30,8 +31,4 @@ public class Helipad extends Building {
         super(x, y, orientation, owner);
     }
 
-    @Override
-    public boolean[] getPassable() {
-        return EAST_WEST;
-    }
 }

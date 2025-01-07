@@ -18,14 +18,11 @@ public class Base extends Building {
         setBuildTime(Base.class, TPS * 15);
         setBaseSprite(Base.class, SpriteSheet.SPRITE_ID_BASE);
         setDeathSound(Base.class, SoundManager.SOUND_LONG_EXPLOSION_1);
+        setPassable(Base.class, EAST_WEST);
     }
 
     public Base(int x, int y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
     }
 
-    @Override
-    public boolean[] getPassable() {
-        return EAST_WEST;
-    }
 }

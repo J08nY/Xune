@@ -37,15 +37,19 @@ public abstract class CommandStrategy {
         @Override
         public Command defaultBehavior(Entity entity, Level level) {
             if (entity instanceof Unit unit) {
-                // If there is an enemy attacking us: respond
-                if (unit.isUnderAttack()) {
-                    return new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), unit.getAttacker());
-                }
-                // If there is an enemy in range: attack
-                for (Entity other : level.getEntities()) {
-                    if (unit.isEnemyOf(other) && unit.inRange(other)) {
-                        return new Command.AttackCommand(other, false);
+                try {
+                    // If there is an enemy attacking us: respond
+                    if (unit.isUnderAttack()) {
+                        return new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), unit.getAttacker());
                     }
+                    // If there is an enemy in range: attack
+                    for (Entity other : level.getEntities()) {
+                        if (unit.isEnemyOf(other) && unit.inRange(other)) {
+                            return new Command.AttackCommand(other, false);
+                        }
+                    }
+                } catch (NoPathFound e) {
+                    return null;
                 }
             }
             return null;

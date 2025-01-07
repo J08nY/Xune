@@ -17,9 +17,13 @@ import static sk.neuromancer.Xune.level.Tile.TILE_WIDTH;
 
 public class Pathfinder implements Tickable, Renderable {
     private final Level l;
+    // LevelMap is true if the point is passable
     private final BoolMap levelMap;
+    // SoligMap is true if the point is solid
     private final BoolMap solidMap;
+    // BuildingMap is true if the point is occupied by a building
     private final BoolMap buildingMap;
+    // EntityMap is true if the point is occupied by an entity
     private final BoolMap entityMap;
     private final List<Entity> entities;
     private final List<Path> paths;
@@ -212,8 +216,8 @@ public class Pathfinder implements Tickable, Renderable {
 
     public boolean isTileClear(int tileX, int tileY, boolean[] footprint) {
         return levelMap.isTileTrue(tileX, tileY, footprint) &&
-                !buildingMap.isTileTrue(tileX, tileY, footprint) &&
-                !entityMap.isTileTrue(tileX, tileY, footprint);
+                !buildingMap.isTileTrue(tileX, tileY, negate(footprint)) &&
+                !entityMap.isTileTrue(tileX, tileY, negate(footprint));
     }
 
     public boolean isTileBuildable(int tileX, int tileY) {
@@ -221,7 +225,13 @@ public class Pathfinder implements Tickable, Renderable {
     }
 
     public boolean isTileBuildable(int tileX, int tileY, boolean[] footprint) {
-        return isTileClear(tileX, tileY) && solidMap.isTileTrue(tileX, tileY, footprint);
+        System.out.println("Level" + Arrays.toString(levelMap.getTile(levelMap.getValMap(), tileX, tileY)));
+        System.out.println("Building" + Arrays.toString(buildingMap.getTile(buildingMap.getValMap(), tileX, tileY)));
+        System.out.println("Entity" + Arrays.toString(entityMap.getTile(entityMap.getValMap(), tileX, tileY)));
+
+        System.out.println("Clear" + isTileClear(tileX, tileY, footprint));
+        System.out.println("Solid" + solidMap.isTileTrue(tileX, tileY, footprint));
+        return isTileClear(tileX, tileY, footprint) && solidMap.isTileTrue(tileX, tileY, footprint);
     }
 
     public void addEntity(Entity e) {
