@@ -1,0 +1,64 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.google.protobuf' version '0.8.18'
+}
+
+group 'sk.neuromancer'
+version '1.0'
+
+application {
+    mainClass = 'sk.neuromancer.Xune.game.Game'
+}
+
+project.ext.lwjglVersion = "3.3.6"
+project.ext.lwjglNatives = "natives-linux"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+
+    implementation "org.lwjgl:lwjgl"
+    implementation "org.lwjgl:lwjgl-glfw"
+    implementation "org.lwjgl:lwjgl-openal"
+    implementation "org.lwjgl:lwjgl-opengl"
+    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+
+    implementation 'com.google.protobuf:protobuf-java:4.28.3'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        proto {
+            srcDir 'src/sk/neuromancer/Xune/net/proto'
+        }
+        resources {
+            srcDir 'res'
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:4.28.3'
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
+        }
+    }
+}
+

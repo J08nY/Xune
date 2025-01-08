@@ -1,5 +1,6 @@
 package sk.neuromancer.Xune.game;
 
+import org.lwjgl.system.Library;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.gfx.HUD;
@@ -173,6 +174,7 @@ public class Game implements Renderable {
     }
 
     public static void main(String[] args) {
+        Library.initialize();
         Game g = new Game();
         g.start();
     }

@@ -1,4 +1,7 @@
 /classes
+/build
+/.gradle
 .idea/
-lib/
+/lib/
 /src/sk/neuromancer/Xune/net/proto/*.java
+
