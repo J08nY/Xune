@@ -25,3 +25,17 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Create big JAR
+        run: ./gradlew uberJar
+
+      - name: Find big JAR
+        run: |
+          file=$(find build/libs -name 'Xune-*-all.jar')
+          echo "jar=$file" >> $GITHUB_ENV
+
+      - name: Upload big JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: Xune.jar
+          path: ${{ env.jar }}

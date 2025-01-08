@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'com.google.protobuf' version '0.8.18'
+    id 'com.google.protobuf' version '0.9.4'
 }
 
 group 'sk.neuromancer'
@@ -22,24 +22,23 @@ dependencies {
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
     implementation "org.lwjgl:lwjgl"
+	implementation "org.lwjgl:lwjgl:3.3.6:sources"
+    implementation "org.lwjgl:lwjgl:3.3.6:javadoc"
     implementation "org.lwjgl:lwjgl-glfw"
+    implementation "org.lwjgl:lwjgl-glfw:3.3.6:sources"
+    implementation "org.lwjgl:lwjgl-glfw:3.3.6:javadoc"
     implementation "org.lwjgl:lwjgl-openal"
+    implementation "org.lwjgl:lwjgl-openal:3.3.6:sources"
+    implementation "org.lwjgl:lwjgl-openal:3.3.6:javadoc"
     implementation "org.lwjgl:lwjgl-opengl"
+    implementation "org.lwjgl:lwjgl-opengl:3.3.6:sources"
+    implementation "org.lwjgl:lwjgl-opengl:3.3.6:javadoc"
     runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
 
     implementation 'com.google.protobuf:protobuf-java:4.28.3'
-
-    implementation "org.lwjgl:lwjgl:3.3.6:sources"
-    implementation "org.lwjgl:lwjgl:3.3.6:javadoc"
-    implementation "org.lwjgl:lwjgl-glfw:3.3.6:sources"
-    implementation "org.lwjgl:lwjgl-glfw:3.3.6:javadoc"
-    implementation "org.lwjgl:lwjgl-openal:3.3.6:sources"
-    implementation "org.lwjgl:lwjgl-openal:3.3.6:javadoc"
-    implementation "org.lwjgl:lwjgl-opengl:3.3.6:sources"
-    implementation "org.lwjgl:lwjgl-opengl:3.3.6:javadoc"
 }
 
 sourceSets {
@@ -71,3 +70,25 @@ protobuf {
     }
 }
 
+jar {
+	manifest {
+		attributes 'Main-Class': application.mainClass
+    }
+}
+
+
+tasks.register('uberJar', Jar) {
+    archiveFileName = "Xune-${version}-all.jar"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
+
+    from sourceSets.main.output
+
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
+    }
+}
