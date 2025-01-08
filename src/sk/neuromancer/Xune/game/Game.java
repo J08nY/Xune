@@ -17,7 +17,7 @@ public class Game implements Renderable {
 
     private boolean keepRunning = false;
     private static int tickCount = 0;
-    private boolean playing = false;
+    private GameState state;
 
     private InputHandler input;
     private SoundManager sound;
@@ -35,8 +35,13 @@ public class Game implements Renderable {
 
     public static final int TPS = 60;
 
+    public enum GameState {
+        INTRO, PLAYING, PAUSED, GAMEOVER
+    }
+
     public void start() {
         keepRunning = true;
+        state = GameState.INTRO;
         init();
         run();
         quit();
@@ -107,11 +112,18 @@ public class Game implements Renderable {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        if (playing) {
-            level.render();
-            hud.render();
-        } else {
-            intro.render();
+        switch (state) {
+            case INTRO:
+                intro.render();
+                break;
+            case PLAYING:
+                level.render();
+                hud.render();
+                break;
+            case PAUSED:
+                break;
+            case GAMEOVER:
+                break;
         }
 
         glfwSwapBuffers(window.getHandle());
@@ -121,19 +133,25 @@ public class Game implements Renderable {
         tickCount++;
         glfwPollEvents();
 
-        if (playing) {
-            level.tick(tickCount);
-            hud.tick(tickCount);
-            input.tick(tickCount);
-            sound.tick(tickCount);
-            if (human.isEliminated()) {
-                stop();
-            }
-        } else {
-            intro.tick(tickCount);
-            input.tick(tickCount);
-            sound.tick(tickCount);
-            playing = intro.isDone();
+        switch (state) {
+            case INTRO:
+                intro.tick(tickCount);
+                input.tick(tickCount);
+                sound.tick(tickCount);
+                if (intro.isDone()) {
+                    state = GameState.PLAYING;
+                }
+                break;
+            case PLAYING:
+                level.tick(tickCount);
+                hud.tick(tickCount);
+                input.tick(tickCount);
+                sound.tick(tickCount);
+                break;
+            case PAUSED:
+                break;
+            case GAMEOVER:
+                break;
         }
 
         if (input.ESC.isPressed() || glfwWindowShouldClose(window.getHandle()))
