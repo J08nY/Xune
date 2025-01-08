@@ -379,7 +379,6 @@ public class Level implements Renderable, Tickable {
     }
 
     public boolean isTileBuildable(int tileX, int tileY, boolean[] footprint) {
-        System.out.println("isTileBuildable" + tileX + " " + tileY + " " + Arrays.toString(footprint));
         return pathfinder.isTileBuildable(tileX, tileY, footprint);
     }
 

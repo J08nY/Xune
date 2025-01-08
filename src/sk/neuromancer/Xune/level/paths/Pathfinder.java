@@ -225,12 +225,6 @@ public class Pathfinder implements Tickable, Renderable {
     }
 
     public boolean isTileBuildable(int tileX, int tileY, boolean[] footprint) {
-        System.out.println("Level" + Arrays.toString(levelMap.getTile(levelMap.getValMap(), tileX, tileY)));
-        System.out.println("Building" + Arrays.toString(buildingMap.getTile(buildingMap.getValMap(), tileX, tileY)));
-        System.out.println("Entity" + Arrays.toString(entityMap.getTile(entityMap.getValMap(), tileX, tileY)));
-
-        System.out.println("Clear" + isTileClear(tileX, tileY, footprint));
-        System.out.println("Solid" + solidMap.isTileTrue(tileX, tileY, footprint));
         return isTileClear(tileX, tileY, footprint) && solidMap.isTileTrue(tileX, tileY, footprint);
     }
 

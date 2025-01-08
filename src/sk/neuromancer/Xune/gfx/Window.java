@@ -57,7 +57,6 @@ public class Window {
         GL.createCapabilities();
 
         System.out.println("OpenGL: " + glGetString(GL_VERSION));
-        System.out.println("Max texture units: " + getMaxTextureUnits());
 
         glViewport(0, 0, width, height);
         glMatrixMode(GL_PROJECTION);

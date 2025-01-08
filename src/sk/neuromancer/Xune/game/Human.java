@@ -1,5 +1,6 @@
 package sk.neuromancer.Xune.game;
 
+import org.lwjgl.system.Library;
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.Building;
@@ -110,33 +111,49 @@ public class Human extends Player {
     }
 
     private void handleLeftClick(float levelX, float levelY) {
-        Entity other = level.entityAt(levelX, levelY);
+        // Handle building placement first
         if (buildingToPlace != null) {
             if (canPlace) {
                 finishBuild(buildingToPlace);
                 buildingToPlace = null;
                 SoundManager.play(SoundManager.SOUND_TADA_1, false, 0.5f);
             }
-        }
-        if (other instanceof PlayableEntity playable && entities.contains(playable)) {
-            if (selected.contains(playable)) {
-                selected.remove(playable);
-                playable.unselect();
-            } else {
-                selected.add(playable);
-                playable.select();
-            }
             return;
         }
 
-        if (other != null && !isTileVisible(level.tileAt(other))) {
-            return;
+        // Handle selection changes
+        Entity other = level.entityAt(levelX, levelY);
+        boolean allUnits = !selected.isEmpty() && selected.stream().allMatch(e -> e instanceof Unit);
+        boolean allBuildings = !selected.isEmpty() && selected.stream().allMatch(e -> e instanceof Building);
+
+        if (other instanceof PlayableEntity playable && entities.contains(playable)) {
+            // We clicked on something ours.
+
+            if (selected.contains(playable)) {
+                // We clicked on something selected, deselect it.
+                selected.remove(playable);
+                playable.unselect();
+                return;
+            } else {
+                // We clicked on something not selected.
+                if ((allUnits && playable instanceof Building) || (allBuildings && playable instanceof Unit)) {
+                    // Do not change selection, instead continue to the commands
+                } else {
+                    selected.add(playable);
+                    playable.select();
+                    return;
+                }
+            }
+        }
+
+        if (other != null && !isTileVisible(level.tileAt(levelX, levelY))) {
+            other = null;
         }
 
         for (PlayableEntity only : selected) {
             CommandStrategy strategy = commandStrategies.get(only.getClass());
             if (strategy != null) {
-                Command command = strategy.createCommand(only, other, level, levelX, levelY);
+                Command command = strategy.onClick(only, other, level, levelX, levelY);
                 if (command != null) {
                     only.pushCommand(command);
                 }
