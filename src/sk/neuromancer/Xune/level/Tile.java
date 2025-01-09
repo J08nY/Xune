@@ -154,6 +154,9 @@ public class Tile implements Renderable {
         } else if (type < 51) {
             this.pass = ALL;
             this.solid = ALL;
+        } else if (type < 59) {
+            this.pass = NONE;
+            this.solid = NONE;
         } else {
             throw new IllegalStateException("Invalid tile type: " + type);
         }

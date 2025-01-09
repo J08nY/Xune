@@ -1,6 +1,5 @@
 package sk.neuromancer.Xune.gfx;
 
-import sk.neuromancer.Xune.game.Clickable;
 import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.building.*;
@@ -21,10 +20,8 @@ import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class HUD implements Tickable, Renderable {
     private final Game game;
-    private final Level level;
-    private final Human human;
-    private final float width;
-    private final float height;
+    private final float screenWidth;
+    private final float screenHeight;
 
     private Sprite currentCursor;
     private final float cursorScale = 2f;
@@ -35,7 +32,10 @@ public class HUD implements Tickable, Renderable {
     private final float hudTop;
     private final float hudLeft;
 
-    private final List<Button<?>> buttons;
+
+    private Level level;
+    private Human human;
+    private List<Button<?>> buttons;
 
     private double mouseX, mouseY;
     private double fromX, fromY;
@@ -45,22 +45,25 @@ public class HUD implements Tickable, Renderable {
 
     public HUD(Game game) {
         this.game = game;
-        this.level = game.getLevel();
-        this.human = level.getHuman();
-        this.width = game.getWindow().getWidth();
-        this.height = game.getWindow().getHeight();
+        this.screenWidth = game.getWindow().getWidth();
+        this.screenHeight = game.getWindow().getHeight();
         glfwSetInputMode(game.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // TODO: This does nothing. Why?
-        glfwSetCursorPos(game.getWindow().getHandle(), (double) width / 2, (double) height / 2);
+        glfwSetCursorPos(game.getWindow().getHandle(), (double) screenWidth / 2, (double) screenHeight / 2);
         this.currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
 
         this.logo = SpriteSheet.LOGO.getSprite(0);
 
         this.hudPanel = SpriteSheet.HUD_PANEL.getSprite(0);
-        this.hudScale = width / (float) hudPanel.getWidth();
-        this.hudTop = height - (hudPanel.getHeight() * hudScale);
+        this.hudScale = screenWidth / (float) hudPanel.getWidth();
+        this.hudTop = screenHeight - (hudPanel.getHeight() * hudScale);
         this.hudLeft = 60 * hudScale;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
+        this.human = level.getHuman();
 
         this.buttons = new ArrayList<>(11);
         this.buttons.add(new Button<>(Base.class, human, 2, 1, hudLeft + 400, hudTop + 64, 4));
@@ -274,8 +277,8 @@ public class HUD implements Tickable, Renderable {
             mouseX = 10;
             currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(7);
             hitEdge = true;
-        } else if (mouseX > width - 10) {
-            mouseX = width - 10;
+        } else if (mouseX > screenWidth - 10) {
+            mouseX = screenWidth - 10;
             currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(5);
             hitEdge = true;
         }
@@ -283,8 +286,8 @@ public class HUD implements Tickable, Renderable {
             mouseY = 10;
             currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(4);
             hitEdge = true;
-        } else if (mouseY > height - 10) {
-            mouseY = height - 10;
+        } else if (mouseY > screenHeight - 10) {
+            mouseY = screenHeight - 10;
             currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(6);
             hitEdge = true;
         }
@@ -300,7 +303,7 @@ public class HUD implements Tickable, Renderable {
                     }
                 }
             } else {
-                Entity entity = level.entityAt(level.getLevelX(mouseX), level.getLevelY(mouseY));
+                Entity entity = level.entityAt(game.getView().getLevelX(mouseX), game.getView().getLevelY(mouseY));
                 if (entity != null && human.isTileVisible(level.tileAt(entity))) {
                     tooltip = new Text(entity.getClass().getSimpleName(), (float) mouseX, (float) mouseY + 20, true, 1f);
                 }
@@ -339,7 +342,11 @@ public class HUD implements Tickable, Renderable {
     }
 
     public boolean isMouseOverHud(float mouseY) {
-        return mouseY > height - (hudPanel.getHeight() * hudScale);
+        return mouseY > hudTop;
+    }
+
+    public float getHudTop() {
+        return hudTop;
     }
 
     public List<Button<?>> getButtons() {

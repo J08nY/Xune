@@ -53,10 +53,10 @@ public class Human extends Player {
             return;
         }
 
-        float levelX = level.getLevelX(mouseX);
-        float levelY = level.getLevelY(mouseY);
-        float fromLevelX = level.getLevelX(fromX);
-        float fromLevelY = level.getLevelY(fromY);
+        float levelX = game.getView().getLevelX(mouseX);
+        float levelY = game.getView().getLevelY(mouseY);
+        float fromLevelX = game.getView().getLevelX(fromX);
+        float fromLevelY = game.getView().getLevelY(fromY);
 
         if (buildingToPlace != null) {
             int tileX = Level.levelToTileX(levelX, levelY);
@@ -172,8 +172,8 @@ public class Human extends Player {
                         }
                     } else {
                         if (buildingToBuild == klass && isBuildDone()) {
-                            float levelX = level.getLevelX(mouseX);
-                            float levelY = level.getLevelY(mouseY);
+                            float levelX = game.getView().getLevelX(mouseX);
+                            float levelY = game.getView().getLevelY(mouseY);
                             int tileX = Level.levelToTileX(levelX, levelY);
                             int tileY = Level.levelToTileY(levelX, levelY);
                             buildingToPlace = getBuildResult(tileX, tileY);

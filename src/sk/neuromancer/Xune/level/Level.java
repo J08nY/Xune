@@ -1,11 +1,11 @@
 package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.gfx.Effect;
+import sk.neuromancer.Xune.gfx.LevelView;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.sfx.SoundManager;
@@ -37,17 +37,7 @@ public class Level implements Renderable, Tickable {
     private final int screenWidth, screenHeight;
     private final float screenCenterX, screenCenterY;
 
-    public float zoom;
-    public float xOff;
-    public float yOff;
-
     public static final String LEVEL_1 = "level1.lvl";
-    public static final float ZOOM_SPEED = (float) 3 / TPS;
-    public static final float SCROLL_SPEED = (float) 5 / TPS;
-    public static final float MOVE_SPEED = (float) TPS / 4.5f;
-    public static final float EDGE_MARGIN_X = Tile.TILE_WIDTH * 2;
-    public static final float EDGE_MARGIN_Y_TOP = Tile.TILE_HEIGHT * 4;
-    public static final float EDGE_MARGIN_Y_BOTTOM = Tile.TILE_HEIGHT * 10;
 
 
     public Level(Game game, String levelName) {
@@ -66,41 +56,6 @@ public class Level implements Renderable, Tickable {
 
     @Override
     public void tick(int tickCount) {
-        InputHandler input = this.game.getInput();
-
-        if (input.PLUS.isPressed()) {
-            zoomIn(ZOOM_SPEED);
-        } else if (input.MINUS.isPressed()) {
-            zoomOut(ZOOM_SPEED);
-        }
-
-        float dy = input.scroller.getDeltaY();
-        if (dy > 0) {
-            zoomIn(SCROLL_SPEED);
-        } else if (dy < 0) {
-            zoomOut(SCROLL_SPEED);
-        }
-
-        float dx = input.scroller.getDeltaX();
-        if (dx > 0) {
-            moveLeft();
-        } else if (dx < 0) {
-            moveRight();
-        }
-
-        double mouseX = input.mouse.getX();
-        double mouseY = input.mouse.getY();
-
-        if (input.W.isPressed() || mouseY < 10) {
-            moveUp();
-        } else if (input.A.isPressed() || mouseX < 10) {
-            moveLeft();
-        } else if (input.S.isPressed() || mouseY > game.getWindow().getHeight() - 10) {
-            moveDown();
-        } else if (input.D.isPressed() || mouseX > game.getWindow().getWidth() - 10) {
-            moveRight();
-        }
-
         for (Player player : players) {
             player.tick(tickCount);
         }
@@ -122,62 +77,30 @@ public class Level implements Renderable, Tickable {
         effects.removeIf(Effect::isFinished);
     }
 
-
-    public void zoomIn(float speed) {
-        this.zoom *= 1 + speed;
-    }
-
-    public void zoomOut(float speed) {
-        if (getLevelY(0) > -EDGE_MARGIN_Y_TOP && getLevelX(0) > -EDGE_MARGIN_X && getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_X + (float) Tile.TILE_HEIGHT / 2) && getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_Y_BOTTOM + (float) Tile.TILE_WIDTH / 2))
-            this.zoom *= 1 - speed;
-    }
-
-    public void moveUp() {
-        if (getLevelY(0) > -EDGE_MARGIN_Y_TOP) {
-            this.yOff += MOVE_SPEED * (1 / zoom);
-        }
-    }
-
-    public void moveDown() {
-        if (getLevelY(game.getWindow().getHeight()) < (getHeight() + EDGE_MARGIN_Y_BOTTOM + (float) Tile.TILE_HEIGHT / 2)) {
-            this.yOff -= MOVE_SPEED * (1 / zoom);
-        }
-    }
-
-    public void moveLeft() {
-        if (getLevelX(0) > -EDGE_MARGIN_X) {
-            this.xOff += MOVE_SPEED * (1 / zoom);
-        }
-    }
-
-    public void moveRight() {
-        if (getLevelX(game.getWindow().getWidth()) < (getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
-            this.xOff -= MOVE_SPEED * (1 / zoom);
-        }
-    }
-
     @Override
     public void render() {
-        glPushMatrix();
-        float centerX = (float) game.getWindow().getWidth() / 2;
-        float centerY = (float) game.getWindow().getHeight() / 2;
-        glTranslatef(centerX, centerY, 0);
-        glScalef(zoom, zoom, 1f);
-        glTranslatef(-centerX, -centerY, 0);
-        glTranslatef(xOff, yOff, 0);
-
         boolean[][] visible = human.getVisible();
         boolean[][] discovered = human.getDiscovered();
+        LevelView view = game.getView();
+        float left = view.getLevelX(0);
+        float right = view.getLevelX(screenWidth);
+        float top = view.getLevelY(0);
+        float bottom = view.getLevelY(screenHeight);
+        int minX = levelToTileX(left, top) - 1;
+        int maxX = levelToTileX(right, bottom) + 1;
+        int minY = levelToTileY(left, top) - 1;
+        int maxY = levelToTileY(right, bottom) + 1;
+
         for (int x = 0; x < this.width; x++) {
+            if (x < minX || x > maxX) {
+                continue;
+            }
             for (int y = 0; y < this.height; y++) {
+                if (y < minY || y > maxY) {
+                    continue;
+                }
                 if (discovered[x][y]) {
                     Tile t = this.level[x][y];
-                    float screenX = getScreenX(t.getLevelX());
-                    float screenY = getScreenY(t.getLevelY());
-                    if (screenX + Tile.TILE_WIDTH * zoom < 0 || screenX > screenWidth ||
-                            screenY + Tile.TILE_HEIGHT * zoom < 0 || screenY > screenHeight) {
-                        continue;
-                    }
                     t.render();
                 }
             }
@@ -213,7 +136,22 @@ public class Level implements Renderable, Tickable {
                 }
             }
         }
-        glPopMatrix();
+        for (int x = 0; x < this.width + 1; x++) {
+            if (x == 0) {
+                new Tile(57, x, this.height).render();
+            } else if (x == this.width) {
+                new Tile(55, x, -1).render();
+            } else {
+                new Tile(51, x, -1).render();
+                new Tile(52, x, this.height).render();
+            }
+        }
+        for (int y = 0; y < this.height; y++) {
+            if (y % 2 == 0)
+                new Tile(53, 0, y).render();
+            if (y % 2 == 1)
+                new Tile(54, this.width - 1, y).render();
+        }
         glPopMatrix();
     }
 
@@ -268,9 +206,6 @@ public class Level implements Renderable, Tickable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.zoom = 5.0f;
-        this.xOff = screenCenterX - (screenCenterX / this.zoom);
-        this.yOff = screenCenterY - (screenCenterY / this.zoom);
     }
 
     public void addPlayer(Player player) {
@@ -443,22 +378,6 @@ public class Level implements Renderable, Tickable {
 
     public int getHeightInTiles() {
         return this.height;
-    }
-
-    public float getLevelX(double screenPointX) {
-        return (((float) screenPointX - this.screenCenterX) / this.zoom) - this.xOff + this.screenCenterX;
-    }
-
-    public float getScreenX(float levelX) {
-        return (levelX + this.xOff - this.screenCenterX) * this.zoom + this.screenCenterX;
-    }
-
-    public float getLevelY(double screenPointY) {
-        return (((float) screenPointY - this.screenCenterY) / this.zoom) - this.yOff + this.screenCenterY;
-    }
-
-    public float getScreenY(float levelY) {
-        return (levelY + this.yOff - this.screenCenterY) * this.zoom + this.screenCenterY;
     }
 
     public static float tileToLevelX(int tileX, int tileY) {

@@ -155,7 +155,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     public abstract boolean isEnemyOf(Entity other);
 
     protected float computeDepth(Game game) {
-        return game.getLevel().getScreenY(y) / game.getWindow().getHeight();
+        return game.getView().getScreenY(y) / game.getWindow().getHeight();
 
     }
 

@@ -3,10 +3,7 @@ package sk.neuromancer.Xune.game;
 import org.lwjgl.system.Library;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.gfx.HUD;
-import sk.neuromancer.Xune.gfx.Renderable;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
-import sk.neuromancer.Xune.gfx.Window;
+import sk.neuromancer.Xune.gfx.*;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
@@ -26,6 +23,7 @@ public class Game implements Renderable {
     private Intro intro;
 
     private Level level;
+    private LevelView view;
     private Human human;
     private Bot bot;
     private HUD hud;
@@ -41,7 +39,7 @@ public class Game implements Renderable {
 
     public void start() {
         keepRunning = true;
-        state = GameState.INTRO;
+        state = GameState.PLAYING;
         init();
         run();
         quit();
@@ -56,15 +54,18 @@ public class Game implements Renderable {
         input = new InputHandler(this);
         sound = new SoundManager(this);
 
+
         intro = new Intro(this);
 
         level = new Level(this, Level.LEVEL_1);
         human = new Human(this, level, Flag.BLUE, 1000);
         bot = new Bot.JackOfAllTrades(this, level, Flag.RED, 1000);
-
         hud = new HUD(this);
-        SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
+        hud.setLevel(level);
+        view = new LevelView(this);
+        view.setLevel(level);
 
+        SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
         window.show();
     }
 
@@ -117,7 +118,7 @@ public class Game implements Renderable {
                 intro.render();
                 break;
             case PLAYING:
-                level.render();
+                view.render();
                 hud.render();
                 break;
             case PAUSED:
@@ -143,6 +144,7 @@ public class Game implements Renderable {
                 }
                 break;
             case PLAYING:
+                view.tick(tickCount);
                 level.tick(tickCount);
                 hud.tick(tickCount);
                 input.tick(tickCount);
@@ -185,6 +187,14 @@ public class Game implements Renderable {
 
     public HUD getHud() {
         return hud;
+    }
+
+    public LevelView getView() {
+        return view;
+    }
+
+    public GameState getState() {
+        return state;
     }
 
     public static int currentTick() {
