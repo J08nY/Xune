@@ -18,7 +18,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class Level implements Renderable, Tickable {
     private final Game game;
@@ -34,9 +33,6 @@ public class Level implements Renderable, Tickable {
     private int width, height;
     private List<Tile> spawns;
 
-    private final int screenWidth, screenHeight;
-    private final float screenCenterX, screenCenterY;
-
     public static final String LEVEL_1 = "level1.lvl";
 
 
@@ -46,11 +42,6 @@ public class Level implements Renderable, Tickable {
         this.worms = new LinkedList<>();
         this.roads = new LinkedList<>();
         this.effects = new LinkedList<>();
-
-        this.screenWidth = game.getWindow().getWidth();
-        this.screenHeight = game.getWindow().getHeight();
-        this.screenCenterX = game.getWindow().getCenterX();
-        this.screenCenterY = game.getWindow().getCenterY();
         loadLevel(levelName);
     }
 
@@ -83,9 +74,9 @@ public class Level implements Renderable, Tickable {
         boolean[][] discovered = human.getDiscovered();
         LevelView view = game.getView();
         float left = view.getLevelX(0);
-        float right = view.getLevelX(screenWidth);
+        float right = view.getLevelX(view.getScreenWidth());
         float top = view.getLevelY(0);
-        float bottom = view.getLevelY(screenHeight);
+        float bottom = view.getLevelY(view.getScreenHeight());
         int minX = levelToTileX(left, top) - 1;
         int maxX = levelToTileX(right, bottom) + 1;
         int minY = levelToTileY(left, top) - 1;
@@ -127,15 +118,15 @@ public class Level implements Renderable, Tickable {
 
         glPushMatrix();
         glTranslatef(0, 0, 0.99f);
+        glColor4f(1, 1, 1, 0.5f);
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
                 if (discovered[x][y] && !visible[x][y]) {
-                    glColor4f(1, 1, 1, 0.5f);
                     new Tile(50, x, y).render();
-                    glColor4f(1, 1, 1, 1);
                 }
             }
         }
+        glColor4f(1, 1, 1, 1);
         for (int x = 0; x < this.width + 1; x++) {
             if (x == 0) {
                 new Tile(57, x, this.height).render();

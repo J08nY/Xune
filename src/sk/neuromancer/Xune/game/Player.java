@@ -228,9 +228,6 @@ public class Player implements Tickable, Renderable {
         }
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                if (visible[x][y]) {
-                    continue;
-                }
                 Tile t = level.getTile(x, y);
                 float cx = t.getCenterX();
                 float cy = t.getCenterY();

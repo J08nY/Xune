@@ -44,7 +44,6 @@ public class LevelView implements Tickable, Renderable {
         this.yOff = screenCenterY - (screenCenterY / this.zoom);
     }
 
-
     @Override
     public void tick(int tickCount) {
         InputHandler input = this.game.getInput();
@@ -133,6 +132,14 @@ public class LevelView implements Tickable, Renderable {
 
     public float getScreenY(float levelY) {
         return (levelY + this.yOff - this.screenCenterY) * this.zoom + this.screenCenterY;
+    }
+
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public int getScreenHeight() {
+        return screenHeight;
     }
 
     private void applyLevelView() {
