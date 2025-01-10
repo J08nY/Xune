@@ -26,7 +26,6 @@ public class HUD implements Tickable, Renderable {
     private Sprite currentCursor;
     private final float cursorScale = 2f;
     private Text tooltip;
-    private final Sprite logo;
     private final Sprite hudPanel;
     private final float hudScale;
     private final float hudTop;
@@ -52,8 +51,6 @@ public class HUD implements Tickable, Renderable {
         // TODO: This does nothing. Why?
         glfwSetCursorPos(game.getWindow().getHandle(), (double) screenWidth / 2, (double) screenHeight / 2);
         this.currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
-
-        this.logo = SpriteSheet.LOGO.getSprite(0);
 
         this.hudPanel = SpriteSheet.HUD_PANEL.getSprite(0);
         this.hudScale = screenWidth / (float) hudPanel.getWidth();
@@ -180,7 +177,7 @@ public class HUD implements Tickable, Renderable {
         renderPower();
         renderPanelBackground();
         renderMinimap();
-        renderEntities();
+        renderButtons();
         renderPanelText();
     }
 
@@ -199,22 +196,28 @@ public class HUD implements Tickable, Renderable {
         glVertex2f(level.getWidthInTiles(), level.getHeightInTiles());
         glVertex2f(0, level.getHeightInTiles());
         glEnd();
+
+        boolean[][] visible = human.getVisible();
+        boolean[][] discovered = human.getDiscovered();
         glBegin(GL_QUADS);
         for (int x = 0; x < level.getWidthInTiles(); x++) {
             for (int y = 0; y < level.getHeightInTiles(); y++) {
+                boolean thisVisible = visible[x][y];
+                boolean thisDiscovered = discovered[x][y];
+                if (!thisDiscovered) {
+                    continue;
+                }
                 Tile tile = level.getTile(x, y);
                 Sprite sprite = SpriteSheet.MAP_SHEET.getSprite(tile.type);
                 int[] pixels = sprite.getPixels();
-                byte red = (byte) (pixels[0] & 0xff);
-                byte green = (byte) (pixels[1] & 0xff);
-                byte blue = (byte) (pixels[2] & 0xff);
+                byte red = (byte) pixels[0];
+                byte green = (byte) pixels[1];
+                byte blue = (byte) pixels[2];
                 byte alpha;
-                if (human.isTileVisible(tile)) {
+                if (thisVisible) {
                     alpha = (byte) 255;
-                } else if (human.isTileDiscovered(tile)) {
-                    alpha = (byte) 128;
                 } else {
-                    continue;
+                    alpha = (byte) 128;
                 }
                 glColor4ub(red, green, blue, alpha);
                 glVertex2f(x, y);
@@ -251,8 +254,8 @@ public class HUD implements Tickable, Renderable {
         glPopMatrix();
     }
 
-    private void renderEntities() {
-        // Render entities
+    private void renderButtons() {
+        // Render buttons
         glPushMatrix();
         glTranslatef(0, 0, 0.99f);
         for (Button<?> button : buttons) {
@@ -451,10 +454,7 @@ public class HUD implements Tickable, Renderable {
                         if (!cmd.isStarted(producers.getKey())) {
                             continue;
                         }
-                        float progress = (float) (Game.currentTick() - cmd.getStart()) / cmd.getDuration();
-                        if (progress <= 0) {
-                            continue;
-                        }
+                        float progress = cmd.getProgress();
                         renderProgress(index, progress);
                         index++;
                     }

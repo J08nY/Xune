@@ -29,11 +29,13 @@ public class Player implements Tickable, Renderable {
     protected List<Entity.PlayableEntity> toRemove = new LinkedList<>();
 
     protected int money;
+    protected int powerProduction;
+    protected int powerConsumption;
     protected final Flag flag;
     protected final Map<Class<? extends Entity.PlayableEntity>, CommandStrategy> commandStrategies = new HashMap<>();
 
     protected Class<? extends Building> buildingToBuild;
-    protected int buildStartTime;
+    protected float buildProgress;
     protected int buildDuration;
 
     public Player(Game game, Level level, Flag flag, int money) {
@@ -55,11 +57,27 @@ public class Player implements Tickable, Renderable {
     public void addEntity(Entity.PlayableEntity e) {
         toAdd.add(e);
         level.addEntity(e);
+        if (e instanceof Building b) {
+            int power = b.getPower();
+            if (power > 0) {
+                powerProduction += power;
+            } else {
+                powerConsumption += power;
+            }
+        }
     }
 
     public void removeEntity(Entity.PlayableEntity e) {
         toRemove.add(e);
         level.removeEntity(e);
+        if (e instanceof Building b) {
+            int power = b.getPower();
+            if (power > 0) {
+                powerProduction -= power;
+            } else {
+                powerConsumption -= power;
+            }
+        }
     }
 
     public List<Entity.PlayableEntity> getEntities() {
@@ -108,11 +126,11 @@ public class Player implements Tickable, Renderable {
     }
 
     public int getPowerConsumption() {
-        return Math.abs(entities.stream().filter(e -> e instanceof Building).mapToInt(e -> ((Building) e).getPower()).filter(i -> i < 0).sum());
+        return Math.abs(powerConsumption);
     }
 
     public int getPowerProduction() {
-        return entities.stream().filter(e -> e instanceof Building).mapToInt(e -> ((Building) e).getPower()).filter(i -> i > 0).sum();
+        return powerProduction;
     }
 
     public float getPowerFactor() {
@@ -122,7 +140,7 @@ public class Player implements Tickable, Renderable {
     protected void startBuild(Class<? extends Entity.PlayableEntity> klass) {
         takeMoney(Entity.PlayableEntity.getCost(klass));
         buildingToBuild = klass.asSubclass(Building.class);
-        buildStartTime = Game.currentTick();
+        buildProgress = 0;
         buildDuration = Entity.PlayableEntity.getBuildTime(klass);
     }
 
@@ -131,14 +149,14 @@ public class Player implements Tickable, Renderable {
     }
 
     public boolean isBuildDone() {
-        return getBuildProgress() == 1.0f;
+        return buildDuration != 0 && buildProgress >= buildDuration;
     }
 
     public float getBuildProgress() {
         if (!isBuilding()) {
             return 0.0f;
         }
-        return Math.min((float) (Game.currentTick() - buildStartTime) / buildDuration, 1.0f);
+        return Math.min(buildProgress / buildDuration, 1.0f);
     }
 
     protected Building getBuildResult(int tileX, int tileY) {
@@ -152,7 +170,7 @@ public class Player implements Tickable, Renderable {
 
     protected void finishBuild(Building building) {
         addEntity(building);
-        buildStartTime = 0;
+        buildProgress = 0;
         buildDuration = 0;
         buildingToBuild = null;
     }
@@ -179,11 +197,18 @@ public class Player implements Tickable, Renderable {
         for (Entity e : entities) {
             e.tick(tickCount);
         }
+        handleBuild();
         handleDead();
         handleUnitBehavior();
         entities.removeAll(toRemove);
         toRemove.clear();
         updateVisibility();
+    }
+
+    private void handleBuild() {
+        if (isBuilding()) {
+            buildProgress += Math.min(getPowerFactor(), 1.0f);
+        }
     }
 
     private void handleDead() {

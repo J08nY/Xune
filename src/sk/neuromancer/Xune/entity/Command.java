@@ -348,7 +348,7 @@ public abstract class Command {
     public static class ProduceCommand extends Command {
         private final Class<? extends Unit> resultClass;
         private final Pathfinder pathfinder;
-        private int start;
+        private float progress;
         private boolean finished;
         private final int duration;
 
@@ -361,7 +361,7 @@ public abstract class Command {
         @Override
         public void start(Entity entity, int tickCount) {
             super.start(entity, tickCount);
-            start = tickCount;
+            progress = 0;
         }
 
         public Class<? extends Unit> getResultClass() {
@@ -372,14 +372,14 @@ public abstract class Command {
             return duration;
         }
 
-        public int getStart() {
-            return start;
+        public float getProgress() {
+            return progress / duration;
         }
 
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Building building) {
-                if (tickCount - start >= duration) {
+                if (progress >= duration) {
                     Unit result;
                     try {
                         Constructor<? extends Unit> con = resultClass.getConstructor(float.class, float.class, Orientation.class, Player.class);
@@ -402,6 +402,8 @@ public abstract class Command {
                     }
                     building.owner.addEntity(result);
                     finished = true;
+                } else {
+                    progress += Math.min(building.owner.getPowerFactor(), 1.0f);
                 }
             } else {
                 throw new IllegalArgumentException("Entity must be a building.");
