@@ -205,6 +205,8 @@ public class InputHandler implements Tickable {
     public Key MINUS = new Key();
     public Key UP = new Key();
     public Key DOWN = new Key();
+    public Key LEFT = new Key();
+    public Key RIGHT = new Key();
 
     public Mouse mouse = new Mouse();
 
@@ -234,6 +236,12 @@ public class InputHandler implements Tickable {
                         break;
                     case GLFW_KEY_DOWN:
                         DOWN.toggle(isPress);
+                        break;
+                    case GLFW_KEY_LEFT:
+                        LEFT.toggle(isPress);
+                        break;
+                    case GLFW_KEY_RIGHT:
+                        RIGHT.toggle(isPress);
                         break;
                     case GLFW_KEY_ESCAPE:
                         ESC.toggle(isPress);
@@ -297,6 +305,8 @@ public class InputHandler implements Tickable {
         MINUS.resetPress();
         UP.resetPress();
         DOWN.resetPress();
+        LEFT.resetPress();
+        RIGHT.resetPress();
     }
 
     public void quit() {

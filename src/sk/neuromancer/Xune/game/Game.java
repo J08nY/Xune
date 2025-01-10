@@ -3,10 +3,14 @@ package sk.neuromancer.Xune.game;
 import org.lwjgl.system.Library;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.gfx.*;
+import sk.neuromancer.Xune.gfx.HUD;
+import sk.neuromancer.Xune.gfx.LevelView;
+import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.gfx.Window;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
-import sk.neuromancer.Xune.sfx.SoundPlayer;
+
+import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -40,7 +44,7 @@ public class Game {
 
     public void start() {
         keepRunning = true;
-        state = GameState.PLAYING;
+        state = GameState.INTRO;
         init();
         run();
         quit();
@@ -57,14 +61,6 @@ public class Game {
 
         intro = new Intro(this);
         pause = new Pause(this);
-
-        level = new Level(this, Level.LEVEL_1);
-        human = new Human(this, level, Flag.BLUE, 1000);
-        bot = new Bot.JackOfAllTrades(this, level, Flag.RED, 1000);
-        hud = new HUD(this);
-        hud.setLevel(level);
-        view = new LevelView(this);
-        view.setLevel(level);
 
         SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
         window.show();
@@ -177,6 +173,26 @@ public class Game {
 
     private void play() {
         state = GameState.PLAYING;
+
+        Flag humanFlag = intro.getSelectedFlag();
+        Flag[] flags = Flag.values();
+        Flag botFlag = humanFlag;
+        Random r = new Random();
+        while (botFlag == humanFlag) {
+            botFlag = flags[r.nextInt(flags.length)];
+        }
+
+        level = new Level(this, Level.LEVEL_1);
+        human = new Human(this, level, humanFlag, 1000);
+        Class<? extends Bot> botClass = intro.getSelectedBot();
+        try {
+            bot = botClass.getDeclaredConstructor(Game.class, Level.class, Flag.class, int.class).newInstance(this, level, botFlag, 1000);
+        } catch (Exception ignored) {}
+
+        hud = new HUD(this);
+        hud.setLevel(level);
+        view = new LevelView(this);
+        view.setLevel(level);
     }
 
     private void pause() {

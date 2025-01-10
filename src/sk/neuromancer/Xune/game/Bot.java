@@ -59,6 +59,11 @@ public class Bot extends Player {
         defend();
         planUnitBuild();
         planBuildingBuild();
+        if (tickCount % TPS == 0) {
+            System.out.println("Bot: " + flag + " Money: " + money + " Buildings: " + buildings + " Units: " + units + " Harvesters: " + harvesters);
+            System.out.println("UnitPlan " + unitPlan.stream().map(Class::getSimpleName).toList());
+            System.out.println("BuildingPlan " + buildingPlan.stream().map(Class::getSimpleName).toList());
+        }
     }
 
     private void checkSpiceCollection() {
@@ -105,14 +110,15 @@ public class Bot extends Player {
     }
 
     private void defend() {
-        List<Entity.PlayableEntity> underAttack = entities.stream().filter(e -> e instanceof Building && e.isUnderAttack()).toList();
+        List<Entity.PlayableEntity> underAttack = entities.stream().filter(e -> (e instanceof Building || e instanceof Harvester) && e.isUnderAttack()).toList();
         if (!underAttack.isEmpty()) {
-            List<Unit> freeUnits = entities.stream().filter(e -> e instanceof Unit unit && !(e instanceof Harvester) && unit.getCommands().isEmpty()).map(e -> (Unit) e).toList();
+            List<Unit> freeUnits = entities.stream().filter(e -> e instanceof Unit unit && !(e instanceof Harvester) && !unit.hasCommands()).map(e -> (Unit) e).toList();
+            System.out.println("Defending with " + freeUnits.size() + " units.");
             for (int i = 0; i < freeUnits.size(); i++) {
-                Entity.PlayableEntity building = underAttack.get(i % underAttack.size());
+                Entity.PlayableEntity attacked = underAttack.get(i % underAttack.size());
                 Unit unit = freeUnits.get(i);
                 try {
-                    unit.sendCommand(new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), building.getAttacker()));
+                    unit.sendCommand(new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), attacked.getAttacker()));
                 } catch (NoPathFound ignored) {
                 }
             }
@@ -135,6 +141,7 @@ public class Bot extends Player {
             if (!attackers.isEmpty()) {
                 int total = attackers.size();
                 int participating = rand.nextInt(total);
+                System.out.println("Attacking with " + participating + " units.");
                 for (int i = 0; i < participating; i++) {
                     Unit attacker = attackers.get(i);
                     if (attacker instanceof Heli) {
@@ -160,6 +167,7 @@ public class Bot extends Player {
             if (Entity.PlayableEntity.canBeBuilt(klass, this)) {
                 List<Building> producers = entities.stream().filter(e -> e instanceof Building building && building.getProduces().contains(klass)).map(e -> (Building) e).sorted(Comparator.comparingInt(building -> building.getCommands().size())).toList();
                 if (!producers.isEmpty()) {
+                    System.out.println("Producing " + klass.getSimpleName());
                     Building building = producers.getFirst();
                     takeMoney(Entity.PlayableEntity.getCost(klass));
                     building.sendCommand(new Command.ProduceCommand(Entity.PlayableEntity.getBuildTime(klass), klass, level.getPathfinder()));
@@ -174,6 +182,7 @@ public class Bot extends Player {
             return;
         }
         Class<? extends Building> building = buildingPlan.getFirst();
+        System.out.println("Building " + building);
         if (Entity.PlayableEntity.canBeBuilt(building, this) && !isBuilding()) {
             startBuild(building);
             buildingPlan.removeFirst();

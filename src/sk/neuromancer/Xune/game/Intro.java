@@ -1,5 +1,6 @@
 package sk.neuromancer.Xune.game;
 
+import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.Sprite;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
@@ -15,6 +16,9 @@ public class Intro implements Tickable, Renderable {
     private boolean worm;
     private int wormIndex;
     private int wormTicks;
+    private int selectedColor;
+    private int selectedBot;
+    private int column;
     private boolean done;
 
     public Intro(Game game) {
@@ -27,29 +31,56 @@ public class Intro implements Tickable, Renderable {
 
     @Override
     public void tick(int tickCount) {
+        InputHandler input = game.getInput();
         if (scaleOld < 3.0f) {
             scaleOld += 0.01f;
+            if (input.mouse.isLeftReleased() || input.mouse.isRightReleased() || input.ENTER.wasPressed()) {
+                scaleOld = 3.0f;
+            }
         } else if (scaleNew < 3.0f) {
             scaleNew += 0.01f;
+            if (input.mouse.isLeftReleased() || input.mouse.isRightReleased() || input.ENTER.wasPressed()) {
+                scaleNew = 3.0f;
+            }
         } else {
-            if (game.getInput().mouse.isLeftReleased() || game.getInput().mouse.isRightReleased()) {
-                if (!worm) {
+            if (worm) {
+                wormTicks++;
+                if (wormTicks % 20 == 0) {
+                    if (wormIndex < SpriteSheet.WORM_SHEET.getWidth()) {
+                        wormIndex++;
+                    } else {
+                        done = true;
+                    }
+                }
+            } else {
+                if (input.mouse.isLeftReleased() || input.mouse.isRightReleased() || input.ENTER.wasPressed()) {
                     worm = true;
                     wormTicks = tickCount;
                 }
-            }
-            if (worm) {
-                wormTicks++;
-            }
-            if (worm && wormTicks % 20 == 0) {
-                if (wormIndex < SpriteSheet.WORM_SHEET.getWidth()) {
-                    wormIndex++;
-                } else {
-                    done = true;
+                if (column == 0) {
+                    if ((input.W.wasPressed() || input.UP.wasPressed()) && selectedColor > 0) {
+                        selectedColor = (selectedColor - 1) % 3;
+                    }
+                    if ((input.S.wasPressed() || input.DOWN.wasPressed()) && selectedColor < 2) {
+                        selectedColor = (selectedColor + 1) % 3;
+                    }
+                    if (input.D.wasPressed() || input.RIGHT.wasPressed()) {
+                        column = 1;
+                    }
+                } else if (column == 1) {
+                    if ((input.W.wasPressed() || input.UP.wasPressed()) && selectedBot > 0) {
+                        selectedBot = (selectedBot - 1) % 4;
+                    }
+                    if ((input.S.wasPressed() || input.DOWN.wasPressed()) && selectedBot < 3) {
+                        selectedBot = (selectedBot + 1) % 4;
+                    }
+                    if (input.A.wasPressed() || input.LEFT.wasPressed()) {
+                        column = 0;
+                    }
                 }
             }
+            scaleStart = 0.9f + (float) Math.sin(Math.toRadians(tickCount * 1.7f)) * 0.2f;
         }
-        scaleStart = 0.9f + (float) Math.sin(Math.toRadians(tickCount * 1.7f)) * 0.2f;
     }
 
     @Override
@@ -78,13 +109,38 @@ public class Intro implements Tickable, Renderable {
             }
             glPopMatrix();
 
-//            glPushMatrix();
-//            glTranslatef(game.getWindow().getCenterX() / 2, game.getWindow().getCenterY() * 1.5f, 0);
-//            float height = Text.heightOf("X", 2);
-//            new Text("RED", 0, 0, true, 2).render();
-//            new Text("BLUE", 0, height, true, 2).render();
-//            new Text("GREEN", 0, 2 * height, true, 2).render();
-//            glPopMatrix();
+            glPushMatrix();
+            glTranslatef(game.getWindow().getCenterX() / 2, game.getWindow().getCenterY() * 1.5f, 0);
+            float height = Text.heightOf("X", 2);
+            float w = Text.widthOf(">", 2);
+            Text selector = new Text(">", -w, selectedColor * height, true, 2);
+            glColor3fv(getSelectedFlag().getColor());
+            selector.render();
+            glColor3f(1, 1, 1);
+            new Text("Flag", 0, -height * 3, true, 2).render();
+            new Text("RED", 0, 0, true, 2).render();
+            new Text("BLUE", 0, height, true, 2).render();
+            new Text("GREEN", 0, 2 * height, true, 2).render();
+            if (column == 0) {
+                new Text("-----", 0, -height, true, 2).render();
+                new Text("-----", 0, 3 * height, true, 2).render();
+            }
+            glPopMatrix();
+
+            glPushMatrix();
+            glTranslatef(game.getWindow().getCenterX() * 0.75f, game.getWindow().getCenterY() * 1.5f, 0);
+            Text selectorBot = new Text(">", -w, selectedBot * height, true, 2);
+            selectorBot.render();
+            new Text("Bot", 0, -height * 3, true, 2).render();
+            new Text("Army General", 0, 0, true, 2).render();
+            new Text("Buggy Boy", 0, height, true, 2).render();
+            new Text("Heli Master", 0, 2 * height, true, 2).render();
+            new Text("Jack of All Trades", 0, 3 * height, true, 2).render();
+            if (column == 1) {
+                new Text("------------------", 0, -height, true, 2).render();
+                new Text("------------------", 0, 4 * height, true, 2).render();
+            }
+            glPopMatrix();
         }
 
         glPushMatrix();
@@ -101,6 +157,20 @@ public class Intro implements Tickable, Renderable {
             glPopMatrix();
         }
 
+    }
+
+    public Flag getSelectedFlag() {
+        return Flag.values()[selectedColor];
+    }
+
+    public Class<? extends Bot> getSelectedBot() {
+        return switch (selectedBot) {
+            case 0 -> Bot.ArmyGeneral.class;
+            case 1 -> Bot.BuggyBoy.class;
+            case 2 -> Bot.HeliMaster.class;
+            case 3 -> Bot.JackOfAllTrades.class;
+            default -> null;
+        };
     }
 
     public boolean isDone() {
