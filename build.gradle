@@ -11,15 +11,12 @@ application {
     mainClass = 'sk.neuromancer.Xune.game.Game'
 }
 
-project.ext.lwjglVersion = "3.3.6"
-project.ext.lwjglNatives = "natives-linux"
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+    implementation platform("org.lwjgl:lwjgl-bom:3.3.6")
 
     implementation "org.lwjgl:lwjgl"
 	implementation "org.lwjgl:lwjgl:3.3.6:sources"
@@ -33,10 +30,18 @@ dependencies {
     implementation "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-opengl:3.3.6:sources"
     implementation "org.lwjgl:lwjgl-opengl:3.3.6:javadoc"
-    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl::natives-linux"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::natives-linux"
+    runtimeOnly "org.lwjgl:lwjgl-openal::natives-linux"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::natives-linux"
+    runtimeOnly "org.lwjgl:lwjgl::natives-windows"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::natives-windows"
+    runtimeOnly "org.lwjgl:lwjgl-openal::natives-windows"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::natives-windows"
+    runtimeOnly "org.lwjgl:lwjgl::natives-macos"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::natives-macos"
+    runtimeOnly "org.lwjgl:lwjgl-openal::natives-macos"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::natives-macos"
 
     implementation 'com.google.protobuf:protobuf-java:4.28.3'
 }
@@ -76,7 +81,6 @@ jar {
     }
 }
 
-
 tasks.register('uberJar', Jar) {
     archiveFileName = "Xune-${version}-all.jar"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
@@ -90,5 +94,53 @@ tasks.register('uberJar', Jar) {
     dependsOn configurations.runtimeClasspath
     from {
         configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
+    }
+}
+
+tasks.register('uberJarLinux', Jar) {
+    archiveFileName = "Xune-${version}-linux.jar"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
+
+    from sourceSets.main.output
+
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") && (!it.name.contains("natives") || it.name.contains("natives-linux")) }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
+    }
+}
+
+tasks.register('uberJarWindows', Jar) {
+    archiveFileName = "Xune-${version}-windows.jar"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
+
+    from sourceSets.main.output
+
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") && (!it.name.contains("natives") || it.name.contains("natives-windows")) }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
+    }
+}
+
+tasks.register('uberJarMacos', Jar) {
+    archiveFileName = "Xune-${version}-macos.jar"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
+
+    from sourceSets.main.output
+
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") && (!it.name.contains("natives") || it.name.contains("natives-macos")) }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
     }
 }
