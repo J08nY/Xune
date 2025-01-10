@@ -6,6 +6,7 @@ import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.gfx.*;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
+import sk.neuromancer.Xune.sfx.SoundPlayer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;

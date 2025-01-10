@@ -65,19 +65,21 @@ public class HUD implements Tickable, Renderable {
         this.level = level;
         this.human = level.getHuman();
 
+        float buttonsLeft = hudLeft + 70 * hudScale;
+        float buttonsTop = hudTop + hudScale * 12;
         this.buttons = new ArrayList<>(11);
-        this.buttons.add(new Button<>(Base.class, human, 2, 1, hudLeft + 400, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Powerplant.class, human, 2, 1, hudLeft + 400 + 4 * 25, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Barracks.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 2, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Factory.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 3, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Refinery.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 4, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Silo.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 5, hudTop + 64, 4));
-        this.buttons.add(new Button<>(Helipad.class, human, 2, 1, hudLeft + 400 + 4 * 25 * 6, hudTop + 64, 4));
+        this.buttons.add(new Button<>(Base.class, human, 2, 1, buttonsLeft, buttonsTop, hudScale));
+        this.buttons.add(new Button<>(Powerplant.class, human, 2, 1, buttonsLeft + hudScale * 25, buttonsTop, hudScale));
+        this.buttons.add(new Button<>(Barracks.class, human, 2, 1, buttonsLeft + hudScale * 25 * 2, buttonsTop, hudScale));
+        this.buttons.add(new Button<>(Factory.class, human, 2, 1, buttonsLeft + hudScale * 25 * 3, buttonsTop, hudScale));
+        this.buttons.add(new Button<>(Refinery.class, human, 2, 1, buttonsLeft + hudScale * 25 * 4, buttonsTop, hudScale));
+        this.buttons.add(new Button<>(Silo.class, human, 2, 1, buttonsLeft + hudScale * 25 * 5, buttonsTop, hudScale));
+        this.buttons.add(new Button<>(Helipad.class, human, 2, 1, buttonsLeft + hudScale * 25 * 6, buttonsTop, hudScale));
 
-        this.buttons.add(new Button<>(Soldier.class, human, 2, 12, hudLeft + 400, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Buggy.class, human, 2, 4, hudLeft + 400 + 4 * 25, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Heli.class, human, 2, 8, hudLeft + 400 + 4 * 25 * 2, hudTop + 64 + 4 * 12, 4));
-        this.buttons.add(new Button<>(Harvester.class, human, 2, 4, hudLeft + 400 + 4 * 25 * 3, hudTop + 64 + 4 * 12, 4));
+        this.buttons.add(new Button<>(Soldier.class, human, 2, 12, buttonsLeft, buttonsTop + hudScale * 12, hudScale));
+        this.buttons.add(new Button<>(Buggy.class, human, 2, 4, buttonsLeft + hudScale * 25, buttonsTop + hudScale * 12, hudScale));
+        this.buttons.add(new Button<>(Heli.class, human, 2, 8, buttonsLeft + hudScale * 25 * 2, buttonsTop + hudScale * 12, hudScale));
+        this.buttons.add(new Button<>(Harvester.class, human, 2, 4, buttonsLeft + hudScale * 25 * 3, buttonsTop + hudScale * 12, hudScale));
     }
 
     @Override
@@ -118,10 +120,10 @@ public class HUD implements Tickable, Renderable {
         // Render HUD text
         glPushMatrix();
         glTranslatef(hudLeft, hudTop, 0);
-        glScalef(2f, 2f, 1);
+        glScalef(hudScale / 3, hudScale / 3, 1);
 
         renderText(20, 40, "MONEY: " + human.getMoney() + "$");
-        renderText(20, 60, "POWER: " + human.getPowerProduction() + "/" + human.getPowerConsumption());
+        renderText(20, 60, "POWER: +" + human.getPowerProduction() + "&/-" + human.getPowerConsumption() + "&");
         String selected = human.getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
         renderText(20, 110, selected);
 
@@ -387,6 +389,7 @@ public class HUD implements Tickable, Renderable {
             this.width = sprite.getWidth();
             this.height = sprite.getHeight();
             this.scale = scale;
+            this.inProgress = new HashMap<>();
         }
 
         @Override
@@ -398,7 +401,7 @@ public class HUD implements Tickable, Renderable {
                 int col = animation % spriteCols;
                 sprite = SpriteSheet.ENTITY_SHEET.getSprite(spriteOffset + row * SpriteSheet.SPRITE_ROW_LENGTH + col);
             }
-            inProgress = new HashMap<>();
+            inProgress.clear();
             totalInProgress = 0;
             if (Unit.class.isAssignableFrom(klass)) {
                 for (Entity.PlayableEntity entity : human.getEntities()) {
@@ -438,13 +441,16 @@ public class HUD implements Tickable, Renderable {
             }
             sprite.render();
             if (totalInProgress > 0) {
-                float textWidth = Text.widthOf(String.valueOf(totalInProgress), 0.4f);
-                float textHeight = Text.heightOf(String.valueOf(totalInProgress), 0.4f);
-                new Text(String.valueOf(totalInProgress), width - textWidth, height - textHeight, true, 0.4f).render();
                 int index = 0;
                 if (Unit.class.isAssignableFrom(klass)) {
+                    float textWidth = Text.widthOf(String.valueOf(totalInProgress), 0.4f);
+                    float textHeight = Text.heightOf(String.valueOf(totalInProgress), 0.4f);
+                    new Text(String.valueOf(totalInProgress), width - textWidth, height - textHeight, true, 0.4f).render();
                     for (Map.Entry<Building, Command.ProduceCommand> producers : inProgress.entrySet()) {
                         Command.ProduceCommand cmd = producers.getValue();
+                        if (!cmd.isStarted(producers.getKey())) {
+                            continue;
+                        }
                         float progress = (float) (Game.currentTick() - cmd.getStart()) / cmd.getDuration();
                         if (progress <= 0) {
                             continue;
@@ -453,7 +459,13 @@ public class HUD implements Tickable, Renderable {
                         index++;
                     }
                 } else if (Building.class.isAssignableFrom(klass)) {
-                    renderProgress(0, human.getBuildProgress());
+                    if (human.isBuildDone()) {
+                        glColor3f(0, 1, 0);
+                        SpriteSheet.MISC_SHEET.getSprite(2).render();
+                        glColor3f(1, 1, 1);
+                    } else {
+                        renderProgress(0, human.getBuildProgress());
+                    }
                 }
             }
             glPopMatrix();

@@ -126,11 +126,11 @@ public class Player implements Tickable, Renderable {
         buildDuration = Entity.PlayableEntity.getBuildTime(klass);
     }
 
-    protected boolean isBuilding() {
+    public boolean isBuilding() {
         return buildingToBuild != null;
     }
 
-    protected boolean isBuildDone() {
+    public boolean isBuildDone() {
         return getBuildProgress() == 1.0f;
     }
 
