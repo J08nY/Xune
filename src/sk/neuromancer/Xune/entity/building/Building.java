@@ -82,6 +82,10 @@ public abstract class Building extends Entity.PlayableEntity {
         return passableMap.getOrDefault(this.getClass(), new boolean[0]);
     }
 
+    public static int getPower(Class<? extends Building> klass) {
+        return powerMap.getOrDefault(klass, 0);
+    }
+
     protected static void setPower(Class<? extends Building> klass, int cost) {
         powerMap.put(klass, cost);
     }

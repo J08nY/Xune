@@ -10,8 +10,7 @@ import sk.neuromancer.Xune.sfx.SoundManager;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
-public class Game implements Renderable {
-
+public class Game {
     private boolean keepRunning = false;
     private static int tickCount = 0;
     private GameState state;
@@ -21,6 +20,7 @@ public class Game implements Renderable {
     private Window window;
 
     private Intro intro;
+    private Pause pause;
 
     private Level level;
     private LevelView view;
@@ -54,8 +54,8 @@ public class Game implements Renderable {
         input = new InputHandler(this);
         sound = new SoundManager(this);
 
-
         intro = new Intro(this);
+        pause = new Pause(this);
 
         level = new Level(this, Level.LEVEL_1);
         human = new Human(this, level, Flag.BLUE, 1000);
@@ -69,37 +69,28 @@ public class Game implements Renderable {
         window.show();
     }
 
-    public void run() {
-        long lastTime = System.nanoTime();
+    private void run() {
+        long lastRender = System.nanoTime();
         double unprocessed = 0;
         double nsPerTick = 1000000000.0 / TPS;
         int frames = 0;
         int ticks = 0;
-        long lastTimer1 = System.currentTimeMillis();
+        long lastSecond = System.currentTimeMillis();
 
         while (keepRunning) {
             long now = System.nanoTime();
-            unprocessed += (now - lastTime) / nsPerTick;
-            lastTime = now;
-            boolean shouldRender = true;
+            unprocessed += (now - lastRender) / nsPerTick;
+            lastRender = now;
             while (unprocessed >= 1) {
                 ticks++;
                 tick();
                 unprocessed -= 1;
-                shouldRender = true;
             }
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (shouldRender) {
-                frames++;
-                render();
-            }
+            frames++;
+            render();
             long currentTime = System.currentTimeMillis();
-            if (currentTime - lastTimer1 > 1000) {
-                lastTimer1 = currentTime;
+            if (currentTime - lastSecond > 1000) {
+                lastSecond = currentTime;
                 System.out.println(ticks + " ticks, " + frames + " fps");
                 frames = 0;
                 ticks = 0;
@@ -107,8 +98,7 @@ public class Game implements Renderable {
         }
     }
 
-    @Override
-    public void render() {
+    private void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -122,6 +112,9 @@ public class Game implements Renderable {
                 hud.render();
                 break;
             case PAUSED:
+                view.render();
+                hud.render();
+                pause.render();
                 break;
             case GAMEOVER:
                 break;
@@ -130,7 +123,7 @@ public class Game implements Renderable {
         glfwSwapBuffers(window.getHandle());
     }
 
-    public void tick() {
+    private void tick() {
         tickCount++;
         glfwPollEvents();
 
@@ -140,7 +133,10 @@ public class Game implements Renderable {
                 input.tick(tickCount);
                 sound.tick(tickCount);
                 if (intro.isDone()) {
-                    state = GameState.PLAYING;
+                    play();
+                }
+                if (input.ESC.isPressed()) {
+                    stop();
                 }
                 break;
             case PLAYING:
@@ -149,18 +145,53 @@ public class Game implements Renderable {
                 hud.tick(tickCount);
                 input.tick(tickCount);
                 sound.tick(tickCount);
+                if (input.ESC.isPressed()) {
+                    pause();
+                }
+                if (level.isDone()) {
+                    end();
+                }
                 break;
             case PAUSED:
+                pause.tick(tickCount);
+                input.tick(tickCount);
+                sound.tick(tickCount);
+                if (pause.shouldContinue()) {
+                    cont();
+                }
+                if (pause.shouldExit()) {
+                    stop();
+                }
                 break;
             case GAMEOVER:
+                if (input.ESC.isPressed()) {
+                    stop();
+                }
                 break;
         }
 
-        if (input.ESC.isPressed() || glfwWindowShouldClose(window.getHandle()))
+        if (glfwWindowShouldClose(window.getHandle()))
             stop();
     }
 
-    public void stop() {
+    private void play() {
+        state = GameState.PLAYING;
+    }
+
+    private void pause() {
+        state = GameState.PAUSED;
+    }
+
+    private void cont() {
+        state = GameState.PLAYING;
+        pause.reset();
+    }
+
+    private void end() {
+        state = GameState.GAMEOVER;
+    }
+
+    private void stop() {
         keepRunning = false;
     }
 

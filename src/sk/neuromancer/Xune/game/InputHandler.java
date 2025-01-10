@@ -16,13 +16,32 @@ public class InputHandler implements Tickable {
 
     public class Key {
         private boolean isPressed = false;
+        private boolean press;
+        private boolean release;
 
         public void toggle(boolean isPressed) {
+            if (isPressed && !this.isPressed)
+                press = true;
+            if (this.isPressed && !isPressed)
+                release = true;
             this.isPressed = isPressed;
         }
 
         public boolean isPressed() {
             return this.isPressed;
+        }
+
+        public boolean wasPressed() {
+            return this.press;
+        }
+
+        public boolean wasReleased() {
+            return this.release;
+        }
+
+        public void resetPress() {
+            this.press = false;
+            this.release = false;
         }
     }
 
@@ -180,9 +199,12 @@ public class InputHandler implements Tickable {
     public Key S = new Key();
     public Key D = new Key();
     public Key ESC = new Key();
+    public Key ENTER = new Key();
 
     public Key PLUS = new Key();
     public Key MINUS = new Key();
+    public Key UP = new Key();
+    public Key DOWN = new Key();
 
     public Mouse mouse = new Mouse();
 
@@ -207,8 +229,17 @@ public class InputHandler implements Tickable {
                     case GLFW_KEY_D:
                         D.toggle(isPress);
                         break;
+                    case GLFW_KEY_UP:
+                        UP.toggle(isPress);
+                        break;
+                    case GLFW_KEY_DOWN:
+                        DOWN.toggle(isPress);
+                        break;
                     case GLFW_KEY_ESCAPE:
                         ESC.toggle(isPress);
+                        break;
+                    case GLFW_KEY_ENTER:
+                        ENTER.toggle(isPress);
                         break;
                     case GLFW_KEY_KP_ADD:
                         PLUS.toggle(isPress);
@@ -256,6 +287,16 @@ public class InputHandler implements Tickable {
         mouse.computeDrag();
         mouse.resetPress();
         scroller.resetDelta();
+        W.resetPress();
+        A.resetPress();
+        S.resetPress();
+        D.resetPress();
+        ESC.resetPress();
+        ENTER.resetPress();
+        PLUS.resetPress();
+        MINUS.resetPress();
+        UP.resetPress();
+        DOWN.resetPress();
     }
 
     public void quit() {

@@ -2,10 +2,10 @@ package sk.neuromancer.Xune.entity.unit;
 
 import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Orientation;
-import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Factory;
 import sk.neuromancer.Xune.entity.building.Refinery;
+import sk.neuromancer.Xune.game.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
@@ -71,6 +71,25 @@ public class Harvester extends Unit {
         glPushMatrix();
         glTranslatef(sx, sy, 0);
         super.render();
+        if (isSelected) {
+            glPushMatrix();
+            glTranslatef(x - (float) sprite.getWidth() / 2, (y - (float) sprite.getHeight() / 2) - 1, 0);
+            glBegin(GL_QUADS);
+            glColor3f(0.5f, 0.5f, 0.5f);
+            float spicePercentage = (float) spice / 500;
+            for (int i = 0; i < 12; i++) {
+                if (i >= spicePercentage * 12) {
+                    continue;
+                }
+                glVertex2f(((float) 25 / 12) * i, 0);
+                glVertex2f(((float) 25 / 12) * i + 1, 0);
+                glVertex2f(((float) 25 / 12) * i + 1, 1);
+                glVertex2f(((float) 25 / 12) * i, 1);
+            }
+            glEnd();
+            glColor3f(1, 1, 1);
+            glPopMatrix();
+        }
         glPopMatrix();
     }
 

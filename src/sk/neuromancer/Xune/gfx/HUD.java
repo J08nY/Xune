@@ -141,21 +141,22 @@ public class HUD implements Tickable, Renderable {
     private void renderPower() {
         // Render power
         glPushMatrix();
-        glTranslated(0, hudTop, 0.99f);
+        glTranslatef(0, hudTop, 0.99f);
         glScalef(hudScale, hudScale, 1);
+        glTranslatef(71, 0, 0);
         glBegin(GL_QUADS);
         glColor3f(0.1f, 0.1f, 0.1f);
-        glVertex2i(71, 4);
+        glVertex2i(0, 4);
         glVertex2i(380, 4);
         glVertex2i(380, 7);
-        glVertex2i(71, 7);
+        glVertex2i(0, 7);
         int production = human.getPowerProduction();
         int consumption = human.getPowerConsumption();
         glColor3f(0.1f, 0.6f, 0.1f);
-        glVertex2i(71, 4);
+        glVertex2i(0, 4);
         glVertex2i(380 * production / MAX_POWER, 4);
         glVertex2i(380 * production / MAX_POWER, 7);
-        glVertex2i(71, 7);
+        glVertex2i(0, 7);
         if (production < consumption) {
             glColor3f(0.6f, 0.1f, 0.1f);
             glVertex2i(380 * production / MAX_POWER, 4);
@@ -299,7 +300,11 @@ public class HUD implements Tickable, Renderable {
                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(13);
                 for (Button<?> button : buttons) {
                     if (button.intersects((float) mouseX, (float) mouseY)) {
-                        tooltip = new Text(button.getKlass().getSimpleName(), (float) mouseX, (float) mouseY + 20, true, 2f);
+                        String text = button.getKlass().getSimpleName() + "\n" + Entity.PlayableEntity.getCost(button.getKlass()) + "$";
+                        if (Building.class.isAssignableFrom(button.getKlass())) {
+                            text += "\n" + Building.getPower((Class<? extends Building>) button.getKlass()) + "&";
+                        }
+                        tooltip = new Text(text, (float) mouseX, (float) mouseY + 20, true, 2f);
                     }
                 }
             } else {
@@ -481,7 +486,7 @@ public class HUD implements Tickable, Renderable {
             this.y = y;
         }
 
-        public Class<T> getKlass() {
+        public Class<? extends Entity.PlayableEntity> getKlass() {
             return klass;
         }
     }

@@ -400,6 +400,10 @@ public class Level implements Renderable, Tickable {
         return Math.round((levelY - Tile.TILE_CENTER_Y) / (0.5f * (Tile.TILE_HEIGHT + 1)));
     }
 
+    public boolean isDone() {
+        return human.isEliminated() || players.stream().allMatch(player -> player.getFlag() == human.getFlag() || player.isEliminated());
+    }
+
     public static class TileFinder implements Iterator<Tile> {
         private final Level level;
         private final boolean[][] visited;
