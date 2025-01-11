@@ -5,12 +5,14 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
+import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.NoPathFound;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static sk.neuromancer.Xune.game.Game.TPS;
 
@@ -23,8 +25,9 @@ public class Bot extends Player {
     protected int buggyPriority = 0;
     protected int heliPriority = 0;
 
-    protected int buildInterval = 10;
+    protected int buildInterval = 15;
     protected int produceInterval = 2;
+    protected int attackInterval = 3;
     protected int attackGroupSize = 5;
 
     private Random rand = new Random();
@@ -45,25 +48,25 @@ public class Bot extends Player {
         harvesters = entities.stream().filter(e -> e instanceof Harvester).mapToInt(e -> 1).sum();
 
         checkSpiceCollection();
+        if (tickCount % (TPS * produceInterval) == 0) {
+            produce();
+        }
         if (tickCount % (TPS * buildInterval) == 0) {
             build();
         }
-        if (tickCount % (TPS * produceInterval) == 0) {
-            produce();
-            if (units >= attackGroupSize) {
-                attack();
-            }
-        }
         if (isBuildDone()) {
             placeBuild();
+        }
+        if (tickCount % (TPS * attackInterval) == 0 && units >= attackGroupSize) {
+            attack();
         }
         defend();
         planUnitBuild();
         planBuildingBuild();
         if (tickCount % TPS == 0) {
-            System.out.println("Bot: " + flag + " Money: " + money + " Buildings: " + buildings + " Units: " + units + " Harvesters: " + harvesters);
-            System.out.println("UnitPlan " + unitPlan.stream().map(Class::getSimpleName).toList());
-            System.out.println("BuildingPlan " + buildingPlan.stream().map(Class::getSimpleName).toList());
+            log("Bot: " + getClass().getSimpleName() + "." + flag + " Money: " + money + " Buildings: " + buildings + " Units: " + units + " Harvesters: " + harvesters);
+            log("\tUnitPlan " + unitPlan.stream().map(Class::getSimpleName).toList());
+            log("\tBuildingPlan " + buildingPlan.stream().map(Class::getSimpleName).toList());
         }
     }
 
@@ -114,7 +117,7 @@ public class Bot extends Player {
         List<Entity.PlayableEntity> underAttack = entities.stream().filter(e -> (e instanceof Building || e instanceof Harvester) && e.isUnderAttack()).toList();
         if (!underAttack.isEmpty()) {
             List<Unit> freeUnits = entities.stream().filter(e -> e instanceof Unit unit && !(e instanceof Harvester) && !unit.hasCommands()).map(e -> (Unit) e).toList();
-            System.out.println("Defending with " + freeUnits.size() + " units.");
+            log("Defending with " + freeUnits.size() + " units.");
             for (int i = 0; i < freeUnits.size(); i++) {
                 Entity.PlayableEntity attacked = underAttack.get(i % underAttack.size());
                 Unit unit = freeUnits.get(i);
@@ -128,29 +131,46 @@ public class Bot extends Player {
 
     private void attack() {
         Iterator<Entity> others = level.findClosestEntity(spawn.getLevelX(), spawn.getLevelY(), e -> e instanceof Entity.PlayableEntity other && other.getOwner() != this);
-        Entity target = null;
+        Entity.PlayableEntity target = null;
         int r = rand.nextInt(3);
         try {
             for (int i = 0; i < r; i++) {
-                target = others.next();
+                target = (Entity.PlayableEntity) others.next();
             }
         } catch (NoSuchElementException ignored) {
         }
 
         if (target != null) {
-            List<Unit> attackers = entities.stream().filter(e -> e instanceof Unit unit && !(e instanceof Harvester) && unit.getCommands().isEmpty()).map(e -> (Unit) e).toList();
+            Entity finalTarget = target;
+            List<Unit> attackers = entities.stream()
+                    .filter(e -> e instanceof Unit unit && !(e instanceof Harvester) && unit.getCommands().isEmpty())
+                    .map(e -> (Unit) e)
+                    .sorted(Comparator.comparingDouble(e -> Math.abs(e.x - finalTarget.x) + Math.abs(e.y - finalTarget.y))).collect(Collectors.toCollection(ArrayList::new));
             if (!attackers.isEmpty()) {
                 int total = attackers.size();
                 int participating = rand.nextInt(total);
-                System.out.println("Attacking with " + participating + " units.");
+                log("Attacking with " + participating + " units. Target: " + target);
+                int successful = 0;
                 for (int i = 0; i < participating; i++) {
-                    Unit attacker = attackers.get(i);
+                    if (attackers.isEmpty()) {
+                        log("Successfully attacked with: " + successful);
+                        break;
+                    }
+                    Unit attacker = attackers.removeFirst();
                     if (attacker instanceof Heli) {
                         attacker.sendCommand(new Command.FlyAndAttackCommand(attacker.x, attacker.y, target));
+                        successful++;
                     } else {
-                        try {
-                            attacker.sendCommand(new Command.MoveAndAttackCommand(attacker.x, attacker.y, level.getPathfinder(), target));
-                        } catch (NoPathFound ignored) {
+                        if (attacker.inRange(target) && target.isStatic()) {
+                            attacker.sendCommand(new Command.AttackCommand(target));
+                            successful++;
+                        } else {
+                            try {
+                                attacker.sendCommand(new Command.MoveAndAttackCommand(attacker.x, attacker.y, level.getPathfinder(), target));
+                                successful++;
+                            } catch (NoPathFound ignored) {
+                                i--;
+                            }
                         }
                     }
                 }
@@ -168,7 +188,7 @@ public class Bot extends Player {
             if (Entity.PlayableEntity.canBeBuilt(klass, this)) {
                 List<Building> producers = entities.stream().filter(e -> e instanceof Building building && building.getProduces().contains(klass)).map(e -> (Building) e).sorted(Comparator.comparingInt(building -> building.getCommands().size())).toList();
                 if (!producers.isEmpty()) {
-                    System.out.println("Producing " + klass.getSimpleName());
+                    log("Producing " + klass.getSimpleName());
                     Building building = producers.getFirst();
                     takeMoney(Entity.PlayableEntity.getCost(klass));
                     building.sendCommand(new Command.ProduceCommand(Entity.PlayableEntity.getBuildTime(klass), klass, level.getPathfinder()));
@@ -183,15 +203,15 @@ public class Bot extends Player {
             return;
         }
         Class<? extends Building> building = buildingPlan.getFirst();
-        System.out.println("Building " + building);
         if (Entity.PlayableEntity.canBeBuilt(building, this) && !isBuilding()) {
+            log("Building " + building);
             startBuild(building);
             buildingPlan.removeFirst();
         }
     }
 
     private void placeBuild() {
-        Iterator<Tile> close = level.findClosestTile(spawn, level::isTileBuildable);
+        Iterator<Tile> close = level.findClosestTile(spawn, tile -> level.isTileBuildable(tile.getX(), tile.getY(), Building.getPassable(buildingToBuild)));
         int pos = rand.nextInt(3 + buildings);
         Tile last = null;
         try {
@@ -204,6 +224,12 @@ public class Bot extends Player {
         if (last != null) {
             Building result = getBuildResult(last.getX(), last.getY());
             finishBuild(result);
+        }
+    }
+
+    private void log(String message) {
+        if (Config.LOG_BOT_ACTIONS) {
+            System.out.println(message);
         }
     }
 

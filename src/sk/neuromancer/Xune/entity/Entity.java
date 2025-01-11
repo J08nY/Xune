@@ -262,6 +262,8 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             return ((PlayableEntity) other).owner != this.owner;
         }
 
+        public abstract boolean isStatic();
+
         public Player getOwner() {
             return owner;
         }

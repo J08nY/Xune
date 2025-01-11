@@ -70,6 +70,16 @@ public abstract class Building extends Entity.PlayableEntity {
         this.tileY = Level.levelToTileY(x, y);
     }
 
+    @Override
+    public boolean isStatic() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "." + flag + " at (" + x + "," + y + "), [" + tileX + "," + tileY + "].";
+    }
+
     public int getPower() {
         return powerMap.getOrDefault(this.getClass(), 0);
     }
@@ -84,6 +94,14 @@ public abstract class Building extends Entity.PlayableEntity {
 
     public static int getPower(Class<? extends Building> klass) {
         return powerMap.getOrDefault(klass, 0);
+    }
+
+    public static List<Class<? extends Unit>> getProduces(Class<? extends Building> klass) {
+        return producesMap.getOrDefault(klass, List.of());
+    }
+
+    public static boolean[] getPassable(Class<? extends Building> klass) {
+        return passableMap.getOrDefault(klass, new boolean[0]);
     }
 
     protected static void setPower(Class<? extends Building> klass, int cost) {

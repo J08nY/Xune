@@ -2,7 +2,7 @@ package sk.neuromancer.Xune.game;
 
 public class Config {
     public static final boolean DEBUG_TILES = false;
-    public static final boolean DEBUG_TILE_GRID = false;
+    public static final boolean DEBUG_TILE_GRID = true;
     public static final boolean DEBUG_PATHS = false;
     public static final boolean DEBUG_PATH_PRINT = false;
     public static final boolean DEBUG_PATH_GRID_LEVEL = false;
@@ -11,4 +11,5 @@ public class Config {
     public static final boolean DEBUG_PATH_GRID_ENTITY = false;
     public static final boolean DEBUG_ATTACK = false;
     public static final boolean ANIMATE_HUD_BUTTONS = false;
+    public static final boolean LOG_BOT_ACTIONS = false;
 }

@@ -106,6 +106,11 @@ public abstract class Unit extends Entity.PlayableEntity implements Moveable {
     }
 
     @Override
+    public boolean isStatic() {
+        return false;
+    }
+
+    @Override
     public void tick(int tickCount) {
         super.tick(tickCount);
         ready++;
