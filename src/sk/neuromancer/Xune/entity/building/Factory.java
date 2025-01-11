@@ -4,7 +4,7 @@ import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
-import sk.neuromancer.Xune.game.Player;
+import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.sfx.SoundManager;
 

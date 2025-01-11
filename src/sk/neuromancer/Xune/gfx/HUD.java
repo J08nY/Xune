@@ -5,6 +5,7 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.*;
+import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 

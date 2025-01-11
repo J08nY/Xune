@@ -3,7 +3,7 @@ package sk.neuromancer.Xune.entity.unit;
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.Factory;
 import sk.neuromancer.Xune.game.Clickable;
-import sk.neuromancer.Xune.game.Player;
+import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;

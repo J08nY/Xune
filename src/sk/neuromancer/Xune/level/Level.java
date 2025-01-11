@@ -4,6 +4,8 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.*;
+import sk.neuromancer.Xune.game.players.Human;
+import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.LevelView;
 import sk.neuromancer.Xune.gfx.Renderable;

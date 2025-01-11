@@ -1,10 +1,11 @@
-package sk.neuromancer.Xune.game;
+package sk.neuromancer.Xune.game.players;
 
-import org.lwjgl.system.Library;
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;
+import sk.neuromancer.Xune.game.Game;
+import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;

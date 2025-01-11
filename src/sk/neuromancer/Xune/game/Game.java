@@ -3,6 +3,11 @@ package sk.neuromancer.Xune.game;
 import org.lwjgl.system.Library;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.game.players.Bot;
+import sk.neuromancer.Xune.game.players.Human;
+import sk.neuromancer.Xune.game.screens.Gameover;
+import sk.neuromancer.Xune.game.screens.Intro;
+import sk.neuromancer.Xune.game.screens.Pause;
 import sk.neuromancer.Xune.gfx.HUD;
 import sk.neuromancer.Xune.gfx.LevelView;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
@@ -26,6 +31,7 @@ public class Game {
 
     private Intro intro;
     private Pause pause;
+    private Gameover gameover;
 
     private Level level;
     private LevelView view;
@@ -61,6 +67,7 @@ public class Game {
 
         intro = new Intro(this);
         pause = new Pause(this);
+        gameover = new Gameover(this);
 
         SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
         window.show();
@@ -114,6 +121,9 @@ public class Game {
                 pause.render();
                 break;
             case GAMEOVER:
+                view.render();
+                hud.render();
+                gameover.render();
                 break;
         }
 
@@ -145,7 +155,7 @@ public class Game {
                 if (input.ESC.isPressed()) {
                     pause();
                 }
-                if (level.isDone()) {
+                if (level.isDone() && !gameover.shouldContinue()) {
                     end();
                 }
                 break;
@@ -161,6 +171,15 @@ public class Game {
                 }
                 break;
             case GAMEOVER:
+                gameover.tick(tickCount);
+                input.tick(tickCount);
+                sound.tick(tickCount);
+                if (gameover.shouldContinue()) {
+                    cont();
+                }
+                if (gameover.shouldExit()) {
+                    stop();
+                }
                 if (input.ESC.isPressed()) {
                     stop();
                 }

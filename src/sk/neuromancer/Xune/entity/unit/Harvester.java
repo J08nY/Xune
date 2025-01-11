@@ -5,7 +5,7 @@ import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Factory;
 import sk.neuromancer.Xune.entity.building.Refinery;
-import sk.neuromancer.Xune.game.Player;
+import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.Pathfinder;

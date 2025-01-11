@@ -1,5 +1,8 @@
-package sk.neuromancer.Xune.game;
+package sk.neuromancer.Xune.game.screens;
 
+import sk.neuromancer.Xune.game.Game;
+import sk.neuromancer.Xune.game.InputHandler;
+import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.Text;
 

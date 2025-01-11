@@ -1,10 +1,11 @@
-package sk.neuromancer.Xune.game;
+package sk.neuromancer.Xune.game.players;
 
 import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
+import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.NoPathFound;

@@ -1,12 +1,11 @@
 package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Orientation;
-import sk.neuromancer.Xune.game.Player;
+import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import static sk.neuromancer.Xune.game.Game.TPS;
-import static sk.neuromancer.Xune.level.Tile.EAST_WEST;
 
 public class Powerplant extends Building {
 

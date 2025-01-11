@@ -1,6 +1,7 @@
-package sk.neuromancer.Xune.game;
+package sk.neuromancer.Xune.game.players;
 
 import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 
 public class Remote extends Player {

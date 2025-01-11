@@ -1,4 +1,4 @@
-package sk.neuromancer.Xune.game;
+package sk.neuromancer.Xune.game.players;
 
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.Base;
@@ -9,6 +9,8 @@ import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Soldier;
+import sk.neuromancer.Xune.game.Game;
+import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.Level;
