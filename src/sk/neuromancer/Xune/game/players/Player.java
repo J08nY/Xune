@@ -111,7 +111,7 @@ public class Player implements Tickable, Renderable {
     }
 
     public boolean isEliminated() {
-        return entities.isEmpty();
+        return entities.isEmpty() && toAdd.isEmpty();
     }
 
     protected Tile setupSpawn() {

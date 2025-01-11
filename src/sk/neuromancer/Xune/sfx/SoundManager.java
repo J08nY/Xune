@@ -96,7 +96,7 @@ public class SoundManager implements Tickable {
     }
 
     public static SoundPlayer play(int soundIndex, boolean loop, float gain) {
-        if (soundIndex == -1) {
+        if (instance == null || soundIndex == -1) {
             return null;
         }
         SoundPlayer player = new SoundPlayer(instance.sounds[soundIndex], loop, gain);

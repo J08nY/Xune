@@ -225,7 +225,7 @@ public class Level implements Renderable, Tickable {
     }
 
     public List<Entity> getEntities() {
-        int size = worms.size() + human.getEntities().size();
+        int size = worms.size();
         for (Player player : players) {
             size += player.getEntities().size();
         }
@@ -403,6 +403,9 @@ public class Level implements Renderable, Tickable {
     }
 
     public boolean isDone() {
+        if (human == null) {
+            return players.stream().anyMatch(Player::isEliminated);
+        }
         return human.isEliminated() || players.stream().allMatch(player -> player.getFlag() == human.getFlag() || player.isEliminated());
     }
 

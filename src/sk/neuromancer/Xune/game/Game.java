@@ -14,6 +14,7 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.gfx.Window;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.sfx.SoundManager;
+import sk.neuromancer.Xune.sfx.SoundPlayer;
 
 import java.util.Random;
 
