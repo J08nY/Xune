@@ -30,6 +30,11 @@ public class Bot extends Player {
     protected int attackInterval = 3;
     protected int attackGroupSize = 5;
 
+    protected boolean buildsBarracks = true;
+    protected boolean buildsFactory = true;
+    protected boolean buildsHelipad = true;
+    protected boolean buildsPowerplant = true;
+
     private Random rand = new Random();
     private int buildings;
     private int units;
@@ -86,13 +91,13 @@ public class Bot extends Player {
     private void planBuildingBuild() {
         if (buildingPlan.isEmpty()) {
             // Check that we have all
-            if (entities.stream().noneMatch(e -> e instanceof Powerplant)) {
+            if (buildsPowerplant && entities.stream().noneMatch(e -> e instanceof Powerplant)) {
                 buildingPlan.add(Powerplant.class);
-            } else if (entities.stream().noneMatch(e -> e instanceof Barracks)) {
+            } else if (buildsBarracks && entities.stream().noneMatch(e -> e instanceof Barracks)) {
                 buildingPlan.add(Barracks.class);
-            } else if (entities.stream().noneMatch(e -> e instanceof Factory)) {
+            } else if (buildsFactory && entities.stream().noneMatch(e -> e instanceof Factory)) {
                 buildingPlan.add(Factory.class);
-            } else if (entities.stream().noneMatch(e -> e instanceof Helipad)) {
+            } else if (buildsHelipad && entities.stream().noneMatch(e -> e instanceof Helipad)) {
                 buildingPlan.add(Helipad.class);
             }
         }
@@ -243,7 +248,10 @@ public class Bot extends Player {
             unitPlan.add(Soldier.class);
             unitPlan.add(Soldier.class);
 
-            soldierPriority = 95;
+            buildsFactory = false;
+            buildsHelipad = false;
+
+            soldierPriority = 90;
             buggyPriority = 0;
             heliPriority = 0;
         }
@@ -259,8 +267,11 @@ public class Bot extends Player {
             unitPlan.add(Buggy.class);
             unitPlan.add(Buggy.class);
 
+            buildsBarracks = false;
+            buildsHelipad = false;
+
             soldierPriority = 0;
-            buggyPriority = 95;
+            buggyPriority = 90;
             heliPriority = 0;
         }
     }
@@ -275,9 +286,12 @@ public class Bot extends Player {
             unitPlan.add(Heli.class);
             unitPlan.add(Heli.class);
 
+            buildsBarracks = false;
+            buildsFactory = false;
+
             soldierPriority = 0;
             buggyPriority = 0;
-            heliPriority = 95;
+            heliPriority = 90;
         }
     }
 
@@ -295,6 +309,25 @@ public class Bot extends Player {
 
             soldierPriority = 50;
             buggyPriority = 30;
+            heliPriority = 10;
+        }
+    }
+
+    public static class EconGraduate extends Bot {
+        public EconGraduate(Game game, Level level, Flag flag, int money) {
+            super(game, level, flag, money);
+            buildingPlan.add(Factory.class);
+            buildingPlan.add(Barracks.class);
+            buildingPlan.add(Powerplant.class);
+
+            unitPlan.add(Harvester.class);
+            unitPlan.add(Soldier.class);
+            unitPlan.add(Soldier.class);
+
+            buildsHelipad = false;
+
+            soldierPriority = 40;
+            buggyPriority = 20;
             heliPriority = 10;
         }
     }
