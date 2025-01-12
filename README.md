@@ -1,6 +1,10 @@
 # Xune 2025
 ![intro](https://github.com/user-attachments/assets/af88b693-da36-4206-80e6-a9465beb1514)
 
+## Download
+
+Download [here](https://nightly.link/J08nY/Xune/workflows/build/main/artifact.zip) (or check out the latest GitHub actions artifact).
+
 ## Screenshots
 
 ![Screenshot](https://github.com/user-attachments/assets/a102ae4f-4729-4564-8a52-de58d258f15b)
