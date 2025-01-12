@@ -6,6 +6,7 @@ import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.level.Tile.CORNERS;
 
 public class Powerplant extends Building {
 
@@ -17,7 +18,7 @@ public class Powerplant extends Building {
         setBuildTime(Powerplant.class, TPS * 8);
         setDeathSound(Powerplant.class, SoundManager.SOUND_LONG_EXPLOSION_1);
         setBaseSprite(Powerplant.class, SpriteSheet.SPRITE_ID_POWERPLANT);
-        setPassable(Powerplant.class, new boolean[] {true, false, true, false, false, false, true, false, false, false, false, false, false});
+        setPassable(Powerplant.class, CORNERS);
     }
 
     public Powerplant(int x, int y, Orientation orientation, Player owner) {

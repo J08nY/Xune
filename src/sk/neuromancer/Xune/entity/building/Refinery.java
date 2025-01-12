@@ -9,6 +9,7 @@ import sk.neuromancer.Xune.sfx.SoundManager;
 import java.util.List;
 
 import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.level.Tile.CORNERS;
 
 public class Refinery extends Building {
 
@@ -20,7 +21,7 @@ public class Refinery extends Building {
         setBuildTime(Refinery.class, TPS * 10);
         setDeathSound(Refinery.class, SoundManager.SOUND_LONG_EXPLOSION_1);
         setBaseSprite(Refinery.class, SpriteSheet.SPRITE_ID_REFINERY);
-        setPassable(Refinery.class, new boolean[]{true, true, true, false, false, false, false, false, false, false, false, false, false});
+        setPassable(Refinery.class, CORNERS);
         registerPrerequisites(Refinery.class, List.of(new Prerequisite(Powerplant.class)));
     }
 
