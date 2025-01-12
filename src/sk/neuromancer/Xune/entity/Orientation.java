@@ -43,6 +43,27 @@ public enum Orientation {
         };
     }
 
+    public int getBit() {
+        return switch (this) {
+            case NORTH -> 0b1;
+            case NORTHEAST -> 0b10;
+            case EAST -> 0b100;
+            case SOUTHEAST -> 0b1000;
+            case SOUTH -> 0b10000;
+            case SOUTHWEST -> 0b100000;
+            case WEST -> 0b1000000;
+            case NORTHWEST -> 0b10000000;
+        };
+    }
+
+    public static int getBits(Orientation... orientations) {
+        int bits = 0;
+        for (Orientation orientation : orientations) {
+            bits |= orientation.getBit();
+        }
+        return bits;
+    }
+
     public static Orientation fromAzimuth(float radians) {
         double degrees = Math.toDegrees(radians);
         if (degrees < 0) {

@@ -307,6 +307,7 @@ public class Level implements Renderable, Tickable {
     }
 
     public boolean isTileBuildable(int tileX, int tileY, boolean[] footprint) {
+        // TODO: This is incorrect somehow. Can build powerplant over refinery or barracks over powerplant AND refinery.
         return pathfinder.isTileBuildable(tileX, tileY, footprint);
     }
 

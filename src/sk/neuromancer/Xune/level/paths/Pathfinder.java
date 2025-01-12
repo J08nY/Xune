@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.level.paths;
 
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.Config;
@@ -10,15 +11,15 @@ import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.level.Tile.TILE_HEIGHT;
-import static sk.neuromancer.Xune.level.Tile.TILE_WIDTH;
+import static sk.neuromancer.Xune.level.Tile.*;
 
 public class Pathfinder implements Tickable, Renderable {
     private final Level l;
-    // LevelMap is true if the point is passable
-    private final BoolMap levelMap;
+    // LevelMap contains the passable tiles as an or of the Orientations
+    private final IntMap levelMap;
     // SoligMap is true if the point is solid
     private final BoolMap solidMap;
     // BuildingMap is true if the point is occupied by a building
@@ -30,7 +31,7 @@ public class Pathfinder implements Tickable, Renderable {
 
     public Pathfinder(Level l) {
         this.l = l;
-        this.levelMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
+        this.levelMap = new IntMap(l.getWidthInTiles(), l.getHeightInTiles());
         this.solidMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
         this.buildingMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
         this.entityMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
@@ -138,7 +139,7 @@ public class Pathfinder implements Tickable, Renderable {
             }
 
             for (Point neighbor : current.point.getNeighbors()) {
-                if (!isPassable(neighbor, w)) continue;
+                if (!isPassableFrom(current.point, neighbor, w)) continue;
 
                 double tentativeG = current.g + current.point.distance(neighbor);
                 Node neighborNode = allNodes.getOrDefault(neighbor, new Node(neighbor));
@@ -159,7 +160,7 @@ public class Pathfinder implements Tickable, Renderable {
     }
 
     private void printPass(Path path) {
-        boolean[][] levelMap = this.levelMap.getValMap();
+        int[][] levelMap = this.levelMap.getValMap();
         boolean[][] buildingMap = this.buildingMap.getValMap();
         boolean[][] entityMap = this.entityMap.getValMap();
         boolean[][] solidMap = this.solidMap.getValMap();
@@ -170,7 +171,7 @@ public class Pathfinder implements Tickable, Renderable {
                     v = '░';
                 } else if (entityMap[i][j]) {
                     v = 'E';
-                } else if (!levelMap[i][j]) {
+                } else if (levelMap[i][j] == 0) {
                     v = '#';
                 } else if (solidMap[i][j]){
                     v = '*';
@@ -202,21 +203,36 @@ public class Pathfinder implements Tickable, Renderable {
     }
 
     public boolean isPassable(Point p, Walkability w) {
-        return (!w.requiresPassable || levelMap.isTrue(p)) &&
+        return (!w.requiresPassable || levelMap.get(p) != 0) &&
                 (!w.requiresNoBuilding || !buildingMap.isTrue(p)) &&
                 (!w.requiresNoEntity || !entityMap.isTrue(p)) &&
                 (!w.requiresNotSolid || !solidMap.isTrue(p));
     }
 
+    public boolean isPassableFrom(Point from, Point to, Walkability w) {
+        Orientation toOrienatation = to.orientationToNeighbor(from);
+        Orientation fromOrientation = from.orientationToNeighbor(to);
+        //System.out.println("From: " + from + " To: " + to + " FromO: " + fromOrientation + " ToO: " + toOrienatation);
+        // Check levelMap at "from" for the orientation
+        if (w.requiresPassable && (levelMap.get(from) & toOrienatation.getBit()) == 0) {
+            return false;
+        }
+        // Check levelMap at "to" for the orientation
+        if (w.requiresPassable && (levelMap.get(to) & fromOrientation.getBit()) == 0) {
+            return false;
+        }
+        return (!w.requiresNoBuilding || !buildingMap.isTrue(to)) &&
+                (!w.requiresNoEntity || !entityMap.isTrue(to)) &&
+                (!w.requiresNotSolid || !solidMap.isTrue(to));
+    }
+
     public boolean isTileClear(int tileX, int tileY) {
-        return levelMap.isTileAllTrue(tileX, tileY) &&
-                !buildingMap.isTilePartiallyTrue(tileX, tileY) &&
+        return !buildingMap.isTilePartiallyTrue(tileX, tileY) &&
                 !entityMap.isTilePartiallyTrue(tileX, tileY);
     }
 
     public boolean isTileClear(int tileX, int tileY, boolean[] footprint) {
-        return levelMap.isTileTrue(tileX, tileY, footprint) &&
-                !buildingMap.isTileTrue(tileX, tileY, negate(footprint)) &&
+        return !buildingMap.isTileTrue(tileX, tileY, negate(footprint)) &&
                 !entityMap.isTileTrue(tileX, tileY, negate(footprint));
     }
 
@@ -289,37 +305,48 @@ public class Pathfinder implements Tickable, Renderable {
 
     @Override
     public void render() {
-        boolean[][] map;
+        int w, h;
+        BiFunction<Integer, Integer, Integer> colorMap;
         if (Config.DEBUG_PATH_GRID_LEVEL) {
-            map = levelMap.getValMap();
+            w = levelMap.getWidth();
+            h = levelMap.getHeight();
+            colorMap = (i, j) -> PASS_TO_COLOR.get(levelMap.get(i, j));
         } else if (Config.DEBUG_PATH_GRID_BUILDING) {
-            map = buildingMap.getValMap();
+            w = buildingMap.getWidth();
+            h = buildingMap.getHeight();
+            colorMap = (i, j) -> buildingMap.isTrue(i, j) ? 0xff0000 : 0x00ff00;
         } else if (Config.DEBUG_PATH_GRID_ENTITY) {
-            map = entityMap.getValMap();
+            w = entityMap.getWidth();
+            h = entityMap.getHeight();
+            colorMap = (i, j) -> entityMap.isTrue(i, j) ? 0xff0000 : 0x00ff00;
         } else if (Config.DEBUG_PATH_GRID_SOLID) {
-            map = solidMap.getValMap();
+            w = solidMap.getWidth();
+            h = solidMap.getHeight();
+            colorMap = (i, j) -> SOLID_TO_COLOR.get(solidMap.isTrue(i, j));
         } else {
             return;
         }
         glPointSize(5);
         glDisable(GL_DEPTH_TEST);
         glBegin(GL_POINTS);
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[i].length; j++) {
-                if (map[i][j]) {
-                    if ((i + j) % 2 == 0) {
-                        glColor4f(1, 0, 0, 0.9f);
-                    } else {
-                        glColor4f(0, 0, 1, 0.9f);
-                    }
-                } else {
-                    glColor4f(0, 0, 0, 0.3f);
-                }
-                glVertex3f(gridXToLevel(j), gridYToLevel(i), 0);
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                int color = colorMap.apply(i, j);
+                glColor3ub((byte) ((color >> 16) & 0xff), (byte) ((color >> 8) & 0xff), (byte) (color & 0xff));
+                glVertex3f(gridXToLevel(i), gridYToLevel(j), 0);
             }
         }
         glColor4f(1, 1, 1, 1);
         glEnd();
+        if (Config.DEBUG_PATH_GRID_LEVEL) {
+            for (int i = 0; i < w; i++) {
+                for (int j = 0; j < h; j++) {
+                    float x = gridXToLevel(i);
+                    float y = gridYToLevel(j);
+
+                }
+            }
+        }
         glEnable(GL_DEPTH_TEST);
     }
 

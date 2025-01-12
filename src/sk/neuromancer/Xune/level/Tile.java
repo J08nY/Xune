@@ -1,9 +1,15 @@
 package sk.neuromancer.Xune.level;
 
+import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.gfx.Sprite;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.gfx.Text;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -16,7 +22,7 @@ public class Tile implements Renderable {
     private final float centerX;
     private final float centerY;
 
-    private final boolean[] pass;
+    private final int[] pass;
     private final boolean[] solid;
     private int spice;
 
@@ -39,96 +45,146 @@ public class Tile implements Renderable {
             {false, false, true, false, false, false, true, false, false, false, false, false, false};
     public static final boolean[] CORNERS =
             {true, false, true, false, true, false, true, false, false, false, false, false, false};
-    public static final boolean[][] PASS_START = {
-            ALL, //0
-            ALL, //1
-            ALL  //2
-    };
-    public static final boolean[][] SOLID_START = {
-            NONE, //0
-            NONE, //1
-            ALL   //2
-    };
-
-    public static final boolean[][] PASS_LOW = {
-            //0     1      2     3     4     5      6     7     8      9    10     11   12
-            {true, false, true, true, true, false, true, true, false, true, true, true, true}, //3
-            {true, true, true, false, true, false, true, true, false, true, true, true, true}, //4
-            {true, true, true, false, true, true, true, false, false, true, true, true, true}, //5
-            {true, false, true, false, true, true, true, true, false, true, true, true, true}, //6
-            ALL,                                                                          //7
-            {true, true, true, true, true, false, true, false, false, true, true, true, true}, //8
-            {true, true, true, false, true, true, true, false, false, true, true, true, true}, //9
-            {true, false, true, true, true, true, true, false, false, true, true, true, true}, //10
-            {true, false, true, true, true, false, true, true, false, true, true, true, true}, //11
-            {true, true, true, false, true, false, true, true, false, true, true, true, true}, //12
-            {true, false, true, true, true, true, true, false, false, true, true, true, true}, //13
-            {true, false, true, false, true, true, true, true, false, false, true, true, true}, //14
-            {true, true, true, true, true, false, true, false, false, true, true, true, false}, //15
-            {true, true, true, true, true, true, true, true, false, false, false, false, false},//16
-            ALL                                                   //17
-    };
-    public static final boolean[][] SOLID_LOW = {
-            //0     1      2     3     4     5      6     7     8      9    10     11   12
-            {false, true, true, true, true, true, false, false, true, false, true, true, false}, //3
-            {false, false, false, true, true, true, false, false, true, false, false, true, false}, //4
-            {false, false, false, true, true, true, true, true, true, false, false, true, true}, //5
-            {false, true, true, true, false, false, false, false, false, false, true, false, false}, //6
-            ALL,                                                                          //7
-            {false, false, false, false, false, true, true, true, false, false, false, false, true}, //8
-            {true, true, true, true, false, false, false, true, true, true, true, false, false}, //9
-            {true, true, false, false, false, false, false, true, true, true, false, false, false}, //10
-            {true, true, false, false, false, true, true, true, true, true, false, false, true}, //11
-            {true, true, true, true, false, true, true, true, true, true, true, false, true}, //12
-            {false, true, true, true, true, true, true, true, true, false, true, true, true}, //13
-            {true, true, false, true, true, true, true, true, true, true, true, true, true}, //14
-            {true, true, true, true, true, true, false, true, true, true, true, true, true}, //15
-            {false, false, false, false, false, false, false, false, true, true, true, true, true},//16
-            NONE                                                   //17
-    };
-
-    public static final boolean[][] PASS_HIGH = {
-            //0     1      2     3     4     5      6     7     8      9    10     11   12
-            {true, false, true, true, true, false, true, true, false, true, true, true, true}, //18
-            {true, true, true, false, true, false, true, true, false, true, true, true, true}, //19
-            {true, true, true, false, true, true, true, false, false, true, true, true, true}, //20
-            {true, false, true, false, true, true, true, true, false, true, true, false, true}, //21
-            ALL,                                                                          //22
-            {true, true, true, true, true, false, true, false, false, true, true, false, true}, //23
-            {true, true, true, false, true, true, true, false, false, true, true, false, false},//24
-            {true, false, true, true, true, true, true, false, false, true, false, false, false}, //25
-            {true, false, true, true, true, false, true, true, false, true, false, false, true}, //26
-            {true, true, true, false, true, false, true, true, false, true, true, false, true}, //27
-            {true, false, true, true, true, true, true, false, false, true, true, true, true}, //28
-            {true, false, true, false, true, true, true, true, false, false, true, true, true}, //29
-            {true, true, true, true, true, false, true, false, true, true, true, true, false}, //30
-            {true, true, true, true, true, true, true, true, false, false, false, false, false},//31
-            ALL                                                                            //32
-    };
-
-    public static final boolean[][] PASS_OPEN = {
-            //0     1      2     3     4     5      6     7     8      9    10     11   12
-            {true, false, true, true, true, false, true, true, true, true, true, true, true}, //33
-            {true, true, true, false, true, false, true, true, true, true, true, true, true}, //34
-            {true, true, true, false, true, true, true, false, true, true, true, true, true}, //35
-            {true, false, true, false, true, true, true, true, true, true, true, true, true}, //36
-            ALL,                                                                         //37
-            {true, true, true, true, true, false, true, false, true, true, true, true, true}, //38
-            {true, true, true, false, true, true, true, false, true, true, true, true, true}, //39
-            {true, false, false, true, true, true, false, false, true, true, false, true, false}, //40
-            {true, false, true, true, true, false, true, true, true, true, true, true, true}, //41
-            {true, true, true, false, true, false, true, true, true, true, true, true, true}, //42
-            {true, false, true, true, true, true, true, false, true, true, true, true, true}, //43
-            {true, false, true, false, true, true, true, true, true, true, true, true, true}, //44
-            {true, true, true, true, true, false, true, false, true, true, true, true, true}, //45
-            {true, true, true, true, true, true, true, true, false, true, true, true, true}, //46
-            ALL                                                                          //47
-    };
-
     public static final int TILE_WIDTH = 24;
     public static final int TILE_HEIGHT = 11;
     public static final float TILE_CENTER_X = (float) TILE_WIDTH / 2;
     public static final float TILE_CENTER_Y = (float) TILE_HEIGHT / 2;
+
+    public static final Map<Integer, Integer> COLOR_TO_PASS = Map.of(
+            /*
+             * #99e550
+             *          * * *
+             *          *   *
+             *          * * *
+             */
+            0x99e550, Orientation.getBits(Orientation.NORTH, Orientation.NORTHEAST, Orientation.EAST, Orientation.SOUTHEAST, Orientation.SOUTH, Orientation.SOUTHWEST, Orientation.WEST, Orientation.NORTHWEST),
+            /*
+             * #ac3232
+             *          o o o
+             *          o   o
+             *          o o o
+             */
+            0xac3232, 0,
+            /*
+             * #d77bba
+             *          * * *
+             *          *
+             *          *
+             */
+            0xd77bba, Orientation.getBits(Orientation.NORTH, Orientation.NORTHEAST, Orientation.SOUTHWEST, Orientation.WEST, Orientation.NORTHWEST),
+            /*
+             * #76428a
+             *              *
+             *              *
+             *          * * *
+             */
+            0x76428a, Orientation.getBits(Orientation.NORTHEAST, Orientation.EAST, Orientation.SOUTHEAST, Orientation.SOUTH, Orientation.SOUTHWEST),
+            /*
+             * #d95763
+             *          * * *
+             *              *
+             *              *
+             */
+            0xd95763, Orientation.getBits(Orientation.NORTHWEST, Orientation.NORTH, Orientation.NORTHEAST, Orientation.EAST, Orientation.SOUTHEAST),
+            /*
+             * #8f974a
+             *          *
+             *          *
+             *          * * *
+             */
+            0x8f974a, Orientation.getBits(Orientation.SOUTHEAST, Orientation.SOUTH, Orientation.SOUTHWEST, Orientation.WEST, Orientation.NORTHWEST),
+            /*
+             * #5b6ee1
+             *
+             *
+             *          * * *
+             */
+            0x5b6ee1, Orientation.getBits(Orientation.SOUTH, Orientation.SOUTHEAST, Orientation.SOUTHWEST),
+            /*
+             * #5fcde4
+             *              *
+             *              *
+             *              *
+             */
+            0x5fcde4, Orientation.getBits(Orientation.EAST, Orientation.SOUTHEAST, Orientation.NORTHEAST),
+            /*
+             * #306082
+             *          *
+             *          *
+             *          *
+             */
+            0x306082, Orientation.getBits(Orientation.WEST, Orientation.NORTHWEST, Orientation.SOUTHWEST),
+            /*
+             * #fbf236
+             *          * * *
+             *
+             *
+             */
+            0xfbf236, Orientation.getBits(Orientation.NORTH, Orientation.NORTHEAST, Orientation.NORTHWEST)
+    );
+    public static final Map<Integer, Integer> PASS_TO_COLOR;
+
+    public static final Map<Integer, Boolean> COLOR_TO_SOLID = Map.of(
+            0x99e550, false,
+            0xac3232, true,
+            0, false
+    );
+    public static final Map<Boolean, Integer> SOLID_TO_COLOR;
+
+    public static final Map<Integer, int[]> passMap;
+    public static final Map<Integer, boolean[]> solidMap;
+
+    static {
+        passMap = new HashMap<>();
+        solidMap = new HashMap<>();
+        for (int type = 0; type < 59; type ++) {
+            Sprite passSprite = SpriteSheet.PASSMAP_SHEET.getSprite(type);
+            int[] pass = new int[13];
+
+            pass[0] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(2, 0, false), 0);
+            pass[1] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(3, 1, false), 0);
+            pass[2] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(4, 2, false), 0);
+            pass[3] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(3, 3, false), 0);
+            pass[4] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(2, 4, false), 0);
+            pass[5] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(1, 3, false), 0);
+            pass[6] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(0, 2, false), 0);
+            pass[7] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(1, 1, false), 0);
+            pass[8] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(2, 2, false), 0);
+            pass[9] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(2, 1, false), 0);
+            pass[10] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(3, 2, false), 0);
+            pass[11] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(2, 3, false), 0);
+            pass[12] = COLOR_TO_PASS.getOrDefault(passSprite.getPixelAt(1, 2, false), 0);
+            passMap.put(type, pass);
+
+            Sprite solidSprite = SpriteSheet.SOLIDMAP_SHEET.getSprite(type);
+            boolean[] solid = new boolean[13];
+            solid[0] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(2, 0, false));
+            solid[1] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(3, 1, false));
+            solid[2] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(4, 2, false));
+            solid[3] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(3, 3, false));
+            solid[4] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(2, 4, false));
+            solid[5] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(1, 3, false));
+            solid[6] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(0, 2, false));
+            solid[7] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(1, 1, false));
+            solid[8] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(2, 2, false));
+            solid[9] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(2, 1, false));
+            solid[10] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(3, 2, false));
+            solid[11] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(2, 3, false));
+            solid[12] = COLOR_TO_SOLID.get(solidSprite.getPixelAt(1, 2, false));
+            solidMap.put(type, solid);
+        }
+
+        PASS_TO_COLOR = new HashMap<>();
+        for (Map.Entry<Integer, Integer> entry : COLOR_TO_PASS.entrySet()) {
+            PASS_TO_COLOR.put(entry.getValue(), entry.getKey());
+        }
+
+        SOLID_TO_COLOR = new HashMap<>();
+        for (Map.Entry<Integer, Boolean> entry : COLOR_TO_SOLID.entrySet()) {
+            SOLID_TO_COLOR.put(entry.getValue(), entry.getKey());
+        }
+    }
+
 
     public Tile(int type, int x, int y) {
         this.x = x;
@@ -139,31 +195,13 @@ public class Tile implements Renderable {
         this.centerY = levelY + TILE_CENTER_Y;
 
         this.type = type;
-        if (type < 3) {
-            this.pass = PASS_START[type];
-            this.solid = SOLID_START[type];
-        } else if (type < 18) {
-            this.pass = ALL;
-            this.solid = SOLID_LOW[type - 3];
-        } else if (type < 33) {
-            this.pass = PASS_HIGH[type - 18];
-            this.solid = SOLID_LOW[type - 18];
-        } else if (type < 48) {
-            this.pass = PASS_OPEN[type - 33];
-            this.solid = SOLID_LOW[type - 33];
-        } else if (type < 51) {
-            this.pass = ALL;
-            this.solid = ALL;
-        } else if (type < 59) {
-            this.pass = NONE;
-            this.solid = NONE;
-        } else {
-            throw new IllegalStateException("Invalid tile type: " + type);
-        }
+        this.pass = passMap.get(type);
+        this.solid = solidMap.get(type);
         if (isSpicy()) {
             this.spice = 1000;
         }
     }
+
 
     public int getX() {
         return this.x;
@@ -201,7 +239,7 @@ public class Tile implements Renderable {
         this.spice -= amount;
     }
 
-    public boolean[] getPassable() {
+    public int[] getPassable() {
         return this.pass;
     }
 

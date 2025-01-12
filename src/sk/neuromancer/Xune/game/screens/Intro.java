@@ -73,10 +73,10 @@ public class Intro implements Tickable, Renderable {
                     }
                 } else if (column == 1) {
                     if ((input.W.wasPressed() || input.UP.wasPressed()) && selectedBot > 0) {
-                        selectedBot = (selectedBot - 1) % 4;
+                        selectedBot = (selectedBot - 1) % 5;
                     }
-                    if ((input.S.wasPressed() || input.DOWN.wasPressed()) && selectedBot < 3) {
-                        selectedBot = (selectedBot + 1) % 4;
+                    if ((input.S.wasPressed() || input.DOWN.wasPressed()) && selectedBot < 4) {
+                        selectedBot = (selectedBot + 1) % 5;
                     }
                     if (input.A.wasPressed() || input.LEFT.wasPressed()) {
                         column = 0;
@@ -140,9 +140,10 @@ public class Intro implements Tickable, Renderable {
             new Text("Buggy Boy", 0, height, true, 2).render();
             new Text("Heli Master", 0, 2 * height, true, 2).render();
             new Text("Jack of All Trades", 0, 3 * height, true, 2).render();
+            new Text("Econ Graduate", 0, 4 * height, true, 2).render();
             if (column == 1) {
                 new Text("------------------", 0, -height, true, 2).render();
-                new Text("------------------", 0, 4 * height, true, 2).render();
+                new Text("------------------", 0, 5 * height, true, 2).render();
             }
             glPopMatrix();
         }
@@ -173,6 +174,7 @@ public class Intro implements Tickable, Renderable {
             case 1 -> Bot.BuggyBoy.class;
             case 2 -> Bot.HeliMaster.class;
             case 3 -> Bot.JackOfAllTrades.class;
+            case 4 -> Bot.EconGraduate.class;
             default -> null;
         };
     }

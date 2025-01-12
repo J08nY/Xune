@@ -85,6 +85,18 @@ public class Sprite implements Renderable {
         return pixels;
     }
 
+    public int getPixelAt(int x, int y, boolean withAlpha) {
+        if (pixels == null) {
+            return 0;
+        }
+        if (withAlpha) {
+            return pixels[(y * width + x) * 4] << 24 | pixels[(y * width + x) * 4 + 1] << 16 | pixels[(y * width + x) * 4 + 2] << 8 | pixels[(y * width + x) * 4 + 3];
+        } else {
+            return pixels[(y * width + x) * 4] << 16 | pixels[(y * width + x) * 4 + 1] << 8 | pixels[(y * width + x) * 4 + 2];
+        }
+    }
+
+
     public void destroy() {
         glDeleteTextures(textureId);
     }

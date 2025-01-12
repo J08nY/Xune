@@ -320,14 +320,14 @@ public class Bot extends Player {
             buildingPlan.add(Barracks.class);
             buildingPlan.add(Powerplant.class);
 
+            unitPlan.add(Buggy.class);
             unitPlan.add(Harvester.class);
-            unitPlan.add(Soldier.class);
             unitPlan.add(Soldier.class);
 
             buildsHelipad = false;
 
-            soldierPriority = 40;
-            buggyPriority = 20;
+            soldierPriority = 30;
+            buggyPriority = 30;
             heliPriority = 10;
         }
     }

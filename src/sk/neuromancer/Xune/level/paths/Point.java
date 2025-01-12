@@ -1,5 +1,7 @@
 package sk.neuromancer.Xune.level.paths;
 
+import sk.neuromancer.Xune.entity.Orientation;
+
 import java.util.Objects;
 
 public class Point {
@@ -47,25 +49,16 @@ public class Point {
     }
 
     public Point[] getNeighbors() {
-        if ((x + y) % 2 == 0) {
-            return new Point[]{
-                    new Point(x - 1, y - 1),
-                    new Point(x - 1, y),
-                    new Point(x - 1, y + 1),
-                    new Point(x, y - 1),
-                    new Point(x, y + 1),
-                    new Point(x + 1, y - 1),
-                    new Point(x + 1, y),
-                    new Point(x + 1, y + 1),
-            };
-        } else {
-            return new Point[]{
-                    new Point(x - 1, y),
-                    new Point(x, y - 1),
-                    new Point(x, y + 1),
-                    new Point(x + 1, y),
-            };
-        }
+        return new Point[]{
+                new Point(x - 1, y - 1),
+                new Point(x - 1, y),
+                new Point(x - 1, y + 1),
+                new Point(x, y - 1),
+                new Point(x, y + 1),
+                new Point(x + 1, y - 1),
+                new Point(x + 1, y),
+                new Point(x + 1, y + 1),
+        };
     }
 
     public int angleToNeighbor(Point b) {
@@ -89,7 +82,7 @@ public class Point {
             case -1 -> switch (dy) {
                 case -1 -> 315;
                 case 0 -> 270;
-                case 1 -> 180;
+                case 1 -> 225;
                 default -> throw new IllegalArgumentException("Invalid dy.");
             };
             case 0 -> switch (dy) {
@@ -101,6 +94,35 @@ public class Point {
                 case -1 -> 45;
                 case 0 -> 90;
                 case 1 -> 135;
+                default -> throw new IllegalArgumentException("Invalid dy.");
+            };
+            default -> throw new IllegalArgumentException("Invalid dx.");
+        };
+    }
+
+    public Orientation orientationToNeighbor(Point b) {
+        if (!isNextTo(b)) {
+            throw new IllegalArgumentException("Points are not neighbors.");
+        }
+
+        int dx = x - b.x;
+        int dy = y - b.y;
+        return switch (dx) {
+            case -1 -> switch (dy) {
+                case -1 -> Orientation.NORTHWEST;
+                case 0 -> Orientation.WEST;
+                case 1 -> Orientation.SOUTHWEST;
+                default -> throw new IllegalArgumentException("Invalid dy.");
+            };
+            case 0 -> switch (dy) {
+                case -1 -> Orientation.NORTH;
+                case 1 -> Orientation.SOUTH;
+                default -> throw new IllegalArgumentException("Invalid dy.");
+            };
+            case 1 -> switch (dy) {
+                case -1 -> Orientation.NORTHEAST;
+                case 0 -> Orientation.EAST;
+                case 1 -> Orientation.SOUTHEAST;
                 default -> throw new IllegalArgumentException("Invalid dy.");
             };
             default -> throw new IllegalArgumentException("Invalid dx.");

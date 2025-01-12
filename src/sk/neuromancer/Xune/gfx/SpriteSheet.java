@@ -9,6 +9,8 @@ import java.io.IOException;
 public class SpriteSheet {
     public static SpriteSheet ENTITY_SHEET = new SpriteSheet("entities.png", 24, 11);
     public static SpriteSheet TILE_SHEET = new SpriteSheet("tiles.png", 24, 11);
+    public static SpriteSheet PASSMAP_SHEET = new SpriteSheet("passmap.png", 5, 5, true);
+    public static SpriteSheet SOLIDMAP_SHEET = new SpriteSheet("solidmap.png", 5, 5, true);
     public static SpriteSheet MAP_SHEET = new SpriteSheet("minimap.png", 1, 1, true);
     public static SpriteSheet EFFECTS_SHEET = new SpriteSheet("effects.png", 24, 11);
     public static SpriteSheet MISC_SHEET = new SpriteSheet("misc.png", 24, 11);
@@ -127,6 +129,8 @@ public class SpriteSheet {
     public static void initSheets() {
         SpriteSheet.ENTITY_SHEET.initSheet();
         SpriteSheet.TILE_SHEET.initSheet();
+        SpriteSheet.PASSMAP_SHEET.initSheet();
+        SpriteSheet.SOLIDMAP_SHEET.initSheet();
         SpriteSheet.MAP_SHEET.initSheet();
         SpriteSheet.EFFECTS_SHEET.initSheet();
         SpriteSheet.MISC_SHEET.initSheet();
@@ -141,6 +145,8 @@ public class SpriteSheet {
     public static void destroySheets() {
         SpriteSheet.ENTITY_SHEET.destroySheet();
         SpriteSheet.TILE_SHEET.destroySheet();
+        SpriteSheet.PASSMAP_SHEET.destroySheet();
+        SpriteSheet.SOLIDMAP_SHEET.destroySheet();
         SpriteSheet.MAP_SHEET.destroySheet();
         SpriteSheet.EFFECTS_SHEET.destroySheet();
         SpriteSheet.MISC_SHEET.destroySheet();
