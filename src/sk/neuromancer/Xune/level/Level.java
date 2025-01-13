@@ -383,11 +383,15 @@ public class Level implements Renderable, Tickable {
     }
 
     public static int levelToTileX(float levelX, float levelY) {
+        return Math.round(levelToFullTileX(levelX, levelY));
+    }
+
+    public static float levelToFullTileX(float levelX, float levelY) {
         int tileY = levelToTileY(levelX, levelY);
         if (tileY % 2 == 0) {
-            return Math.round((levelX - Tile.TILE_CENTER_X) / Tile.TILE_WIDTH);
+            return (levelX - Tile.TILE_CENTER_X) / Tile.TILE_WIDTH;
         } else {
-            return Math.round((levelX - 2 * Tile.TILE_CENTER_X) / Tile.TILE_WIDTH);
+            return (levelX - 2 * Tile.TILE_CENTER_X) / Tile.TILE_WIDTH;
         }
     }
 
@@ -400,7 +404,11 @@ public class Level implements Renderable, Tickable {
     }
 
     public static int levelToTileY(float levelX, float levelY) {
-        return Math.round((levelY - Tile.TILE_CENTER_Y) / (0.5f * (Tile.TILE_HEIGHT + 1)));
+        return Math.round(levelToFullTileY(levelX, levelY));
+    }
+
+    public static float levelToFullTileY(float levelX, float levelY) {
+        return (levelY - Tile.TILE_CENTER_Y) / (0.5f * (Tile.TILE_HEIGHT + 1));
     }
 
     public boolean isDone() {

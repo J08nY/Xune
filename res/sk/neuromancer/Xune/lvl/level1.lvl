@@ -62,5 +62,5 @@
 
 spawn 5,6
 spawn 21,50
-worm 25,0
+worm 25,1
 worm 0,59

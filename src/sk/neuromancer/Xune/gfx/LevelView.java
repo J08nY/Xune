@@ -40,8 +40,7 @@ public class LevelView implements Tickable, Renderable {
     public void setLevel(Level level) {
         this.level = level;
         this.zoom = 5.0f;
-        this.xOff = screenCenterX - (screenCenterX / this.zoom);
-        this.yOff = screenCenterY - (screenCenterY / this.zoom);
+        centerOn(level.getWidth() / 2, level.getHeight() / 2);
     }
 
     @Override
@@ -87,7 +86,7 @@ public class LevelView implements Tickable, Renderable {
     }
 
     public void zoomOut(float speed) {
-        if (getLevelY(0) > -EDGE_MARGIN_Y &&
+        if (true || getLevelY(0) > -EDGE_MARGIN_Y &&
                 getLevelX(0) > -EDGE_MARGIN_X &&
                 getLevelY(hudTop) < (level.getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2) &&
                 getLevelX(screenWidth) < (level.getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2))
@@ -95,27 +94,32 @@ public class LevelView implements Tickable, Renderable {
     }
 
     public void moveUp() {
-        if (getLevelY(0) > -EDGE_MARGIN_Y) {
+        if (true || getLevelY(0) > -EDGE_MARGIN_Y) {
             this.yOff += MOVE_SPEED * (1 / zoom);
         }
     }
 
     public void moveDown() {
-        if (getLevelY(hudTop) < (level.getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
+        if (true || getLevelY(hudTop) < (level.getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
             this.yOff -= MOVE_SPEED * (1 / zoom);
         }
     }
 
     public void moveLeft() {
-        if (getLevelX(0) > -EDGE_MARGIN_X) {
+        if (true || getLevelX(0) > -EDGE_MARGIN_X) {
             this.xOff += MOVE_SPEED * (1 / zoom);
         }
     }
 
     public void moveRight() {
-        if (getLevelX(screenWidth) < (level.getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
+        if (true || getLevelX(screenWidth) < (level.getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
             this.xOff -= MOVE_SPEED * (1 / zoom);
         }
+    }
+
+    public void centerOn(float levelX, float levelY) {
+        this.xOff = screenCenterX - levelX;
+        this.yOff = screenCenterY - levelY;
     }
 
     public float getLevelX(double screenPointX) {

@@ -125,16 +125,20 @@ public class HUD implements Tickable, Renderable {
         String selected = human.getSelected().stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(", "));
         renderText(20, 110, selected);
 
-//        float levelX = level.getLevelX(mouseX);
-//        float levelY = level.getLevelY(mouseY);
-//
-//        renderText(0, 70, String.format("X:      %.2f", mouseX));
-//        renderText(0, 80, String.format("Y:      %.2f", mouseY));
-//        renderText(0, 90, String.format("LEVELX: %.2f", levelX));
-//        renderText(0, 100, String.format("LEVELY: %.2f", levelY));
-//        renderText(0, 110, String.format("XOFF:   %.2f", level.xOff));
-//        renderText(0, 120, String.format("YOFF:   %.2f", level.yOff));
-//        renderText(200, 120, String.format("ZOOM:   %.2f", level.zoom));
+        if (Config.DEBUG_VIEW) {
+            LevelView view = game.getView();
+            float levelX = view.getLevelX(mouseX);
+            float levelY = view.getLevelY(mouseY);
+
+            renderText(0, 70, String.format("X:      %.2f", mouseX));
+            renderText(0, 80, String.format("Y:      %.2f", mouseY));
+            renderText(0, 90, String.format("LEVELX: %.2f", levelX));
+            renderText(0, 100, String.format("LEVELY: %.2f", levelY));
+            renderText(0, 110, String.format("XOFF:   %.2f", view.xOff));
+            renderText(0, 120, String.format("YOFF:   %.2f", view.yOff));
+            renderText(200, 120, String.format("ZOOM:   %.2f", view.zoom));
+        }
+
         glPopMatrix();
     }
 
@@ -244,6 +248,21 @@ public class HUD implements Tickable, Renderable {
         }
         glColor3f(1, 1, 1);
         glEnd();
+
+        float startX = game.getView().getLevelX(0);
+        float startY = game.getView().getLevelY(0);
+        float sX = Math.max(Level.levelToFullTileX(startX, startY), 0);
+        float sY = Math.max(Level.levelToFullTileY(startX, startY), 0);
+        float endX = game.getView().getLevelX(screenWidth);
+        float endY = game.getView().getLevelY(hudTop);
+        float eX = Math.min(Level.levelToFullTileX(endX, endY), level.getWidthInTiles());
+        float eY = Math.min(Level.levelToFullTileY(endX, endY), level.getHeightInTiles());
+        glBegin(GL_LINE_LOOP);
+        glVertex2f(sX, sY);
+        glVertex2f(eX, sY);
+        glVertex2f(eX, eY);
+        glVertex2f(sX, eY);
+        glEnd();
         glPopMatrix();
     }
 
@@ -270,6 +289,29 @@ public class HUD implements Tickable, Renderable {
         updateInputs();
         updateCursor();
         updateButtons(tickCount);
+        updateMinimap();
+    }
+
+    private void updateMinimap() {
+        if (game.getInput().mouse.isLeftReleased() && isMouseOverHud((float) mouseY)) {
+            float mapStartX = hudScale * 5;
+            float mapStartY = hudTop + hudScale * 5;
+            float mapEndX = hudScale * 55;
+            float mapEndY = hudTop + hudScale * 55;
+            if (mouseX > mapStartX &&
+                    mouseX < mapEndX &&
+                    mouseY > mapStartY &&
+                    mouseY < mapEndY) {
+                System.out.println("MouseX: " + mouseX + " MouseY: " + mouseY);
+                int tx = Math.round((float) (mouseX - mapStartX) * level.getWidthInTiles() / (hudScale * 50));
+                int ty = Math.round((float) (mouseY - mapStartY) * level.getHeightInTiles() / (hudScale * 50));
+                System.out.println("X: " + tx + " Y: " + ty);
+                float lx = Level.tileToLevelX(tx, ty);
+                float ly = Level.tileToLevelY(tx, ty);
+                System.out.println("LX: " + lx + " LY: " + ly);
+                game.getView().centerOn(lx, ly);
+            }
+        }
     }
 
     private void updateButtons(int tickCount) {
