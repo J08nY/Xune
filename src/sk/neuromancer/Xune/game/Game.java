@@ -70,7 +70,8 @@ public class Game {
         pause = new Pause(this);
         gameover = new Gameover(this);
 
-        SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
+        SoundPlayer player = SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
+        System.out.println(player.getState());
         window.show();
     }
 

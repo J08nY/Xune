@@ -1,9 +1,9 @@
 package sk.neuromancer.Xune.entity.building;
 
 import sk.neuromancer.Xune.entity.Orientation;
-import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.unit.Heli;
+import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.sfx.SoundManager;
 

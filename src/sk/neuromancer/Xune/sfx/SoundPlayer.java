@@ -67,16 +67,25 @@ public class SoundPlayer {
     public void play() {
         state = SoundPlayerState.PLAYING;
         alSourcePlay(source);
+        if (alGetError() != AL_NO_ERROR) {
+            throw new RuntimeException("Error playing sound.");
+        }
     }
 
     public void pause() {
         state = SoundPlayerState.PAUSED;
         alSourcePause(source);
+        if (alGetError() != AL_NO_ERROR) {
+            throw new RuntimeException("Error pausing sound.");
+        }
     }
 
     public void stop() {
         state = SoundPlayerState.STOPPED;
         alSourceStop(source);
+        if (alGetError() != AL_NO_ERROR) {
+            throw new RuntimeException("Error stopping sound.");
+        }
     }
 
     public SoundPlayerState getState() {

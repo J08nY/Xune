@@ -2,8 +2,8 @@ package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.game.Clickable;
 import sk.neuromancer.Xune.game.Game;
-import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.game.Tickable;
+import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.Sprite;
 

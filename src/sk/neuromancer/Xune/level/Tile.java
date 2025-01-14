@@ -7,7 +7,6 @@ import sk.neuromancer.Xune.gfx.Sprite;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.gfx.Text;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

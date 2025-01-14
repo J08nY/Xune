@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.sfx;
 
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALCCapabilities;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
@@ -9,6 +10,7 @@ import sk.neuromancer.Xune.sfx.SoundPlayer.SoundPlayerState;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,22 +28,22 @@ public class SoundManager implements Tickable {
     private final Sound[] sounds;
 
     private static final String[] soundNames = new String[]{
-            "blip_1.wav",
-            "explosion_1.wav",
-            "explosion_2.wav",
-            "explosion_3.wav",
-            "hit_1.wav",
-            "hit_2.wav",
-            "hit_3.wav",
-            "laser_1.wav",
-            "long_explosion_1.wav",
-            "shot_1.wav",
-            "shot_2.wav",
-            "tada_1.wav",
-            "wilhelm.wav",
-            "worm_death.wav",
-            "worm_kill.wav",
-            "duneshifter.wav"
+            "blip_1.opus",
+            "explosion_1.opus",
+            "explosion_2.opus",
+            "explosion_3.opus",
+            "hit_1.opus",
+            "hit_2.opus",
+            "hit_3.opus",
+            "laser_1.opus",
+            "long_explosion_1.opus",
+            "shot_1.opus",
+            "shot_2.opus",
+            "tada_1.opus",
+            "wilhelm.opus",
+            "worm_death.opus",
+            "worm_kill.opus",
+            "duneshifter.opus"
     };
 
     public static final int SOUND_NONE = -1;
@@ -66,6 +68,12 @@ public class SoundManager implements Tickable {
     private static SoundManager instance;
 
     public SoundManager(Game game) {
+        String deviceList = ALC10.alcGetString(0, ALC10.ALC_DEVICE_SPECIFIER);
+        if (deviceList != null) {
+            String[] deviceArray = deviceList.split("\0");
+            System.out.println("OpenAL devices: " + Arrays.toString(deviceArray));
+        }
+
         this.game = game;
         this.device = alcOpenDevice((ByteBuffer) null);
         if (device == NULL) {
@@ -83,7 +91,7 @@ public class SoundManager implements Tickable {
 
         this.sounds = new Sound[SoundManager.soundNames.length];
         for (int i = 0; i < this.sounds.length; i++) {
-            this.sounds[i] = new Sound(SoundManager.soundNames[i]);
+            this.sounds[i] = Sound.create(SoundManager.soundNames[i]);
         }
         instance = this;
     }

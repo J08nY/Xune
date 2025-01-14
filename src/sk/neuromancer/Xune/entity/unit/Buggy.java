@@ -1,6 +1,8 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.Command;
+import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Factory;
 import sk.neuromancer.Xune.game.Clickable;
 import sk.neuromancer.Xune.game.players.Player;
