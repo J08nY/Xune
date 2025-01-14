@@ -146,12 +146,10 @@ public abstract class Sound {
             try (MemoryStack stack = MemoryStack.stackPush();
                  InputStream stream = getClass().getResourceAsStream("/sk/neuromancer/Xune/aud/" + fileName)) {
                 assert stream != null;
-                System.out.println("Loading " + fileName);
-                System.out.println("Available data: " + stream.available());
                 ByteBuffer buffer = MemoryUtil.memAlloc(stream.available());
                 Channels.newChannel(stream).read(buffer);
                 buffer.flip();
-                System.out.println("Buffer size: " + buffer.remaining());
+
                 IntBuffer eOut = stack.mallocInt(1);
                 long opusFile = op_open_memory(buffer, eOut);
                 if (opusFile == NULL) {
@@ -163,7 +161,6 @@ public abstract class Sound {
                 }
 
                 int channels = op_channel_count(opusFile, -1);
-                System.out.println(channels);
                 long totalSamples = op_pcm_total(opusFile, -1);
                 if (totalSamples < 0) {
                     throw new RuntimeException("Failed to get total samples");

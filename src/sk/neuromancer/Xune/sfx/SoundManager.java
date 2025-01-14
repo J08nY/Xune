@@ -1,22 +1,19 @@
 package sk.neuromancer.Xune.sfx;
 
-import org.lwjgl.openal.AL;
-import org.lwjgl.openal.ALC;
-import org.lwjgl.openal.ALC10;
-import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.*;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.sfx.SoundPlayer.SoundPlayerState;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.lwjgl.openal.AL10.AL_INVERSE_DISTANCE_CLAMPED;
 import static org.lwjgl.openal.AL10.alDistanceModel;
 import static org.lwjgl.openal.ALC10.*;
+import static org.lwjgl.openal.ALC11.ALC_ALL_DEVICES_SPECIFIER;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class SoundManager implements Tickable {
@@ -68,10 +65,13 @@ public class SoundManager implements Tickable {
     private static SoundManager instance;
 
     public SoundManager(Game game) {
-        String deviceList = ALC10.alcGetString(0, ALC10.ALC_DEVICE_SPECIFIER);
-        if (deviceList != null) {
-            String[] deviceArray = deviceList.split("\0");
-            System.out.println("OpenAL devices: " + Arrays.toString(deviceArray));
+        if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATE_ALL_EXT")) {
+            System.out.println("ALC_ENUMERATE_ALL_EXT is supported.");
+            List<String> deviceList = ALUtil.getStringList(0, ALC_ALL_DEVICES_SPECIFIER);
+            System.out.println("OpenAL devices: " + deviceList);
+        } else {
+            List<String> deviceList = ALUtil.getStringList(0, ALC10.ALC_DEVICE_SPECIFIER);
+            System.out.println("OpenAL devices: " + deviceList);
         }
 
         this.game = game;

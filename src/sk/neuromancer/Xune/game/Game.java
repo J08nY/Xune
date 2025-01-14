@@ -71,7 +71,6 @@ public class Game {
         gameover = new Gameover(this);
 
         SoundPlayer player = SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
-        System.out.println(player.getState());
         window.show();
     }
 
