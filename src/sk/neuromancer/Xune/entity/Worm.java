@@ -7,6 +7,7 @@ import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.net.proto.EntityStateProto;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.Iterator;
@@ -34,10 +35,25 @@ public class Worm extends Entity implements Moveable {
         WANDERING,
         HUNTING,
         EATING;
+
+        public EntityStateProto.WormState.WormStatus serialize() {
+            return switch (this) {
+                case WANDERING -> EntityStateProto.WormState.WormStatus.WANDERING;
+                case HUNTING -> EntityStateProto.WormState.WormStatus.HUNTING;
+                case EATING -> EntityStateProto.WormState.WormStatus.EATING;
+            };
+        }
     }
 
     private enum Position {
         ABOVE, BELOW;
+
+        public EntityStateProto.WormState.WormPosition serialize() {
+            return switch (this) {
+                case ABOVE -> EntityStateProto.WormState.WormPosition.ABOVE;
+                case BELOW -> EntityStateProto.WormState.WormPosition.BELOW;
+            };
+        }
     }
 
     static {
@@ -268,4 +284,19 @@ public class Worm extends Entity implements Moveable {
         return !(other instanceof Worm);
     }
 
+    public EntityStateProto.WormState serialize() {
+        return EntityStateProto.WormState.newBuilder()
+                .setEntity(toEntityState())
+                .setAnimation(animation)
+                .setDir(dir)
+                .addAllPlan(plan.stream().map(Path::serialize).toList())
+                .setCurrent(current != null ? current.serialize() : null)
+                .setNextPoint(nextPoint)
+                .setSpeed(speed)
+                .setStatus(state.serialize())
+                .setStateSince(stateSince)
+                .setPosition(position.serialize())
+                .setTargetId(target != null ? target.getId() : -1)
+                .setScale(scale).build();
+    }
 }

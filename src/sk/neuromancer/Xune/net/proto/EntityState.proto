@@ -4,8 +4,8 @@ package sk.neuromancer.Xune.net.proto;
 
 option java_outer_classname = "EntityStateProto";
 
-import "sk/neuromancer/Xune/net/Base.proto";
-import "sk/neuromancer/Xune/net/Command.proto";
+import "sk/neuromancer/Xune/net/proto/Base.proto";
+import "sk/neuromancer/Xune/net/proto/Command.proto";
 
 message EntityState {
   uint64 id = 1;
@@ -45,4 +45,32 @@ message UnitState {
 message BuildingState {
   PlayableEntityState entity = 1;
   Tile tilePosition = 2;
+}
+
+message WormState {
+  EntityState entity = 1;
+  uint32 animation = 2;
+  uint32 dir = 3;
+  repeated Path plan = 4;
+  Path current = 5;
+  uint32 nextPoint = 6;
+  float speed = 7;
+
+  enum WormStatus {
+    WANDERING = 0;
+    HUNTING = 1;
+    EATING = 2;
+  }
+
+  WormStatus status = 8;
+  uint32 stateSince = 9;
+
+  enum WormPosition {
+    ABOVE = 0;
+    BELOW = 1;
+  }
+
+  WormPosition position = 10;
+  uint64 targetId = 11;
+  float scale = 12;
 }

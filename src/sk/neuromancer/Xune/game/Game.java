@@ -6,7 +6,6 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.game.players.Human;
-import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.game.screens.Gameover;
 import sk.neuromancer.Xune.game.screens.Intro;
 import sk.neuromancer.Xune.game.screens.Pause;
@@ -15,7 +14,7 @@ import sk.neuromancer.Xune.gfx.LevelView;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.gfx.Window;
 import sk.neuromancer.Xune.level.Level;
-import sk.neuromancer.Xune.net.proto.PlayerProto;
+import sk.neuromancer.Xune.net.proto.LevelProto;
 import sk.neuromancer.Xune.sfx.SoundManager;
 import sk.neuromancer.Xune.sfx.SoundPlayer;
 
@@ -212,19 +211,16 @@ public class Game implements Runnable {
 
     private void save() {
         try (FileOutputStream fos = new FileOutputStream("save.xune")) {
-            for (Player player : level.getPlayers()) {
-                player.serialize().writeTo(fos);
-            }
+            level.serializeFull().writeTo(fos);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        load();
     }
 
     private void load() {
         try (FileInputStream fis = new FileInputStream("save.xune")) {
-            for (Player player : level.getPlayers()) {
-                PlayerProto.PlayerState.parseFrom(fis);
-            }
+            System.out.println(LevelProto.FullLevelState.parseFrom(fis));
         } catch (IOException e) {
             e.printStackTrace();
         }

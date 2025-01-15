@@ -12,6 +12,8 @@ import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.LevelView;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
+import sk.neuromancer.Xune.net.proto.BaseProto;
+import sk.neuromancer.Xune.net.proto.LevelProto;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.io.BufferedReader;
@@ -419,6 +421,45 @@ public class Level implements Renderable, Tickable {
             return players.stream().anyMatch(Player::isEliminated);
         }
         return human.isEliminated() || players.stream().allMatch(player -> player.getFlag() == human.getFlag() || player.isEliminated());
+    }
+
+    public LevelProto.LevelState serializeTransient() {
+        LevelProto.LevelState.Builder builder = LevelProto.LevelState.newBuilder();
+        for (Player player : players) {
+            builder.addPlayers(player.serialize());
+        }
+        for (Worm worm : worms) {
+            builder.addWorms(worm.serialize());
+        }
+        LevelProto.LevelState.SpiceMap.Builder spiceBuilder = LevelProto.LevelState.SpiceMap.newBuilder();
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                Tile t = this.level[x][y];
+                if (t.isSpicy()) {
+                    BaseProto.Tile tile = BaseProto.Tile.newBuilder().setX(x).setY(y).build();
+                    spiceBuilder.addEntries(LevelProto.SpiceEntry.newBuilder().setKey(tile).setValue(t.getSpice()));
+                }
+            }
+        }
+        builder.setSpiceMap(spiceBuilder.build());
+        return builder.build();
+    }
+
+    public LevelProto.FullLevelState serializeFull() {
+        LevelProto.FullLevelState.Builder builder = LevelProto.FullLevelState.newBuilder();
+        builder.setWidth(this.width);
+        builder.setHeight(this.height);
+        builder.setTransient(serializeTransient());
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                Tile t = this.level[x][y];
+                builder.addTiles(t.type);
+            }
+        }
+        for (Tile spawn : this.spawns) {
+            builder.addSpawns(BaseProto.Tile.newBuilder().setX(spawn.getX()).setY(spawn.getY()));
+        }
+        return builder.build();
     }
 
     public static class TileFinder implements Iterator<Tile> {

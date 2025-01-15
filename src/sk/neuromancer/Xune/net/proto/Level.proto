@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package sk.neuromancer.Xune.net.proto;
+
+option java_outer_classname = "LevelProto";
+
+import "sk/neuromancer/Xune/net/proto/Base.proto";
+import "sk/neuromancer/Xune/net/proto/EntityState.proto";
+import "sk/neuromancer/Xune/net/proto/Player.proto";
+
+
+message SpiceEntry {
+  Tile key = 1;
+  uint32 value = 2;
+}
+
+message LevelState {
+  repeated PlayerState players = 1;
+  repeated WormState worms = 2;
+
+  message SpiceMap {
+    repeated SpiceEntry entries = 1;
+  }
+  SpiceMap spiceMap = 3;
+}
+
+message FullLevelState {
+  LevelState transient = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  repeated uint32 tiles = 4;
+  repeated Tile spawns = 6;
+}
