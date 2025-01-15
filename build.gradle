@@ -50,6 +50,8 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-opus::natives-macos"
 
     implementation 'com.google.protobuf:protobuf-java:4.29.2'
+
+    implementation 'info.picocli:picocli:4.7.6'
 }
 
 sourceSets {

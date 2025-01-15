@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.game;
 
 import org.lwjgl.system.Library;
+import picocli.CommandLine;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.game.players.Bot;
@@ -26,7 +27,8 @@ import java.util.Random;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
-public class Game {
+@CommandLine.Command(name = "Xune", mixinStandardHelpOptions = true, version = "1.0", description = "Xune 2025.")
+public class Game implements Runnable {
     private boolean keepRunning = false;
     private static int tickCount = 0;
     private GameState state;
@@ -50,20 +52,28 @@ public class Game {
 
     public static final int TPS = 60;
 
+    @CommandLine.Option(names = {"-f", "--fullscreen"}, description = "Run in fullscreen mode.")
+    private boolean fullscreen;
+
+
     public enum GameState {
         INTRO, PLAYING, PAUSED, GAMEOVER
     }
 
-    public void start() {
+    public void run() {
         keepRunning = true;
         state = GameState.INTRO;
         init();
-        run();
+        loop();
         quit();
     }
 
     private void init() {
-        window = new Window(); //DEFAULT_WIDTH, DEFAULT_HEIGHT
+        if (fullscreen) {
+            window = new Window();
+        } else {
+            window = new Window(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        }
 
         SpriteSheet.initSheets();
         Entity.initClasses();
@@ -79,7 +89,7 @@ public class Game {
         window.show();
     }
 
-    private void run() {
+    private void loop() {
         long lastRender = System.nanoTime();
         double unprocessed = 0;
         double nsPerTick = 1000000000.0 / TPS;
@@ -301,8 +311,8 @@ public class Game {
 
     public static void main(String[] args) {
         Library.initialize();
-        Game g = new Game();
-        g.start();
+        int exitCode = new CommandLine(new Game()).execute(args);
+        System.exit(exitCode);
     }
 
 
