@@ -4,8 +4,8 @@ package sk.neuromancer.Xune.net.proto;
 
 option java_outer_classname = "EntityStateProto";
 
-import "Base.proto";
-import "Command.proto";
+import "sk/neuromancer/Xune/net/Base.proto";
+import "sk/neuromancer/Xune/net/Command.proto";
 
 message EntityState {
   uint64 id = 1;

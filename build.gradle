@@ -4,8 +4,8 @@ plugins {
     id 'com.google.protobuf' version '0.9.4'
 }
 
-group 'sk.neuromancer'
-version '1.0'
+group = 'sk.neuromancer'
+version = '1.0'
 
 application {
     mainClass = 'sk.neuromancer.Xune.game.Game'
@@ -58,7 +58,8 @@ sourceSets {
             srcDir 'src'
         }
         proto {
-            srcDir 'src/sk/neuromancer/Xune/net/proto'
+            srcDir 'src'
+            include '**/*.proto'
         }
         resources {
             srcDir 'res'
@@ -71,10 +72,9 @@ protobuf {
         artifact = 'com.google.protobuf:protoc:4.29.2'
     }
     generateProtoTasks {
-        all().each { task ->
+        ofSourceSet("main").each { task ->
             task.builtins {
                 java {
-                    option 'lite'
                 }
             }
         }
@@ -148,5 +148,23 @@ tasks.register('uberJarMacos', Jar) {
     dependsOn configurations.runtimeClasspath
     from {
         configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") && (!it.name.contains("natives") || it.name.contains("natives-macos")) }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
+    }
+}
+
+tasks.register('printIncludedFiles') {
+    doLast {
+        sourceSets.each { sourceSet ->
+            println "SourceSet: ${sourceSet.name}"
+            sourceSet.allSource.srcDirs.each { srcDir ->
+                if (srcDir.exists()) {
+                    println "  Directory: ${srcDir}"
+                    srcDir.eachFileRecurse { file ->
+                        println "    File: ${file}"
+                    }
+                } else {
+                    println "  Directory: ${srcDir} (does not exist)"
+                }
+            }
+        }
     }
 }

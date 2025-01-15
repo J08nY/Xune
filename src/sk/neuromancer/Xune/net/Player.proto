@@ -4,8 +4,9 @@ package sk.neuromancer.Xune.net.proto;
 
 option java_outer_classname = "PlayerProto";
 
-import "EntityState.proto";
-import "Base.proto";
+import "sk/neuromancer/Xune/net/Base.proto";
+import "sk/neuromancer/Xune/net/EntityState.proto";
+
 
 message PlayerEntity {
   oneof entity {

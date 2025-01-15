@@ -4,7 +4,7 @@ package sk.neuromancer.Xune.net.proto;
 
 option java_outer_classname = "CommandProto";
 
-import "Base.proto";
+import "sk/neuromancer/Xune/net/Base.proto";
 
 message CommandFly {
   Position from = 1;
