@@ -1,7 +1,7 @@
 package sk.neuromancer.Xune.entity.building;
 
-import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
@@ -17,7 +17,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelX;
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;
 
-public abstract class Building extends Entity.PlayableEntity {
+public abstract class Building extends PlayableEntity {
     protected static final Map<Class<? extends Building>, Integer> powerMap = new HashMap<>();
     protected static final Map<Class<? extends Building>, List<Class<? extends Unit>>> producesMap = new HashMap<>();
     protected static final Map<Class<? extends Building>, boolean[]> passableMap = new HashMap<>();

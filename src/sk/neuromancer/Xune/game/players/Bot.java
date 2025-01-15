@@ -3,6 +3,7 @@ package sk.neuromancer.Xune.game.players;
 import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Config;
@@ -128,12 +129,12 @@ public class Bot extends Player {
     }
 
     private void defend() {
-        List<Entity.PlayableEntity> underAttack = entities.stream().filter(e -> (e instanceof Building || e instanceof Harvester) && e.isUnderAttack()).toList();
+        List<PlayableEntity> underAttack = entities.stream().filter(e -> (e instanceof Building || e instanceof Harvester) && e.isUnderAttack()).toList();
         if (!underAttack.isEmpty()) {
             List<Unit> freeUnits = entities.stream().filter(e -> e instanceof Unit unit && !(e instanceof Harvester) && !unit.hasCommands()).map(e -> (Unit) e).toList();
             log("Defending with " + freeUnits.size() + " units.");
             for (int i = 0; i < freeUnits.size(); i++) {
-                Entity.PlayableEntity attacked = underAttack.get(i % underAttack.size());
+                PlayableEntity attacked = underAttack.get(i % underAttack.size());
                 Unit unit = freeUnits.get(i);
                 try {
                     unit.sendCommand(new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), attacked.getAttacker()));
@@ -144,12 +145,12 @@ public class Bot extends Player {
     }
 
     private void attack() {
-        Iterator<Entity> others = level.findClosestEntity(spawn.getLevelX(), spawn.getLevelY(), e -> e instanceof Entity.PlayableEntity other && other.getOwner() != this);
-        Entity.PlayableEntity target = null;
+        Iterator<Entity> others = level.findClosestEntity(spawn.getLevelX(), spawn.getLevelY(), e -> e instanceof PlayableEntity other && other.getOwner() != this);
+        PlayableEntity target = null;
         int r = rand.nextInt(3);
         try {
             for (int i = 0; i < r; i++) {
-                target = (Entity.PlayableEntity) others.next();
+                target = (PlayableEntity) others.next();
             }
         } catch (NoSuchElementException ignored) {
         }
@@ -199,13 +200,13 @@ public class Bot extends Player {
                 return;
             }
             Class<? extends Unit> klass = unitPlan.getFirst();
-            if (Entity.PlayableEntity.canBeBuilt(klass, this)) {
+            if (PlayableEntity.canBeBuilt(klass, this)) {
                 List<Building> producers = entities.stream().filter(e -> e instanceof Building building && building.getProduces().contains(klass)).map(e -> (Building) e).sorted(Comparator.comparingInt(building -> building.getCommands().size())).toList();
                 if (!producers.isEmpty()) {
                     log("Producing " + klass.getSimpleName());
                     Building building = producers.getFirst();
-                    takeMoney(Entity.PlayableEntity.getCost(klass));
-                    building.sendCommand(new Command.ProduceCommand(Entity.PlayableEntity.getBuildTime(klass), klass, level.getPathfinder()));
+                    takeMoney(PlayableEntity.getCost(klass));
+                    building.sendCommand(new Command.ProduceCommand(PlayableEntity.getBuildTime(klass), klass, level.getPathfinder()));
                     unitPlan.removeFirst();
                 }
             }
@@ -217,7 +218,7 @@ public class Bot extends Player {
             return;
         }
         Class<? extends Building> building = buildingPlan.getFirst();
-        if (Entity.PlayableEntity.canBeBuilt(building, this) && !isBuilding()) {
+        if (PlayableEntity.canBeBuilt(building, this) && !isBuilding()) {
             log("Building " + building);
             startBuild(building);
             buildingPlan.removeFirst();

@@ -11,7 +11,7 @@ public class Prerequisite {
     }
 
     public boolean isMet(Player owner) {
-        for (Entity.PlayableEntity entity : owner.getEntities()) {
+        for (PlayableEntity entity : owner.getEntities()) {
             if (requiredBuilding.isInstance(entity)) {
                 return true;
             }

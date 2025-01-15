@@ -3,7 +3,7 @@ package sk.neuromancer.Xune.game.players;
 import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.CommandStrategy;
 import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.Entity.PlayableEntity;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;

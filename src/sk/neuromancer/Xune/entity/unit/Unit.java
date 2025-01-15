@@ -3,6 +3,7 @@ package sk.neuromancer.Xune.entity.unit;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Moveable;
 import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.Effect;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public abstract class Unit extends Entity.PlayableEntity implements Moveable {
+public abstract class Unit extends PlayableEntity implements Moveable {
     protected static final Map<Class<? extends Unit>, Float> speedMap = new HashMap<>();
     protected static final Map<Class<? extends Unit>, Float> rangeMap = new HashMap<>();
     protected static final Map<Class<? extends Unit>, Integer> rateMap = new HashMap<>();

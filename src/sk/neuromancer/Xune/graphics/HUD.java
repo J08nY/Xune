@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.graphics;
 
 import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.*;
@@ -234,7 +235,7 @@ public class HUD implements Tickable, Renderable {
         glEnd();
         glBegin(GL_QUADS);
         for (Entity entity : level.getEntities()) {
-            if (entity instanceof Entity.PlayableEntity playable && human.isTileDiscovered(level.tileAt(entity))) {
+            if (entity instanceof PlayableEntity playable && human.isTileDiscovered(level.tileAt(entity))) {
                 glColor3fv(playable.getOwner().getFlag().getColor());
                 float lx = entity.x;
                 float ly = entity.y;
@@ -345,7 +346,7 @@ public class HUD implements Tickable, Renderable {
                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(13);
                 for (Button<?> button : buttons) {
                     if (button.intersects((float) mouseX, (float) mouseY)) {
-                        String text = button.getKlass().getSimpleName() + "\n" + Entity.PlayableEntity.getCost(button.getKlass()) + "$";
+                        String text = button.getKlass().getSimpleName() + "\n" + PlayableEntity.getCost(button.getKlass()) + "$";
                         if (Building.class.isAssignableFrom(button.getKlass())) {
                             text += "\n" + Building.getPower((Class<? extends Building>) button.getKlass()) + "&";
                         }
@@ -361,7 +362,7 @@ public class HUD implements Tickable, Renderable {
                     currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
                 } else {
                     if (entity != null && human.isTileVisible(level.tileAt(entity))) {
-                        if (entity instanceof Entity.PlayableEntity playable) {
+                        if (entity instanceof PlayableEntity playable) {
                             if (playable.getOwner() == human) {
                                 currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(0);
                             } else {
@@ -403,7 +404,7 @@ public class HUD implements Tickable, Renderable {
         return buttons;
     }
 
-    public static class Button<T extends Entity.PlayableEntity> implements Clickable, Tickable, Renderable {
+    public static class Button<T extends PlayableEntity> implements Clickable, Tickable, Renderable {
         private final Class<T> klass;
         private final Human human;
         private Sprite sprite;
@@ -423,7 +424,7 @@ public class HUD implements Tickable, Renderable {
         public Button(Class<T> klass, Human human, int spriteRows, int spriteCols, float x, float y, float scale) {
             this.klass = klass;
             this.human = human;
-            this.spriteOffset = Entity.PlayableEntity.getBaseSprite(klass) + SpriteSheet.flagToOffset(human.getFlag());
+            this.spriteOffset = PlayableEntity.getBaseSprite(klass) + SpriteSheet.flagToOffset(human.getFlag());
             this.spriteRows = spriteRows;
             this.spriteCols = spriteCols;
             this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(this.spriteOffset);
@@ -437,7 +438,7 @@ public class HUD implements Tickable, Renderable {
 
         @Override
         public void tick(int tickCount) {
-            enabled = Entity.PlayableEntity.canBeBuilt(klass, human);
+            enabled = PlayableEntity.canBeBuilt(klass, human);
             if (Config.ANIMATE_HUD_BUTTONS && tickCount % TPS == 0) {
                 animation = (animation + 1) % (spriteCols * spriteRows);
                 int row = animation / spriteCols;
@@ -447,7 +448,7 @@ public class HUD implements Tickable, Renderable {
             inProgress.clear();
             totalInProgress = 0;
             if (Unit.class.isAssignableFrom(klass)) {
-                for (Entity.PlayableEntity entity : human.getEntities()) {
+                for (PlayableEntity entity : human.getEntities()) {
                     if (!(entity instanceof Building)) {
                         continue;
                     }
@@ -538,7 +539,7 @@ public class HUD implements Tickable, Renderable {
             this.y = y;
         }
 
-        public Class<? extends Entity.PlayableEntity> getKlass() {
+        public Class<? extends PlayableEntity> getKlass() {
             return klass;
         }
     }

@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.Config;
@@ -96,7 +97,7 @@ public class Level implements Renderable, Tickable {
             if (player instanceof Human h) {
                 this.human = h;
             }
-            for (Entity.PlayableEntity entity : player.getEntities()) {
+            for (PlayableEntity entity : player.getEntities()) {
                 addEntity(entity);
             }
         }
@@ -316,7 +317,7 @@ public class Level implements Renderable, Tickable {
             }
         }
         for (Player player : players) {
-            for (Entity.PlayableEntity entity : player.getEntities()) {
+            for (PlayableEntity entity : player.getEntities()) {
                 if (entity.intersects(levelX, levelY)) {
                     return entity;
                 }

@@ -28,16 +28,16 @@ public class Player implements Tickable, Renderable {
     private final boolean[][] visible;
     private final boolean[][] discovered;
 
-    protected List<Entity.PlayableEntity> entities = new ArrayList<>();
-    protected List<Entity.PlayableEntity> toAdd = new LinkedList<>();
-    protected List<Entity.PlayableEntity> toRemove = new LinkedList<>();
+    protected List<PlayableEntity> entities = new ArrayList<>();
+    protected List<PlayableEntity> toAdd = new LinkedList<>();
+    protected List<PlayableEntity> toRemove = new LinkedList<>();
 
     protected long id;
     protected int money;
     protected int powerProduction;
     protected int powerConsumption;
     protected final Flag flag;
-    protected final Map<Class<? extends Entity.PlayableEntity>, CommandStrategy> commandStrategies = new HashMap<>();
+    protected final Map<Class<? extends PlayableEntity>, CommandStrategy> commandStrategies = new HashMap<>();
 
     protected Class<? extends Building> buildingToBuild;
     protected float buildProgress;
@@ -105,7 +105,7 @@ public class Player implements Tickable, Renderable {
         commandStrategies.put(Soldier.class, new CommandStrategy.GroundAttackStrategy());
     }
 
-    public void addEntity(Entity.PlayableEntity e) {
+    public void addEntity(PlayableEntity e) {
         toAdd.add(e);
         level.addEntity(e);
         if (e instanceof Building b) {
@@ -118,7 +118,7 @@ public class Player implements Tickable, Renderable {
         }
     }
 
-    public void removeEntity(Entity.PlayableEntity e) {
+    public void removeEntity(PlayableEntity e) {
         toRemove.add(e);
         level.removeEntity(e);
         if (e instanceof Building b) {
@@ -131,7 +131,7 @@ public class Player implements Tickable, Renderable {
         }
     }
 
-    public List<Entity.PlayableEntity> getEntities() {
+    public List<PlayableEntity> getEntities() {
         return entities;
     }
 
@@ -188,11 +188,11 @@ public class Player implements Tickable, Renderable {
         return (float) getPowerProduction() / getPowerConsumption();
     }
 
-    protected void startBuild(Class<? extends Entity.PlayableEntity> klass) {
-        takeMoney(Entity.PlayableEntity.getCost(klass));
+    protected void startBuild(Class<? extends PlayableEntity> klass) {
+        takeMoney(PlayableEntity.getCost(klass));
         buildingToBuild = klass.asSubclass(Building.class);
         buildProgress = 0;
-        buildDuration = Entity.PlayableEntity.getBuildTime(klass);
+        buildDuration = PlayableEntity.getBuildTime(klass);
     }
 
     public boolean isBuilding() {
@@ -263,7 +263,7 @@ public class Player implements Tickable, Renderable {
     }
 
     private void handleDead() {
-        for (Entity.PlayableEntity e : entities) {
+        for (PlayableEntity e : entities) {
             if (e.health <= 0) {
                 if (e.hasCommands()) {
                     e.getCommands().forEach(c -> c.finish(e, Game.currentTick(), false));
@@ -281,7 +281,7 @@ public class Player implements Tickable, Renderable {
     }
 
     private void handleUnitBehavior() {
-        for (Entity.PlayableEntity entity : entities) {
+        for (PlayableEntity entity : entities) {
             if (!entity.hasCommands() && !toRemove.contains(entity)) {
                 CommandStrategy strategy = commandStrategies.get(entity.getClass());
                 if (strategy != null) {
@@ -307,7 +307,7 @@ public class Player implements Tickable, Renderable {
                 Tile t = level.getTile(x, y);
                 float cx = t.getCenterX();
                 float cy = t.getCenterY();
-                for (Entity.PlayableEntity e : entities) {
+                for (PlayableEntity e : entities) {
                     if (e.inSight(cx, cy)) {
                         visible[x][y] = true;
                         discovered[x][y] = true;
@@ -417,13 +417,13 @@ public class Player implements Tickable, Renderable {
                 .setPowerProduction(powerProduction)
                 .setPowerConsumption(powerConsumption)
                 .setFlag(flag.serialize())
-                .setBuildingKlass(Entity.PlayableEntity.toEntityClass(buildingToBuild))
+                .setBuildingKlass(PlayableEntity.toEntityClass(buildingToBuild))
                 .setBuildProgress(buildProgress)
                 .setBuildDuration(buildDuration)
                 .setVisible(ByteString.copyFrom(serializeVisibility(visible)))
                 .setDiscovered(ByteString.copyFrom(serializeVisibility(discovered)));
 
-        for (Entity.PlayableEntity e : entities) {
+        for (PlayableEntity e : entities) {
             if (e instanceof Unit unit) {
                 builder.addEntities(PlayerProto.PlayerEntity.newBuilder().setUnit(unit.serialize()).build());
             } else if (e instanceof Building building) {

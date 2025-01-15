@@ -16,16 +16,16 @@ import static sk.neuromancer.Xune.game.Game.TPS;
 
 public abstract class CommandStrategy {
 
-    public abstract Command onClick(Entity.PlayableEntity entity, Entity clicked, Level level, float levelX, float levelY);
+    public abstract Command onClick(PlayableEntity entity, Entity clicked, Level level, float levelX, float levelY);
 
-    public abstract Command defaultBehavior(Entity.PlayableEntity entity, Level level);
+    public abstract Command defaultBehavior(PlayableEntity entity, Level level);
 
     public static class GroundAttackStrategy extends CommandStrategy {
         @Override
-        public Command onClick(Entity.PlayableEntity entity, Entity clicked, Level level, float levelX, float levelY) {
+        public Command onClick(PlayableEntity entity, Entity clicked, Level level, float levelX, float levelY) {
             try {
                 if (clicked != null) {
-                    if (clicked instanceof Entity.PlayableEntity playable && playable.owner == entity.owner) {
+                    if (clicked instanceof PlayableEntity playable && playable.owner == entity.owner) {
                         return new Command.MoveCommand(entity.x, entity.y, levelX, levelY, level.getPathfinder());
                     } else {
                         return new Command.MoveAndAttackCommand(entity.x, entity.y, level.getPathfinder(), clicked);
@@ -39,7 +39,7 @@ public abstract class CommandStrategy {
         }
 
         @Override
-        public Command defaultBehavior(Entity.PlayableEntity entity, Level level) {
+        public Command defaultBehavior(PlayableEntity entity, Level level) {
             if (entity instanceof Unit unit) {
                 try {
                     // If there is an enemy attacking us: respond
@@ -62,9 +62,9 @@ public abstract class CommandStrategy {
 
     public static class AirAttackStrategy extends CommandStrategy {
         @Override
-        public Command onClick(Entity.PlayableEntity entity, Entity clicked, Level level, float levelX, float levelY) {
+        public Command onClick(PlayableEntity entity, Entity clicked, Level level, float levelX, float levelY) {
             if (clicked != null) {
-                if (clicked instanceof Entity.PlayableEntity playable && playable.owner == entity.owner) {
+                if (clicked instanceof PlayableEntity playable && playable.owner == entity.owner) {
                     return new Command.FlyCommand(entity.x, entity.y, levelX, levelY);
                 } else {
                     return new Command.FlyAndAttackCommand(entity.x, entity.y, clicked);
@@ -75,7 +75,7 @@ public abstract class CommandStrategy {
         }
 
         @Override
-        public Command defaultBehavior(Entity.PlayableEntity entity, Level level) {
+        public Command defaultBehavior(PlayableEntity entity, Level level) {
             if (entity instanceof Unit unit) {
                 // If there is an enemy attacking us: respond
                 if (unit.isUnderAttack()) {
@@ -96,7 +96,7 @@ public abstract class CommandStrategy {
         Map<Harvester, Integer> harvesters = new HashMap<>();
 
         @Override
-        public Command onClick(Entity.PlayableEntity entity, Entity clicked, Level level, float levelX, float levelY) {
+        public Command onClick(PlayableEntity entity, Entity clicked, Level level, float levelX, float levelY) {
             try {
                 if (clicked instanceof Refinery refinery && refinery.owner == entity.owner) {
                     return new Command.DropOffSpiceCommand(entity.x, entity.y, level.getPathfinder(), refinery);
@@ -116,7 +116,7 @@ public abstract class CommandStrategy {
         }
 
         @Override
-        public Command defaultBehavior(Entity.PlayableEntity entity, Level level) {
+        public Command defaultBehavior(PlayableEntity entity, Level level) {
             if (entity instanceof Harvester harvester) {
                 Player owner = harvester.owner;
                 if (harvesters.containsKey(harvester)) {
@@ -130,7 +130,7 @@ public abstract class CommandStrategy {
                 }
 
                 if (harvester.isFull()) {
-                    for (Iterator<Entity> it = level.findClosestEntity(entity.x, entity.y, e -> e instanceof Entity.PlayableEntity playable && playable.owner == harvester.owner && e instanceof Refinery); it.hasNext(); ) {
+                    for (Iterator<Entity> it = level.findClosestEntity(entity.x, entity.y, e -> e instanceof PlayableEntity playable && playable.owner == harvester.owner && e instanceof Refinery); it.hasNext(); ) {
                         Refinery refinery = (Refinery) it.next();
                         try {
                             return new Command.DropOffSpiceCommand(entity.x, entity.y, level.getPathfinder(), refinery);

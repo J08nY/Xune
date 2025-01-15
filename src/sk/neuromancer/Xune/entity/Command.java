@@ -476,7 +476,7 @@ public abstract class Command {
 
         public ProduceCommand(CommandProto.CommandProduce produce, Pathfinder pathfinder) {
             this.duration = produce.getDuration();
-            this.resultClass = Entity.PlayableEntity.fromEntityClass(produce.getResultClass()).asSubclass(Unit.class);
+            this.resultClass = PlayableEntity.fromEntityClass(produce.getResultClass()).asSubclass(Unit.class);
             this.progress = produce.getProgress();
             this.finished = false;
             this.pathfinder = pathfinder;
@@ -549,7 +549,7 @@ public abstract class Command {
                     .setProduce(CommandProto.CommandProduce.newBuilder()
                             .setProgress(progress)
                             .setDuration(duration)
-                            .setResultClass(Entity.PlayableEntity.toEntityClass(resultClass))
+                            .setResultClass(PlayableEntity.toEntityClass(resultClass))
                             .build())
                     .build();
         }
