@@ -9,7 +9,7 @@ import "Command.proto";
 
 message EntityState {
   uint64 id = 1;
-  uint32 klass = 2;
+  EntityClass klass = 2;
 
   Position position = 3;
   Orientation orientation = 4;
@@ -44,4 +44,5 @@ message UnitState {
 
 message BuildingState {
   PlayableEntityState entity = 1;
+  Tile tilePosition = 2;
 }

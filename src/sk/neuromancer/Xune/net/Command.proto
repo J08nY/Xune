@@ -39,7 +39,7 @@ message CommandFlyAndAttack {
 
 message CommandProduce {
   EntityClass resultClass = 1;
-  uint32 start = 2;
+  float progress = 2;
   uint32 duration = 3;
   //TODO: consider the finished bool?
 }
@@ -61,7 +61,8 @@ message Command {
     CommandAttack attack = 3;
     CommandMoveAndAttack moveAndAttack = 4;
     CommandFlyAndAttack flyAndAttack = 5;
-    CommandCollectSpice collectSpice = 6;
-    CommandDropOffSpice dropOffSpice = 7;
+    CommandProduce produce = 6;
+    CommandCollectSpice collectSpice = 7;
+    CommandDropOffSpice dropOffSpice = 8;
   }
 }

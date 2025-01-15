@@ -36,18 +36,19 @@ message Path {
 }
 
 enum EntityClass {
-  WORM = 0;
-  BARRACKS = 1;
-  BASE = 2;
-  FACTORY = 3;
-  HELIPAD = 4;
-  POWERPLANT = 5;
-  REFINERY = 6;
-  SILO = 7;
-  BUGGY = 8;
-  HARVESTER = 9;
-  HELI = 10;
-  SOLDIER = 11;
+  NULL = 0;
+  WORM = 1;
+  BARRACKS = 2;
+  BASE = 3;
+  FACTORY = 4;
+  HELIPAD = 5;
+  POWERPLANT = 6;
+  REFINERY = 7;
+  SILO = 8;
+  BUGGY = 9;
+  HARVESTER = 10;
+  HELI = 11;
+  SOLDIER = 12;
 }
 
 message Tile {

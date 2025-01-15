@@ -1,5 +1,7 @@
 package sk.neuromancer.Xune.entity;
 
+import sk.neuromancer.Xune.net.proto.BaseProto;
+
 public enum Flag {
     RED, BLUE, GREEN;
 
@@ -12,6 +14,14 @@ public enum Flag {
             case RED -> RED_COLOR;
             case BLUE -> BLUE_COLOR;
             case GREEN -> GREEN_COLOR;
+        };
+    }
+
+    public BaseProto.Flag serialize() {
+        return switch (this) {
+            case RED -> BaseProto.Flag.RED;
+            case BLUE -> BaseProto.Flag.BLUE;
+            case GREEN -> BaseProto.Flag.GREEN;
         };
     }
 }

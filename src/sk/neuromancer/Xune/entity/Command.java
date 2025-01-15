@@ -13,6 +13,8 @@ import sk.neuromancer.Xune.level.paths.NoPathFound;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.net.proto.BaseProto;
+import sk.neuromancer.Xune.net.proto.CommandProto;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.lang.reflect.Constructor;
@@ -35,6 +37,8 @@ public abstract class Command {
     public abstract boolean isFinished(Entity entity);
 
     public abstract void finish(Entity entity, int tickCount, boolean done);
+
+    public abstract CommandProto.Command serialize();
 
     public static class FlyCommand extends Command {
         private final float fromX, fromY, toX, toY;
@@ -94,6 +98,26 @@ public abstract class Command {
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
+        }
+
+        @Override
+        public CommandProto.Command serialize() {
+            BaseProto.Position from = BaseProto.Position.newBuilder()
+                    .setX(fromX)
+                    .setY(fromY)
+                    .build();
+
+            BaseProto.Position to = BaseProto.Position.newBuilder()
+                    .setX(toX)
+                    .setY(toY)
+                    .build();
+
+            return CommandProto.Command.newBuilder()
+                    .setFly(CommandProto.CommandFly.newBuilder()
+                            .setFrom(from)
+                            .setTo(to)
+                            .build())
+                    .build();
         }
     }
 
@@ -188,6 +212,28 @@ public abstract class Command {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
         }
+
+        @Override
+        public CommandProto.Command serialize() {
+            BaseProto.Position from = BaseProto.Position.newBuilder()
+                    .setX(fromX)
+                    .setY(fromY)
+                    .build();
+
+            BaseProto.Position to = BaseProto.Position.newBuilder()
+                    .setX(toX)
+                    .setY(toY)
+                    .build();
+
+            return CommandProto.Command.newBuilder()
+                    .setMove(CommandProto.CommandMove.newBuilder()
+                            .setFrom(from)
+                            .setTo(to)
+                            .setPoints(path.serialize())
+                            .setNext(next)
+                            .build())
+                    .build();
+        }
     }
 
     public static class AttackCommand extends Command {
@@ -232,6 +278,16 @@ public abstract class Command {
         public void finish(Entity entity, int tickCount, boolean done) {
             entity.setAttacking(false, null);
             target.setUnderAttack(false, null);
+        }
+
+        @Override
+        public CommandProto.Command serialize() {
+            return CommandProto.Command.newBuilder()
+                    .setAttack(CommandProto.CommandAttack.newBuilder()
+                            .setTargetId(target.getId())
+                            .setKeep(keep)
+                            .build())
+                    .build();
         }
     }
 
@@ -284,6 +340,16 @@ public abstract class Command {
             attack.finish(entity, tickCount, done);
         }
 
+        @Override
+        public CommandProto.Command serialize() {
+            return CommandProto.Command.newBuilder()
+                    .setMoveAndAttack(CommandProto.CommandMoveAndAttack.newBuilder()
+                            .setMove(move.serialize().getMove())
+                            .setAttack(attack.serialize().getAttack())
+                            .build())
+                    .build();
+        }
+
         public AttackCommand getAttackCommand() {
             return attack;
         }
@@ -334,6 +400,16 @@ public abstract class Command {
         @Override
         public void finish(Entity entity, int tickCount, boolean done) {
             attack.finish(entity, tickCount, done);
+        }
+
+        @Override
+        public CommandProto.Command serialize() {
+            return CommandProto.Command.newBuilder()
+                    .setFlyAndAttack(CommandProto.CommandFlyAndAttack.newBuilder()
+                            .setMove(move.serialize().getFly())
+                            .setAttack(attack.serialize().getAttack())
+                            .build())
+                    .build();
         }
 
         public AttackCommand getAttackCommand() {
@@ -418,6 +494,17 @@ public abstract class Command {
         @Override
         public void finish(Entity entity, int tickCount, boolean done) {
         }
+
+        @Override
+        public CommandProto.Command serialize() {
+            return CommandProto.Command.newBuilder()
+                    .setProduce(CommandProto.CommandProduce.newBuilder()
+                            .setProgress(progress)
+                            .setDuration(duration)
+                            .setResultClass(Entity.PlayableEntity.toEntityClass(resultClass))
+                            .build())
+                    .build();
+        }
     }
 
     public static class CollectSpiceCommand extends Command {
@@ -463,6 +550,21 @@ public abstract class Command {
 
         @Override
         public void finish(Entity entity, int tickCount, boolean done) {
+        }
+
+        @Override
+        public CommandProto.Command serialize() {
+            BaseProto.Tile tile = BaseProto.Tile.newBuilder()
+                    .setX(target.getX())
+                    .setY(target.getY())
+                    .build();
+
+            return CommandProto.Command.newBuilder()
+                    .setCollectSpice(CommandProto.CommandCollectSpice.newBuilder()
+                            .setTarget(tile)
+                            .setMove(move.serialize().getMove())
+                            .build())
+                    .build();
         }
     }
 
@@ -513,6 +615,16 @@ public abstract class Command {
         @Override
         public void finish(Entity entity, int tickCount, boolean done) {
 
+        }
+
+        @Override
+        public CommandProto.Command serialize() {
+            return CommandProto.Command.newBuilder()
+                    .setDropOffSpice(CommandProto.CommandDropOffSpice.newBuilder()
+                            .setTargetId(target.getId())
+                            .setMove(move.serialize().getMove())
+                            .build())
+                    .build();
         }
 
         @Override

@@ -203,11 +203,12 @@ public class Level implements Renderable, Tickable {
         }
     }
 
-    public void addPlayer(Player player) {
+    public long addPlayer(Player player) {
         this.players.add(player);
         if (player instanceof Human h) {
             this.human = h;
         }
+        return players.size();
     }
 
     public Human getHuman() {

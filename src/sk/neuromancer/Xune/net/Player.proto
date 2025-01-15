@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package sk.neuromancer.Xune.net.proto;
+
+option java_outer_classname = "PlayerProto";
+
+import "EntityState.proto";
+import "Base.proto";
+
+message PlayerEntity {
+  oneof entity {
+    UnitState unit = 2;
+    BuildingState building = 3;
+  }
+}
+
+message PlayerState {
+  uint64 id = 1;
+  uint32 money = 2;
+  Flag flag = 3;
+  bytes visible = 4;
+  bytes discovered = 5;
+  uint32 powerProduction = 6;
+  int32 powerConsumption = 7;
+  EntityClass buildingKlass = 8;
+  float buildProgress = 9;
+  uint32 buildDuration = 10;
+  repeated PlayerEntity entities = 11;
+}

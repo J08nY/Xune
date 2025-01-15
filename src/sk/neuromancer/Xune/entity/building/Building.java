@@ -6,6 +6,8 @@ import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.net.proto.BaseProto;
+import sk.neuromancer.Xune.net.proto.EntityStateProto;
 
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +80,12 @@ public abstract class Building extends Entity.PlayableEntity {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "." + flag + " at (" + x + "," + y + "), [" + tileX + "," + tileY + "].";
+    }
+
+    public EntityStateProto.BuildingState serialize() {
+        return EntityStateProto.BuildingState.newBuilder()
+                .setEntity(this.toPlayableEntityState())
+                .setTilePosition(BaseProto.Tile.newBuilder().setX(tileX).setY(tileY).build()).build();
     }
 
     public int getPower() {

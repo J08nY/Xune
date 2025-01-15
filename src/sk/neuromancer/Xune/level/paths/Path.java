@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.level.paths;
 
 import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.net.proto.BaseProto;
 
 import java.util.Arrays;
 
@@ -46,5 +47,13 @@ public class Path implements Renderable {
         return "Path{" +
                 "p=" + Arrays.toString(p) +
                 '}';
+    }
+
+    public BaseProto.Path serialize() {
+        BaseProto.Path.Builder builder = BaseProto.Path.newBuilder();
+        for (Point point : p) {
+            builder.addPoints(point.serialize());
+        }
+        return builder.build();
     }
 }

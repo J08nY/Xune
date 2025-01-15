@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.level.paths;
 
 import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.net.proto.BaseProto;
 
 import java.util.Objects;
 
@@ -134,5 +135,7 @@ public class Point {
         return "Point{" + "x=" + x + ", y=" + y + '}';
     }
 
-
+    public BaseProto.Point serialize() {
+        return BaseProto.Point.newBuilder().setX(x).setY(y).build();
+    }
 }

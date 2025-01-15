@@ -49,7 +49,7 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-opengl::natives-macos"
     runtimeOnly "org.lwjgl:lwjgl-opus::natives-macos"
 
-    implementation 'com.google.protobuf:protobuf-java:4.28.3'
+    implementation 'com.google.protobuf:protobuf-java:4.29.2'
 }
 
 sourceSets {
@@ -68,7 +68,7 @@ sourceSets {
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:4.28.3'
+        artifact = 'com.google.protobuf:protoc:4.29.2'
     }
     generateProtoTasks {
         all().each { task ->

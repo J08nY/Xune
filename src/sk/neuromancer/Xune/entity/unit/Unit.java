@@ -1,5 +1,6 @@
 package sk.neuromancer.Xune.entity.unit;
 
+import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Moveable;
 import sk.neuromancer.Xune.entity.Orientation;
@@ -8,6 +9,8 @@ import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.net.proto.BaseProto;
+import sk.neuromancer.Xune.net.proto.EntityStateProto;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.util.HashMap;
@@ -25,6 +28,7 @@ public abstract class Unit extends Entity.PlayableEntity implements Moveable {
 
     private final float speed;
     private final float range;
+    private final float r2;
     private final int rate;
     private final int damage;
     private final float accuracy;
@@ -37,18 +41,10 @@ public abstract class Unit extends Entity.PlayableEntity implements Moveable {
         Class<? extends Unit> klass = getClass();
         this.speed = getSpeed(klass);
         this.range = getRange(klass);
+        this.r2 = range * range;
         this.rate = getRate(klass);
         this.damage = getDamage(klass);
         this.accuracy = getAccuracy(klass);
-    }
-
-    public void move(float toX, float toY) {
-        float angle = angleTo(toX, toY);
-        face(toX, toY);
-        if (immobile) {
-            return;
-        }
-        setPosition(x + (float) (speed * Math.cos(angle)), y + (float) (speed * Math.sin(angle)));
     }
 
     private float angleTo(float toX, float toY) {
@@ -57,8 +53,21 @@ public abstract class Unit extends Entity.PlayableEntity implements Moveable {
         return (float) Math.atan2(dy, dx);
     }
 
+    public void move(float toX, float toY) {
+        float angle = angleTo(toX, toY);
+        face(angle);
+        if (immobile) {
+            return;
+        }
+        setPosition(x + (float) (speed * Math.cos(angle)), y + (float) (speed * Math.sin(angle)));
+    }
+
     public void face(float toX, float toY) {
         float angle = angleTo(toX, toY);
+        face(angle);
+    }
+
+    public void face(float angle) {
         float azimuth = (float) ((angle < 0 ? angle + 2 * (float) Math.PI : angle) + (Math.PI / 2));
         this.orientation = Orientation.fromAzimuth(azimuth);
         updateSprite();
@@ -67,7 +76,7 @@ public abstract class Unit extends Entity.PlayableEntity implements Moveable {
     public boolean inRange(Entity target) {
         float dx = x - target.x;
         float dy = y - target.y;
-        return dx * dx + dy * dy <= range * range;
+        return dx * dx + dy * dy <= r2;
     }
 
     public void attack(Entity target) {
@@ -159,6 +168,14 @@ public abstract class Unit extends Entity.PlayableEntity implements Moveable {
                 glColor4f(1, 1, 1, 1);
             }
         }
+    }
+
+    public EntityStateProto.UnitState serialize() {
+        return EntityStateProto.UnitState.newBuilder()
+                .setPlayable(toPlayableEntityState())
+                .setReady(this.ready)
+                .setImmobile(this.immobile)
+                .build();
     }
 
     protected static void setSpeed(Class<? extends Unit> klass, float speed) {

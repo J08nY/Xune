@@ -1,5 +1,7 @@
 package sk.neuromancer.Xune.entity;
 
+import sk.neuromancer.Xune.net.proto.BaseProto;
+
 public enum Orientation {
     //0		1		 2		3		4		5		6		7
     NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST;
@@ -99,5 +101,18 @@ public enum Orientation {
 
     public float toAzimuthRadians() {
         return (float) Math.toRadians(toAzimuthDegrees());
+    }
+
+    public BaseProto.Orientation serialize() {
+        return switch (this) {
+            case NORTH -> BaseProto.Orientation.NORTH;
+            case NORTHEAST -> BaseProto.Orientation.NORTHEAST;
+            case EAST -> BaseProto.Orientation.EAST;
+            case SOUTHEAST -> BaseProto.Orientation.SOUTHEAST;
+            case SOUTH -> BaseProto.Orientation.SOUTH;
+            case SOUTHWEST -> BaseProto.Orientation.SOUTHWEST;
+            case WEST -> BaseProto.Orientation.WEST;
+            case NORTHWEST -> BaseProto.Orientation.NORTHWEST;
+        };
     }
 }

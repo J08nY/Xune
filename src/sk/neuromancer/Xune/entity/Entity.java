@@ -6,6 +6,8 @@ import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.gfx.Sprite;
+import sk.neuromancer.Xune.net.proto.BaseProto;
+import sk.neuromancer.Xune.net.proto.EntityStateProto;
 
 import java.util.*;
 
@@ -17,13 +19,14 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected static final Map<Class<? extends Entity>, Integer> deathSoundMap = new HashMap<>();
     protected final Random rand = new Random();
 
-    protected Sprite sprite;
+    protected long id;
     public float x, y;
     public int health;
     protected final int maxHealth;
     protected final int sight;
     protected final int s2;
     protected Orientation orientation;
+    protected Sprite sprite;
     protected final List<Clickable> clickableAreas = new ArrayList<>();
 
     protected boolean attacking;
@@ -32,6 +35,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected Entity attacker;
 
     public Entity(float x, float y) {
+        this.id = rand.nextLong();
         this.x = x;
         this.y = y;
         this.health = getMaxHealth(getClass());
@@ -112,12 +116,54 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         return attacker;
     }
 
+    public long getId() {
+        return id;
+    }
+
     @Override
     public void render() {
         glPushMatrix();
         glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
         this.sprite.render();
         glPopMatrix();
+    }
+
+    public static BaseProto.EntityClass toEntityClass(Class<? extends Entity> klass) {
+        if (klass == null) {
+            return BaseProto.EntityClass.NULL;
+        }
+        return switch (klass.getSimpleName()) {
+            case "Worm" -> BaseProto.EntityClass.WORM;
+            case "Base" -> BaseProto.EntityClass.BASE;
+            case "Barracks" -> BaseProto.EntityClass.BARRACKS;
+            case "Factory" -> BaseProto.EntityClass.FACTORY;
+            case "Helipad" -> BaseProto.EntityClass.HELIPAD;
+            case "Powerplant" -> BaseProto.EntityClass.POWERPLANT;
+            case "Refinery" -> BaseProto.EntityClass.REFINERY;
+            case "Silo" -> BaseProto.EntityClass.SILO;
+            case "Buggy" -> BaseProto.EntityClass.BUGGY;
+            case "Harvester" -> BaseProto.EntityClass.HARVESTER;
+            case "Heli" -> BaseProto.EntityClass.HELI;
+            case "Soldier" -> BaseProto.EntityClass.SOLDIER;
+            default -> BaseProto.EntityClass.UNRECOGNIZED;
+        };
+    }
+
+    protected EntityStateProto.EntityState toEntityState() {
+        return EntityStateProto.EntityState.newBuilder()
+                .setId(this.getId())
+                .setKlass(toEntityClass(this.getClass()))
+                .setPosition(BaseProto.Position.newBuilder().setX(this.x).setY(this.y).build())
+                .setOrientation(BaseProto.Orientation.forNumber(this.orientation.ordinal()))
+                .setHealth(this.health)
+                .setAttackingState(EntityStateProto.EntityState.AttackingState.newBuilder()
+                        .setTargetId(this.attackTarget != null ? this.attackTarget.getId() : 0)
+                        .setAttacking(this.attacking)
+                        .build())
+                .setAttackedState(EntityStateProto.EntityState.AttackedState.newBuilder()
+                        .setAttackerId(this.attacker != null ? this.attacker.getId() : 0)
+                        .setUnderAttack(this.underAttack)
+                        .build()).build();
     }
 
     protected static void setMaxHealth(Class<? extends Entity> klass, int health) {
@@ -158,11 +204,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
 
     protected float computeDepth(Game game) {
         return game.getView().getScreenY(y) / game.getWindow().getHeight();
-
     }
 
     public static void initClasses() {
-        String[] classes = new String[] {
+        String[] classes = new String[]{
                 "sk.neuromancer.Xune.entity.building.Base",
                 "sk.neuromancer.Xune.entity.building.Barracks",
                 "sk.neuromancer.Xune.entity.building.Factory",
@@ -249,6 +294,25 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
                 }
                 glPopMatrix();
             }
+        }
+
+        protected EntityStateProto.PlayableEntityState toPlayableEntityState() {
+            EntityStateProto.PlayableEntityState.Builder builder = EntityStateProto.PlayableEntityState.newBuilder();
+
+            // Convert EntityState
+            EntityStateProto.EntityState entityState = toEntityState();
+            builder.setEntity(entityState);
+
+            // Set other PlayableEntityState fields
+            builder.setFlag(this.flag.serialize());
+            builder.setOwnerId(this.owner.getId());
+
+            // Convert commands
+            for (Command command : this.commands) {
+                builder.addCommands(command.serialize());
+            }
+
+            return builder.build();
         }
 
         @Override

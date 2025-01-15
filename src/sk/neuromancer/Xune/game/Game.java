@@ -5,6 +5,7 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.game.players.Human;
+import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.game.screens.Gameover;
 import sk.neuromancer.Xune.game.screens.Intro;
 import sk.neuromancer.Xune.game.screens.Pause;
@@ -13,9 +14,13 @@ import sk.neuromancer.Xune.gfx.LevelView;
 import sk.neuromancer.Xune.gfx.SpriteSheet;
 import sk.neuromancer.Xune.gfx.Window;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.net.proto.PlayerProto;
 import sk.neuromancer.Xune.sfx.SoundManager;
 import sk.neuromancer.Xune.sfx.SoundPlayer;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -167,6 +172,10 @@ public class Game {
                 if (pause.shouldContinue()) {
                     cont();
                 }
+                if (pause.shouldSave()) {
+                    save();
+                    cont();
+                }
                 if (pause.shouldExit()) {
                     stop();
                 }
@@ -191,6 +200,26 @@ public class Game {
             stop();
     }
 
+    private void save() {
+        try (FileOutputStream fos = new FileOutputStream("save.xune")) {
+            for (Player player : level.getPlayers()) {
+                player.serialize().writeTo(fos);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void load() {
+        try (FileInputStream fis = new FileInputStream("save.xune")) {
+            for (Player player : level.getPlayers()) {
+                PlayerProto.PlayerState.parseFrom(fis);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void play() {
         state = GameState.PLAYING;
 
@@ -207,7 +236,8 @@ public class Game {
         Class<? extends Bot> botClass = intro.getSelectedBot();
         try {
             bot = botClass.getDeclaredConstructor(Game.class, Level.class, Flag.class, int.class).newInstance(this, level, botFlag, 1000);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         hud = new HUD(this);
         hud.setLevel(level);

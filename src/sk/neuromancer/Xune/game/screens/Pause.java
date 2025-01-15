@@ -21,10 +21,10 @@ public class Pause implements Tickable, Renderable {
     public void tick(int tickCount) {
         InputHandler input = game.getInput();
         if ((input.W.wasPressed() || input.UP.wasPressed()) && selected > 0) {
-            selected = (selected - 1) % 2;
+            selected = (selected - 1) % 3;
         }
-        if ((input.S.wasPressed() || input.DOWN.wasPressed()) && selected < 1) {
-            selected = (selected + 1) % 2;
+        if ((input.S.wasPressed() || input.DOWN.wasPressed()) && selected < 2) {
+            selected = (selected + 1) % 3;
         }
         if (input.ENTER.wasPressed()) {
             confirmed = true;
@@ -45,9 +45,12 @@ public class Pause implements Tickable, Renderable {
 
         glTranslatef(game.getWindow().getCenterX(), game.getWindow().getCenterY(), 0);
         Text contText = new Text((selected == 0 ? "> ": "") + "Continue", true, 5f);
-        Text exitText = new Text((selected == 1 ? "> ": "") + "Exit", true, 5f);
+        Text saveText = new Text((selected == 1 ? "> ": "") + "Save", true, 5f);
+        Text exitText = new Text((selected == 2 ? "> ": "") + "Exit", true, 5f);
         contText.render();
         glTranslatef(0, contText.getHeight(), 0);
+        saveText.render();
+        glTranslatef(0, saveText.getHeight(), 0);
         exitText.render();
 
         glEnable(GL_DEPTH_TEST);
@@ -57,8 +60,12 @@ public class Pause implements Tickable, Renderable {
         return confirmed && selected == 0;
     }
 
-    public boolean shouldExit() {
+    public boolean shouldSave() {
         return confirmed && selected == 1;
+    }
+
+    public boolean shouldExit() {
+        return confirmed && selected == 2;
     }
 
     public void reset() {

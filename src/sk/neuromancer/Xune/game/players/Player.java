@@ -1,23 +1,24 @@
 package sk.neuromancer.Xune.game.players;
 
+import com.google.protobuf.ByteString;
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.Base;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.building.Powerplant;
 import sk.neuromancer.Xune.entity.building.Refinery;
-import sk.neuromancer.Xune.entity.unit.Buggy;
-import sk.neuromancer.Xune.entity.unit.Harvester;
-import sk.neuromancer.Xune.entity.unit.Heli;
-import sk.neuromancer.Xune.entity.unit.Soldier;
+import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Effect;
 import sk.neuromancer.Xune.gfx.Renderable;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
+import sk.neuromancer.Xune.net.proto.EntityStateProto;
+import sk.neuromancer.Xune.net.proto.PlayerProto;
 import sk.neuromancer.Xune.sfx.SoundManager;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 public class Player implements Tickable, Renderable {
@@ -30,6 +31,7 @@ public class Player implements Tickable, Renderable {
     protected List<Entity.PlayableEntity> toAdd = new LinkedList<>();
     protected List<Entity.PlayableEntity> toRemove = new LinkedList<>();
 
+    protected long id;
     protected int money;
     protected int powerProduction;
     protected int powerConsumption;
@@ -45,7 +47,7 @@ public class Player implements Tickable, Renderable {
         this.level = level;
         this.flag = flag;
         this.money = money;
-        level.addPlayer(this);
+        this.id = level.addPlayer(this);
 
         this.visible = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];
         this.discovered = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];
@@ -303,5 +305,61 @@ public class Player implements Tickable, Renderable {
             return false;
         }
         return discovered[column][row];
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    private byte[] serializeVisibility(boolean[][] array) {
+        int rows = array.length;
+        int cols = array[0].length;
+        int byteLength = (rows * cols + 7) / 8;
+        ByteBuffer buffer = ByteBuffer.allocate(byteLength);
+        byte currentByte = 0;
+        int bitIndex = 0;
+
+        for (boolean[] row : array) {
+            for (boolean b : row) {
+                if (b) {
+                    currentByte |= (byte) (1 << (7 - bitIndex));
+                }
+                bitIndex++;
+                if (bitIndex == 8) {
+                    buffer.put(currentByte);
+                    currentByte = 0;
+                    bitIndex = 0;
+                }
+            }
+        }
+
+        // Store the last byte if there are remaining bits
+        if (bitIndex > 0) {
+            buffer.put(currentByte);
+        }
+
+        return buffer.array();
+    }
+
+    public PlayerProto.PlayerState serialize() {
+        PlayerProto.PlayerState.Builder builder = PlayerProto.PlayerState.newBuilder();
+        builder.setId(id);
+        builder.setMoney(money);
+        builder.setPowerProduction(powerProduction);
+        builder.setPowerConsumption(powerConsumption);
+        builder.setFlag(flag.serialize());
+        builder.setBuildingKlass(Entity.PlayableEntity.toEntityClass(buildingToBuild));
+        builder.setBuildProgress(buildProgress);
+        builder.setBuildDuration(buildDuration);
+        builder.setVisible(ByteString.copyFrom(serializeVisibility(visible)));
+        builder.setDiscovered(ByteString.copyFrom(serializeVisibility(discovered)));
+        for (Entity.PlayableEntity e : entities) {
+            if (e instanceof Unit unit) {
+                builder.addEntities(PlayerProto.PlayerEntity.newBuilder().setUnit(unit.serialize()).build());
+            } else if (e instanceof Building building) {
+                builder.addEntities(PlayerProto.PlayerEntity.newBuilder().setBuilding(building.serialize()).build());
+            }
+        }
+        return builder.build();
     }
 }
