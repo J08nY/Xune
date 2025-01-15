@@ -302,13 +302,10 @@ public class HUD implements Tickable, Renderable {
                     mouseX < mapEndX &&
                     mouseY > mapStartY &&
                     mouseY < mapEndY) {
-                System.out.println("MouseX: " + mouseX + " MouseY: " + mouseY);
                 int tx = Math.round((float) (mouseX - mapStartX) * level.getWidthInTiles() / (hudScale * 50));
                 int ty = Math.round((float) (mouseY - mapStartY) * level.getHeightInTiles() / (hudScale * 50));
-                System.out.println("X: " + tx + " Y: " + ty);
                 float lx = Level.tileToLevelX(tx, ty);
                 float ly = Level.tileToLevelY(tx, ty);
-                System.out.println("LX: " + lx + " LY: " + ly);
                 game.getView().centerOn(lx, ly);
             }
         }

@@ -10,6 +10,8 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.NoPathFound;
+import sk.neuromancer.Xune.proto.BaseProto;
+import sk.neuromancer.Xune.proto.PlayerProto;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,6 +45,13 @@ public class Bot extends Player {
     Bot(Game game, Level level, Flag flag, int money) {
         super(game, level, flag, money);
         this.spawn = setupSpawn();
+    }
+
+    Bot(Game game, Level level, PlayerProto.PlayerState savedState) {
+        super(game, level, savedState);
+        this.spawn = new Tile(48, savedState.getBot().getSpawn().getX(), savedState.getBot().getSpawn().getY());
+        this.buildingPlan = savedState.getBot().getBuildingPlanList().stream().map(Entity::fromEntityClass).map(e -> (Class<? extends Building>) e).collect(Collectors.toCollection(LinkedList::new));
+        this.unitPlan = savedState.getBot().getUnitPlanList().stream().map(Entity::fromEntityClass).map(e -> (Class<? extends Unit>) e).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override
@@ -238,6 +247,16 @@ public class Bot extends Player {
         }
     }
 
+    public PlayerProto.PlayerState serialize() {
+        PlayerProto.PlayerState.Builder state = super.serialize().toBuilder();
+        PlayerProto.BotState.Builder bot = PlayerProto.BotState.newBuilder()
+                .setSpawn(BaseProto.Tile.newBuilder().setX(spawn.getX()).setY(spawn.getY()).build())
+                .addAllBuildingPlan(buildingPlan.stream().map(Entity::toEntityClass).toList())
+                .addAllUnitPlan(unitPlan.stream().map(Entity::toEntityClass).toList());
+        state.setBot(bot);
+        return state.build();
+    }
+
     public static class ArmyGeneral extends Bot {
         public ArmyGeneral(Game game, Level level, Flag flag, int money) {
             super(game, level, flag, money);
@@ -254,6 +273,10 @@ public class Bot extends Player {
             soldierPriority = 90;
             buggyPriority = 0;
             heliPriority = 0;
+        }
+
+        public ArmyGeneral(Game game, Level level, PlayerProto.PlayerState savedState) {
+            super(game, level, savedState);
         }
     }
 
@@ -274,6 +297,10 @@ public class Bot extends Player {
             buggyPriority = 90;
             heliPriority = 0;
         }
+
+        public BuggyBoy(Game game, Level level, PlayerProto.PlayerState playerState) {
+            super(game, level, playerState);
+        }
     }
 
     public static class HeliMaster extends Bot {
@@ -293,6 +320,10 @@ public class Bot extends Player {
             buggyPriority = 0;
             heliPriority = 90;
         }
+
+        public HeliMaster(Game game, Level level, PlayerProto.PlayerState playerState) {
+            super(game, level, playerState);
+        }
     }
 
     public static class JackOfAllTrades extends Bot {
@@ -310,6 +341,10 @@ public class Bot extends Player {
             soldierPriority = 50;
             buggyPriority = 30;
             heliPriority = 10;
+        }
+
+        public JackOfAllTrades(Game game, Level level, PlayerProto.PlayerState playerState) {
+            super(game, level, playerState);
         }
     }
 
@@ -329,6 +364,10 @@ public class Bot extends Player {
             soldierPriority = 30;
             buggyPriority = 30;
             heliPriority = 10;
+        }
+
+        public EconGraduate(Game game, Level level, PlayerProto.PlayerState playerState) {
+            super(game, level, playerState);
         }
     }
 }

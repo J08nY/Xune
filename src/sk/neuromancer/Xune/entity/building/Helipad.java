@@ -5,6 +5,8 @@ import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.proto.BaseProto;
+import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.List;
@@ -29,6 +31,13 @@ public class Helipad extends Building {
 
     public Helipad(int x, int y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
+    }
+
+    public Helipad(EntityStateProto.BuildingState savedState, Player owner) {
+        super(savedState, owner);
+        if (savedState.getPlayable().getEntity().getKlass() != BaseProto.EntityClass.HELIPAD) {
+            throw new IllegalArgumentException("Invalid entity class");
+        }
     }
 
 }

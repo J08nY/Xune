@@ -13,8 +13,8 @@ import sk.neuromancer.Xune.level.paths.NoPathFound;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
-import sk.neuromancer.Xune.net.proto.BaseProto;
-import sk.neuromancer.Xune.net.proto.CommandProto;
+import sk.neuromancer.Xune.proto.BaseProto;
+import sk.neuromancer.Xune.proto.CommandProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.lang.reflect.Constructor;
@@ -48,6 +48,13 @@ public abstract class Command {
             this.fromY = fromY;
             this.toX = toX;
             this.toY = toY;
+        }
+
+        public FlyCommand(CommandProto.CommandFly fly) {
+            this.fromX = fly.getFrom().getX();
+            this.fromY = fly.getFrom().getY();
+            this.toX = fly.getTo().getX();
+            this.toY = fly.getTo().getY();
         }
 
         public float getFromX() {
@@ -144,6 +151,15 @@ public abstract class Command {
             this.toX = stop.getLevelX();
             this.toY = stop.getLevelY();
             this.next = 0;
+        }
+
+        public MoveCommand(CommandProto.CommandMove move) {
+            this.fromX = move.getFrom().getX();
+            this.fromY = move.getFrom().getY();
+            this.toX = move.getTo().getX();
+            this.toY = move.getTo().getY();
+            this.path = new Path(move.getPoints());
+            this.next = move.getNext();
         }
 
         public Point getNext() {
@@ -249,6 +265,13 @@ public abstract class Command {
             this(target, true);
         }
 
+        public AttackCommand(CommandProto.CommandAttack attack) {
+            //TODO:
+            // this.target = Entity.getEntity(attack.getTargetId());
+            this.target = null;
+            this.keep = attack.getKeep();
+        }
+
         public Entity getTarget() {
             return target;
         }
@@ -303,6 +326,15 @@ public abstract class Command {
             this.attack = new AttackCommand(target);
             this.pathfinder = pathFinder;
             this.target = target;
+            this.targetX = target.x;
+            this.targetY = target.y;
+        }
+
+        public MoveAndAttackCommand(CommandProto.CommandMoveAndAttack moveAndAttack, Pathfinder pathfinder) {
+            this.move = new MoveCommand(moveAndAttack.getMove());
+            this.attack = new AttackCommand(moveAndAttack.getAttack());
+            this.pathfinder = pathfinder;
+            this.target = attack.getTarget();
             this.targetX = target.x;
             this.targetY = target.y;
         }
@@ -373,6 +405,14 @@ public abstract class Command {
             this.targetY = target.y;
         }
 
+        public FlyAndAttackCommand(CommandProto.CommandFlyAndAttack flyAndAttack) {
+            this.move = new FlyCommand(flyAndAttack.getMove());
+            this.attack = new AttackCommand(flyAndAttack.getAttack());
+            this.target = attack.getTarget();
+            this.targetX = target.x;
+            this.targetY = target.y;
+        }
+
         @Override
         public boolean isFinished(Entity entity) {
             return attack.isFinished(entity);
@@ -432,6 +472,14 @@ public abstract class Command {
             this.duration = duration;
             this.resultClass = resultClass;
             this.pathfinder = pathFinder;
+        }
+
+        public ProduceCommand(CommandProto.CommandProduce produce, Pathfinder pathfinder) {
+            this.duration = produce.getDuration();
+            this.resultClass = Entity.PlayableEntity.fromEntityClass(produce.getResultClass()).asSubclass(Unit.class);
+            this.progress = produce.getProgress();
+            this.finished = false;
+            this.pathfinder = pathfinder;
         }
 
         @Override
@@ -518,6 +566,11 @@ public abstract class Command {
             this.target = target;
         }
 
+        public CollectSpiceCommand(CommandProto.CommandCollectSpice collectSpice, Level level) {
+            this.move = new MoveCommand(collectSpice.getMove());
+            this.target = level.getTile(collectSpice.getTarget().getX(), collectSpice.getTarget().getY());
+        }
+
         public Tile getTarget() {
             return target;
         }
@@ -593,6 +646,13 @@ public abstract class Command {
             }
             this.move = m;
             this.target = target;
+        }
+
+        public DropOffSpiceCommand(CommandProto.CommandDropOffSpice dropOffSpice) {
+            this.move = new MoveCommand(dropOffSpice.getMove());
+            // TODO: Fix this
+            //      this.target = (Refinery) Entity.getEntity(dropOffSpice.getTargetId());
+            this.target = null;
         }
 
         public boolean dropping(Entity entity) {

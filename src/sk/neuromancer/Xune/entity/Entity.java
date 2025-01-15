@@ -1,13 +1,19 @@
 package sk.neuromancer.Xune.entity;
 
+import sk.neuromancer.Xune.entity.building.*;
+import sk.neuromancer.Xune.entity.unit.Buggy;
+import sk.neuromancer.Xune.entity.unit.Harvester;
+import sk.neuromancer.Xune.entity.unit.Heli;
+import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.game.Clickable;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.graphics.Sprite;
-import sk.neuromancer.Xune.net.proto.BaseProto;
-import sk.neuromancer.Xune.net.proto.EntityStateProto;
+import sk.neuromancer.Xune.proto.BaseProto;
+import sk.neuromancer.Xune.proto.CommandProto;
+import sk.neuromancer.Xune.proto.EntityStateProto;
 
 import java.util.*;
 
@@ -39,6 +45,28 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         this.x = x;
         this.y = y;
         this.health = getMaxHealth(getClass());
+        this.maxHealth = getMaxHealth(getClass());
+        this.sight = getSight(getClass());
+        this.s2 = sight * sight;
+    }
+
+    public Entity(EntityStateProto.EntityState savedState) {
+        this.id = savedState.getId();
+        this.x = savedState.getPosition().getX();
+        this.y = savedState.getPosition().getY();
+        this.orientation = Orientation.deserialize(savedState.getOrientation());
+
+        if (savedState.hasAttackingState()) {
+            EntityStateProto.EntityState.AttackingState attackingState = savedState.getAttackingState();
+            this.attacking = attackingState.getAttacking();
+            //this.attackTarget = Game.getEntity(attackingState.getTargetId());
+        }
+        if (savedState.hasAttackedState()) {
+            EntityStateProto.EntityState.AttackedState attackedState = savedState.getAttackedState();
+            this.underAttack = attackedState.getUnderAttack();
+            //this.attacker = Game.getEntity(attackedState.getAttackerId());
+        }
+        this.health = savedState.getHealth();
         this.maxHealth = getMaxHealth(getClass());
         this.sight = getSight(getClass());
         this.s2 = sight * sight;
@@ -149,6 +177,24 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         };
     }
 
+    public static Class<? extends Entity> fromEntityClass(BaseProto.EntityClass klass) {
+        return switch (klass) {
+            case WORM -> Worm.class;
+            case BASE -> Base.class;
+            case BARRACKS -> Barracks.class;
+            case FACTORY -> Factory.class;
+            case HELIPAD -> Helipad.class;
+            case POWERPLANT -> Powerplant.class;
+            case REFINERY -> Refinery.class;
+            case SILO -> Silo.class;
+            case BUGGY -> Buggy.class;
+            case HARVESTER -> Harvester.class;
+            case HELI -> Heli.class;
+            case SOLDIER -> Soldier.class;
+            case UNRECOGNIZED, NULL -> null;
+        };
+    }
+
     protected EntityStateProto.EntityState toEntityState() {
         return EntityStateProto.EntityState.newBuilder()
                 .setId(this.getId())
@@ -244,6 +290,50 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
             this.owner = owner;
             this.commands = new LinkedList<>();
             this.flag = owner.getFlag();
+        }
+
+        public PlayableEntity(EntityStateProto.PlayableEntityState savedState, Player owner) {
+            super(savedState.getEntity());
+            this.owner = owner;
+            this.flag = Flag.deserialize(savedState.getFlag());
+            this.commands = new LinkedList<>();
+            for (CommandProto.Command commandState : savedState.getCommandsList()) {
+                switch (commandState.getCmdCase()) {
+                    case FLY -> {
+                        Command.FlyCommand fly = new Command.FlyCommand(commandState.getFly());
+                        this.commands.add(fly);
+                    }
+                    case MOVE -> {
+                        Command.MoveCommand move = new Command.MoveCommand(commandState.getMove());
+                        this.commands.add(move);
+                    }
+                    case ATTACK -> {
+                        Command.AttackCommand attack = new Command.AttackCommand(commandState.getAttack());
+                        this.commands.add(attack);
+                    }
+                    case MOVEANDATTACK -> {
+                        //TODO this pathfinder thing is nasty.
+                        Command.MoveAndAttackCommand moveAndAttack = new Command.MoveAndAttackCommand(commandState.getMoveAndAttack(), owner.getLevel().getPathfinder());
+                        this.commands.add(moveAndAttack);
+                    }
+                    case FLYANDATTACK -> {
+                        Command.FlyAndAttackCommand flyAndAttack = new Command.FlyAndAttackCommand(commandState.getFlyAndAttack());
+                        this.commands.add(flyAndAttack);
+                    }
+                    case PRODUCE -> {
+                        Command.ProduceCommand produce = new Command.ProduceCommand(commandState.getProduce(), owner.getLevel().getPathfinder());
+                        this.commands.add(produce);
+                    }
+                    case COLLECTSPICE -> {
+                        Command.CollectSpiceCommand collectSpice = new Command.CollectSpiceCommand(commandState.getCollectSpice(), owner.getLevel());
+                        this.commands.add(collectSpice);
+                    }
+                    case DROPOFFSPICE -> {
+                        Command.DropOffSpiceCommand dropOffSpice = new Command.DropOffSpiceCommand(commandState.getDropOffSpice());
+                        this.commands.add(dropOffSpice);
+                    }
+                }
+            }
         }
 
         protected static void setBaseSprite(Class<? extends Entity> klass, int sprite) {

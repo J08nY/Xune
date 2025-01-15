@@ -24,8 +24,8 @@ public class LevelView implements Tickable, Renderable {
     public static final float ZOOM_SPEED = (float) 3 / TPS;
     public static final float SCROLL_SPEED = (float) 5 / TPS;
     public static final float MOVE_SPEED = (float) TPS / 4.5f;
-    public static final float EDGE_MARGIN_X = Tile.TILE_WIDTH * 2;
-    public static final float EDGE_MARGIN_Y = Tile.TILE_HEIGHT * 4;
+    public static final float EDGE_MARGIN_X = Tile.TILE_WIDTH * 4;
+    public static final float EDGE_MARGIN_Y = Tile.TILE_HEIGHT * 8;
 
     public LevelView(Game game) {
         this.game = game;
@@ -37,10 +37,12 @@ public class LevelView implements Tickable, Renderable {
         this.hudTop = game.getHud().getHudTop();
     }
 
-    public void setLevel(Level level) {
+    public void setLevel(Level level, boolean reset) {
         this.level = level;
-        this.zoom = 5.0f;
-        centerOn(level.getWidth() / 2, level.getHeight() / 2);
+        if (reset) {
+            this.zoom = 5.0f;
+            centerOn(level.getWidth() / 2, level.getHeight() / 2);
+        }
     }
 
     @Override
@@ -86,7 +88,7 @@ public class LevelView implements Tickable, Renderable {
     }
 
     public void zoomOut(float speed) {
-        if (true || getLevelY(0) > -EDGE_MARGIN_Y &&
+        if (getLevelY(0) > -EDGE_MARGIN_Y &&
                 getLevelX(0) > -EDGE_MARGIN_X &&
                 getLevelY(hudTop) < (level.getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2) &&
                 getLevelX(screenWidth) < (level.getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2))
@@ -94,25 +96,25 @@ public class LevelView implements Tickable, Renderable {
     }
 
     public void moveUp() {
-        if (true || getLevelY(0) > -EDGE_MARGIN_Y) {
+        if (getLevelY(0) > -EDGE_MARGIN_Y) {
             this.yOff += MOVE_SPEED * (1 / zoom);
         }
     }
 
     public void moveDown() {
-        if (true || getLevelY(hudTop) < (level.getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
+        if (getLevelY(hudTop) < (level.getHeight() + EDGE_MARGIN_Y + (float) Tile.TILE_HEIGHT / 2)) {
             this.yOff -= MOVE_SPEED * (1 / zoom);
         }
     }
 
     public void moveLeft() {
-        if (true || getLevelX(0) > -EDGE_MARGIN_X) {
+        if (getLevelX(0) > -EDGE_MARGIN_X) {
             this.xOff += MOVE_SPEED * (1 / zoom);
         }
     }
 
     public void moveRight() {
-        if (true || getLevelX(screenWidth) < (level.getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
+        if (getLevelX(screenWidth) < (level.getWidth() + EDGE_MARGIN_X + (float) Tile.TILE_WIDTH / 2)) {
             this.xOff -= MOVE_SPEED * (1 / zoom);
         }
     }

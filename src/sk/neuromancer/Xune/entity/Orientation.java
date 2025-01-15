@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.entity;
 
-import sk.neuromancer.Xune.net.proto.BaseProto;
+import sk.neuromancer.Xune.proto.BaseProto;
 
 public enum Orientation {
     //0		1		 2		3		4		5		6		7
@@ -113,6 +113,20 @@ public enum Orientation {
             case SOUTHWEST -> BaseProto.Orientation.SOUTHWEST;
             case WEST -> BaseProto.Orientation.WEST;
             case NORTHWEST -> BaseProto.Orientation.NORTHWEST;
+        };
+    }
+
+    public static Orientation deserialize(BaseProto.Orientation orientation) {
+        return switch (orientation) {
+            case BaseProto.Orientation.NORTH -> NORTH;
+            case BaseProto.Orientation.NORTHEAST -> NORTHEAST;
+            case BaseProto.Orientation.EAST -> EAST;
+            case BaseProto.Orientation.SOUTHEAST -> SOUTHEAST;
+            case BaseProto.Orientation.SOUTH -> SOUTH;
+            case BaseProto.Orientation.SOUTHWEST -> SOUTHWEST;
+            case BaseProto.Orientation.WEST -> WEST;
+            case BaseProto.Orientation.NORTHWEST -> NORTHWEST;
+            case BaseProto.Orientation.UNRECOGNIZED -> null;
         };
     }
 }

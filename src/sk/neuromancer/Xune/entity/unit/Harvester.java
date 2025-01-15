@@ -10,6 +10,7 @@ import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.List;
@@ -38,6 +39,13 @@ public class Harvester extends Unit {
 
     public Harvester(float x, float y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
+        updateSprite();
+        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6, false));
+    }
+
+    public Harvester(EntityStateProto.UnitState savedState, Player owner) {
+        super(savedState, owner);
+        this.spice = 0;//TODO: Restore spice levels.
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6, false));
     }

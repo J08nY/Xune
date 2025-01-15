@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package sk.neuromancer.Xune.net.proto;
+package sk.neuromancer.Xune.proto;
 
 option java_outer_classname = "CommandProto";
 
-import "sk/neuromancer/Xune/net/proto/Base.proto";
+import "sk/neuromancer/Xune/proto/Base.proto";
 
 message CommandFly {
   Position from = 1;

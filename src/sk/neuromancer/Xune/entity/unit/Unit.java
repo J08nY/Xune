@@ -8,7 +8,7 @@ import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.Effect;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
-import sk.neuromancer.Xune.net.proto.EntityStateProto;
+import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.HashMap;
@@ -36,6 +36,19 @@ public abstract class Unit extends Entity.PlayableEntity implements Moveable {
     public Unit(float x, float y, Orientation orientation, Player owner) {
         super(x, y, owner);
         this.orientation = orientation;
+        Class<? extends Unit> klass = getClass();
+        this.speed = getSpeed(klass);
+        this.range = getRange(klass);
+        this.r2 = range * range;
+        this.rate = getRate(klass);
+        this.damage = getDamage(klass);
+        this.accuracy = getAccuracy(klass);
+    }
+
+    public Unit(EntityStateProto.UnitState savedState, Player owner) {
+        super(savedState.getPlayable(), owner);
+        this.ready = savedState.getReady();
+        this.immobile = savedState.getImmobile();
         Class<? extends Unit> klass = getClass();
         this.speed = getSpeed(klass);
         this.range = getRange(klass);

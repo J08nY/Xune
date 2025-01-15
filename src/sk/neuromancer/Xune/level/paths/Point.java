@@ -1,7 +1,7 @@
 package sk.neuromancer.Xune.level.paths;
 
 import sk.neuromancer.Xune.entity.Orientation;
-import sk.neuromancer.Xune.net.proto.BaseProto;
+import sk.neuromancer.Xune.proto.BaseProto;
 
 import java.util.Objects;
 
@@ -11,6 +11,11 @@ public class Point {
     public Point(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Point(BaseProto.Point savedPoint) {
+        this.x = savedPoint.getX();
+        this.y = savedPoint.getY();
     }
 
     @Override

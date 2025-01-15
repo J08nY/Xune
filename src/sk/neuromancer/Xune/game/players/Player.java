@@ -13,7 +13,9 @@ import sk.neuromancer.Xune.graphics.Effect;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
-import sk.neuromancer.Xune.net.proto.PlayerProto;
+import sk.neuromancer.Xune.proto.BaseProto;
+import sk.neuromancer.Xune.proto.EntityStateProto;
+import sk.neuromancer.Xune.proto.PlayerProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.lang.reflect.InvocationTargetException;
@@ -41,7 +43,7 @@ public class Player implements Tickable, Renderable {
     protected float buildProgress;
     protected int buildDuration;
 
-    public Player(Game game, Level level, Flag flag, int money) {
+    protected Player(Game game, Level level, Flag flag, int money) {
         this.game = game;
         this.level = level;
         this.flag = flag;
@@ -50,6 +52,52 @@ public class Player implements Tickable, Renderable {
 
         this.visible = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];
         this.discovered = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];
+
+        commandStrategies.put(Heli.class, new CommandStrategy.AirAttackStrategy());
+        commandStrategies.put(Buggy.class, new CommandStrategy.GroundAttackStrategy());
+        commandStrategies.put(Harvester.class, new CommandStrategy.SpiceCollectStrategy());
+        commandStrategies.put(Soldier.class, new CommandStrategy.GroundAttackStrategy());
+    }
+
+    protected Player(Game game, Level level, PlayerProto.PlayerState savedState) {
+        this.game = game;
+        this.level = level;
+        this.flag = Flag.deserialize(savedState.getFlag());
+        this.money = savedState.getMoney();
+        this.id = savedState.getId();
+        this.powerProduction = savedState.getPowerProduction();
+        this.powerConsumption = savedState.getPowerConsumption();
+        if (savedState.getBuildingKlass() != BaseProto.EntityClass.NULL) {
+            this.buildingToBuild = Entity.fromEntityClass(savedState.getBuildingKlass()).asSubclass(Building.class);
+            this.buildDuration = savedState.getBuildDuration();
+            this.buildProgress = savedState.getBuildProgress();
+        }
+        for (PlayerProto.PlayerEntity entity : savedState.getEntitiesList()) {
+            if (entity.hasUnit()) {
+                Class<? extends Unit> klass = Entity.fromEntityClass(entity.getUnit().getPlayable().getEntity().getKlass()).asSubclass(Unit.class);
+                try {
+                    Unit u = klass.getConstructor(EntityStateProto.UnitState.class, Player.class).newInstance(entity.getUnit(), this);
+                    entities.add(u);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                         NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (entity.hasBuilding()) {
+                Class<? extends Building> klass = Entity.fromEntityClass(entity.getBuilding().getPlayable().getEntity().getKlass()).asSubclass(Building.class);
+                try {
+                    Building b = klass.getConstructor(EntityStateProto.BuildingState.class, Player.class).newInstance(entity.getBuilding(), this);
+                    entities.add(b);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                         NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        int w = level.getWidthInTiles();
+        int h = level.getHeightInTiles();
+        this.visible = deserializeVisibility(savedState.getVisible().toByteArray(), w, h);
+        this.discovered = deserializeVisibility(savedState.getDiscovered().toByteArray(), w, h);
 
         commandStrategies.put(Heli.class, new CommandStrategy.AirAttackStrategy());
         commandStrategies.put(Buggy.class, new CommandStrategy.GroundAttackStrategy());
@@ -340,18 +388,41 @@ public class Player implements Tickable, Renderable {
         return buffer.array();
     }
 
+    private boolean[][] deserializeVisibility(byte[] data, int width, int height) {
+        boolean[][] array = new boolean[width][height];
+        int byteIndex = 0;
+        int bitIndex = 0;
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if ((data[byteIndex] & (1 << (7 - bitIndex))) != 0) {
+                    array[x][y] = true;
+                }
+                bitIndex++;
+                if (bitIndex == 8) {
+                    byteIndex++;
+                    bitIndex = 0;
+                }
+            }
+        }
+
+        return array;
+    }
+
     public PlayerProto.PlayerState serialize() {
-        PlayerProto.PlayerState.Builder builder = PlayerProto.PlayerState.newBuilder();
-        builder.setId(id);
-        builder.setMoney(money);
-        builder.setPowerProduction(powerProduction);
-        builder.setPowerConsumption(powerConsumption);
-        builder.setFlag(flag.serialize());
-        builder.setBuildingKlass(Entity.PlayableEntity.toEntityClass(buildingToBuild));
-        builder.setBuildProgress(buildProgress);
-        builder.setBuildDuration(buildDuration);
-        builder.setVisible(ByteString.copyFrom(serializeVisibility(visible)));
-        builder.setDiscovered(ByteString.copyFrom(serializeVisibility(discovered)));
+        PlayerProto.PlayerState.Builder builder = PlayerProto.PlayerState.newBuilder()
+                .setId(id)
+                .setMoney(money)
+                .setPlayerClass(toPlayerClass(getClass()))
+                .setPowerProduction(powerProduction)
+                .setPowerConsumption(powerConsumption)
+                .setFlag(flag.serialize())
+                .setBuildingKlass(Entity.PlayableEntity.toEntityClass(buildingToBuild))
+                .setBuildProgress(buildProgress)
+                .setBuildDuration(buildDuration)
+                .setVisible(ByteString.copyFrom(serializeVisibility(visible)))
+                .setDiscovered(ByteString.copyFrom(serializeVisibility(discovered)));
+
         for (Entity.PlayableEntity e : entities) {
             if (e instanceof Unit unit) {
                 builder.addEntities(PlayerProto.PlayerEntity.newBuilder().setUnit(unit.serialize()).build());
@@ -360,5 +431,25 @@ public class Player implements Tickable, Renderable {
             }
         }
         return builder.build();
+    }
+
+    public static PlayerProto.PlayerClass toPlayerClass(Class<? extends Player> klass) {
+        if (klass == Human.class) {
+            return PlayerProto.PlayerClass.HUMAN;
+        } else if (klass == Bot.ArmyGeneral.class) {
+            return PlayerProto.PlayerClass.BOT_ARMY_GENERAL;
+        } else if (klass == Bot.BuggyBoy.class) {
+            return PlayerProto.PlayerClass.BOT_BUGGY_BOY;
+        } else if (klass == Bot.HeliMaster.class) {
+            return PlayerProto.PlayerClass.BOT_HELI_MASTER;
+        } else if (klass == Bot.JackOfAllTrades.class) {
+            return PlayerProto.PlayerClass.BOT_JACK_OF_ALL_TRADES;
+        } else if (klass == Bot.EconGraduate.class) {
+            return PlayerProto.PlayerClass.BOT_ECON_GRADUATE;
+        } else if (klass == Remote.class) {
+            return PlayerProto.PlayerClass.REMOTE;
+        } else {
+            throw new IllegalArgumentException("Unknown player class: " + klass);
+        }
     }
 }

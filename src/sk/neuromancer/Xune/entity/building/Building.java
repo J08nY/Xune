@@ -6,8 +6,8 @@ import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
-import sk.neuromancer.Xune.net.proto.BaseProto;
-import sk.neuromancer.Xune.net.proto.EntityStateProto;
+import sk.neuromancer.Xune.proto.BaseProto;
+import sk.neuromancer.Xune.proto.EntityStateProto;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +31,14 @@ public abstract class Building extends Entity.PlayableEntity {
         this.orientation = orientation;
         int spriteRow = this.orientation.ordinal() % 2 == 0 ? 1 : 0;
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(getBaseSprite(getClass()) + SpriteSheet.flagToOffset(owner.getFlag()) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH);
+        this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), false));
+    }
+
+    public Building(EntityStateProto.BuildingState savedState, Player owner) {
+        super(savedState.getPlayable(), owner);
+        this.tileX = savedState.getTilePosition().getX();
+        this.tileY = savedState.getTilePosition().getY();
+        this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(getBaseSprite(getClass()) + SpriteSheet.flagToOffset(owner.getFlag()) + (orientation.ordinal() % 2 == 0 ? 1 : 0) * SpriteSheet.SPRITE_ROW_LENGTH);
         this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), false));
     }
 
@@ -84,7 +92,7 @@ public abstract class Building extends Entity.PlayableEntity {
 
     public EntityStateProto.BuildingState serialize() {
         return EntityStateProto.BuildingState.newBuilder()
-                .setEntity(this.toPlayableEntityState())
+                .setPlayable(this.toPlayableEntityState())
                 .setTilePosition(BaseProto.Tile.newBuilder().setX(tileX).setY(tileY).build()).build();
     }
 

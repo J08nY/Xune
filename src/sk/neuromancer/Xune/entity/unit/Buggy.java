@@ -9,6 +9,7 @@ import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.List;
@@ -36,6 +37,12 @@ public class Buggy extends Unit {
 
     public Buggy(float x, float y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
+        updateSprite();
+        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, false));
+    }
+
+    public Buggy(EntityStateProto.UnitState savedState, Player owner) {
+        super(savedState, owner);
         updateSprite();
         this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, false));
     }

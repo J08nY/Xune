@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package sk.neuromancer.Xune.net.proto;
+package sk.neuromancer.Xune.proto;
 
 option java_outer_classname = "LevelProto";
 
-import "sk/neuromancer/Xune/net/proto/Base.proto";
-import "sk/neuromancer/Xune/net/proto/EntityState.proto";
-import "sk/neuromancer/Xune/net/proto/Player.proto";
+import "sk/neuromancer/Xune/proto/Base.proto";
+import "sk/neuromancer/Xune/proto/EntityState.proto";
+import "sk/neuromancer/Xune/proto/Player.proto";
 
 
 message SpiceEntry {

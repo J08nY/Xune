@@ -6,14 +6,17 @@ import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
+import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.Effect;
 import sk.neuromancer.Xune.graphics.LevelView;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
-import sk.neuromancer.Xune.net.proto.BaseProto;
-import sk.neuromancer.Xune.net.proto.LevelProto;
+import sk.neuromancer.Xune.proto.BaseProto;
+import sk.neuromancer.Xune.proto.EntityStateProto;
+import sk.neuromancer.Xune.proto.LevelProto;
+import sk.neuromancer.Xune.proto.PlayerProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.io.BufferedReader;
@@ -41,7 +44,6 @@ public class Level implements Renderable, Tickable {
 
     public static final String LEVEL_1 = "level1.lvl";
 
-
     public Level(Game game, String levelName) {
         this.game = game;
         this.players = new ArrayList<>();
@@ -53,10 +55,59 @@ public class Level implements Renderable, Tickable {
 
     public Level(Game game, LevelProto.FullLevelState savedState) {
         this.game = game;
+        this.width = savedState.getWidth();
+        this.height = savedState.getHeight();
+        this.level = new Tile[this.width][this.height];
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                int type = savedState.getTiles(x * this.height + y);
+                this.level[x][y] = new Tile(type, x, y);
+            }
+        }
+        for (LevelProto.SpiceEntry entry : savedState.getTransient().getSpiceMap().getEntriesList()) {
+            BaseProto.Tile tile = entry.getKey();
+            this.level[tile.getX()][tile.getY()].setSpice(entry.getValue());
+        }
+        this.spawns = new LinkedList<>();
+        for (BaseProto.Tile spawn : savedState.getSpawnsList()) {
+            Tile tile = new Tile(48, spawn.getX(), spawn.getY());
+            this.level[tile.getX()][tile.getY()] = tile;
+            this.spawns.add(tile);
+        }
+        this.pathfinder = new Pathfinder(this);
+
         this.players = new ArrayList<>();
+        for (PlayerProto.PlayerState playerState : savedState.getTransient().getPlayersList()) {
+            PlayerProto.PlayerClass playerClass = playerState.getPlayerClass();
+            Player player = null;
+            switch (playerClass) {
+                case HUMAN -> player = new Human(game, this, playerState);
+                case BOT_ARMY_GENERAL -> player = new Bot.ArmyGeneral(game, this, playerState);
+                case BOT_BUGGY_BOY -> player = new Bot.BuggyBoy(game, this, playerState);
+                case BOT_HELI_MASTER -> player = new Bot.HeliMaster(game, this, playerState);
+                case BOT_JACK_OF_ALL_TRADES -> player = new Bot.JackOfAllTrades(game, this, playerState);
+                case BOT_ECON_GRADUATE -> player = new Bot.EconGraduate(game, this, playerState);
+                case REMOTE -> player = null; //TODO
+            }
+            if (player == null) {
+                continue;
+            }
+            this.players.add(player);
+            if (player instanceof Human h) {
+                this.human = h;
+            }
+            for (Entity.PlayableEntity entity : player.getEntities()) {
+                addEntity(entity);
+            }
+        }
+
         this.worms = new LinkedList<>();
+        for (EntityStateProto.WormState wormState : savedState.getTransient().getWormsList()) {
+            Worm worm = new Worm(this, wormState);
+            this.worms.add(worm);
+        }
         this.roads = new LinkedList<>();
-        this.effects = new LinkedList();
+        this.effects = new LinkedList<>();
     }
 
     @Override
@@ -486,7 +537,6 @@ public class Level implements Renderable, Tickable {
             this.condition = condition;
             this.next = findOne();
         }
-
 
         private Tile findOne() {
             Tile result = null;

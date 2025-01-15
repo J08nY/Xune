@@ -136,7 +136,7 @@ public class Tile implements Renderable {
     static {
         passMap = new HashMap<>();
         solidMap = new HashMap<>();
-        for (int type = 0; type < 59; type ++) {
+        for (int type = 0; type < 59; type++) {
             Sprite passSprite = SpriteSheet.PASSMAP_SHEET.getSprite(type);
             int[] pass = new int[13];
 
@@ -232,6 +232,10 @@ public class Tile implements Renderable {
 
     public int getSpice() {
         return this.spice;
+    }
+
+    public void setSpice(int amount) {
+        this.spice = amount;
     }
 
     public void takeSpice(int amount) {

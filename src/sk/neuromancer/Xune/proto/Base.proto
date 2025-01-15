@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package sk.neuromancer.Xune.net.proto;
+package sk.neuromancer.Xune.proto;
 
 option java_outer_classname = "BaseProto";
 

@@ -4,6 +4,8 @@ import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.proto.BaseProto;
+import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.List;
@@ -27,5 +29,12 @@ public class Silo extends Building {
 
     public Silo(int x, int y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
+    }
+
+    public Silo(EntityStateProto.BuildingState savedState, Player owner) {
+        super(savedState, owner);
+        if (savedState.getPlayable().getEntity().getKlass() != BaseProto.EntityClass.SILO) {
+            throw new IllegalArgumentException("Invalid entity class");
+        }
     }
 }

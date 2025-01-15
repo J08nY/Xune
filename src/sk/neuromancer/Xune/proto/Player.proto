@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package sk.neuromancer.Xune.proto;
+
+option java_outer_classname = "PlayerProto";
+
+import "sk/neuromancer/Xune/proto/Base.proto";
+import "sk/neuromancer/Xune/proto/EntityState.proto";
+
+
+message PlayerEntity {
+  oneof entity {
+    UnitState unit = 2;
+    BuildingState building = 3;
+  }
+}
+
+enum PlayerClass {
+  HUMAN = 0;
+  BOT_ARMY_GENERAL = 1;
+  BOT_BUGGY_BOY = 2;
+  BOT_HELI_MASTER = 3;
+  BOT_JACK_OF_ALL_TRADES = 4;
+  BOT_ECON_GRADUATE = 5;
+  REMOTE = 6;
+}
+
+message HumanState {
+  float xOffset = 1;
+  float yOffset = 2;
+  float zoom = 3;
+}
+
+message BotState {
+  Tile spawn = 1;
+  repeated EntityClass buildingPlan = 2;
+  repeated EntityClass unitPlan = 3;
+}
+
+message PlayerState {
+  uint64 id = 1;
+  uint32 money = 2;
+  PlayerClass playerClass = 3;
+  Flag flag = 4;
+  bytes visible = 5;
+  bytes discovered = 6;
+  uint32 powerProduction = 7;
+  int32 powerConsumption = 8;
+  EntityClass buildingKlass = 9;
+  float buildProgress = 10;
+  uint32 buildDuration = 11;
+  repeated PlayerEntity entities = 12;
+  oneof playerState {
+    HumanState human = 13;
+    BotState bot = 14;
+  }
+}
+
+

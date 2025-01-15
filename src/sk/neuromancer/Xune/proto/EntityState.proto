@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package sk.neuromancer.Xune.net.proto;
+package sk.neuromancer.Xune.proto;
 
 option java_outer_classname = "EntityStateProto";
 
-import "sk/neuromancer/Xune/net/proto/Base.proto";
-import "sk/neuromancer/Xune/net/proto/Command.proto";
+import "sk/neuromancer/Xune/proto/Base.proto";
+import "sk/neuromancer/Xune/proto/Command.proto";
 
 message EntityState {
   uint64 id = 1;
@@ -43,7 +43,7 @@ message UnitState {
 }
 
 message BuildingState {
-  PlayableEntityState entity = 1;
+  PlayableEntityState playable = 1;
   Tile tilePosition = 2;
 }
 

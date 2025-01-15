@@ -14,7 +14,7 @@ import sk.neuromancer.Xune.graphics.LevelView;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.graphics.Window;
 import sk.neuromancer.Xune.level.Level;
-import sk.neuromancer.Xune.net.proto.LevelProto;
+import sk.neuromancer.Xune.proto.LevelProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 import sk.neuromancer.Xune.sound.SoundPlayer;
 
@@ -224,7 +224,12 @@ public class Game implements Runnable {
     private void load() {
         try (FileInputStream fis = new FileInputStream("save.xune.gz");
              GZIPInputStream gis = new GZIPInputStream(fis)) {
-            System.out.println(LevelProto.FullLevelState.parseFrom(gis));
+            LevelProto.FullLevelState state = LevelProto.FullLevelState.parseFrom(gis);
+            level = new Level(this, state);
+            human = level.getHuman();
+            bot = null;
+            hud.setLevel(level);
+            view.setLevel(level, false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -252,7 +257,7 @@ public class Game implements Runnable {
         hud = new HUD(this);
         hud.setLevel(level);
         view = new LevelView(this);
-        view.setLevel(level);
+        view.setLevel(level, true);
     }
 
     private void pause() {

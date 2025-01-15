@@ -7,7 +7,7 @@ import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
-import sk.neuromancer.Xune.net.proto.EntityStateProto;
+import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.Iterator;
@@ -70,6 +70,31 @@ public class Worm extends Entity implements Moveable {
         this.orientation = Orientation.SOUTH;
         this.sprite = SpriteSheet.WORM_SHEET.getSprite(animation);
         this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6, false));
+    }
+
+    public Worm(Level level, EntityStateProto.WormState wormState) {
+        super(wormState.getEntity());
+        this.level = level;
+        this.animation = wormState.getAnimation();
+        this.dir = wormState.getDir();
+        this.plan = new LinkedList<>(wormState.getPlanList().stream().map(Path::new).toList());
+        this.current = wormState.hasCurrent() ? new Path(wormState.getCurrent()) : null;
+        this.nextPoint = wormState.getNextPoint();
+        this.speed = wormState.getSpeed();
+        this.state = switch (wormState.getStatus()) {
+            case WANDERING -> State.WANDERING;
+            case HUNTING -> State.HUNTING;
+            case EATING -> State.EATING;
+            default -> throw new IllegalStateException("Unexpected value: " + wormState.getStatus());
+        };
+        this.stateSince = wormState.getStateSince();
+        this.position = switch (wormState.getPosition()) {
+            case ABOVE -> Position.ABOVE;
+            case BELOW -> Position.BELOW;
+            default -> throw new IllegalStateException("Unexpected value: " + wormState.getPosition());
+        };
+        //this.target = wormState.getTargetId() != -1 ? (Unit) level.getEntity(wormState.getTargetId()) : null;
+
     }
 
     @Override

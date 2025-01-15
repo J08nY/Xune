@@ -11,6 +11,7 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.graphics.HUD;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.proto.PlayerProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.Comparator;
@@ -29,6 +30,13 @@ public class Human extends Player {
     public Human(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
         setupSpawn();
+    }
+
+    public Human(Game game, Level level, PlayerProto.PlayerState playerState) {
+        super(game, level, playerState);
+        game.getView().xOff = playerState.getHuman().getXOffset();
+        game.getView().yOff = playerState.getHuman().getYOffset();
+        game.getView().zoom = playerState.getHuman().getZoom();
     }
 
     @Override
@@ -218,5 +226,15 @@ public class Human extends Player {
 
     public List<PlayableEntity> getSelected() {
         return selected;
+    }
+
+    public PlayerProto.PlayerState serialize() {
+        PlayerProto.PlayerState.Builder state = super.serialize().toBuilder();
+        PlayerProto.HumanState.Builder human = PlayerProto.HumanState.newBuilder()
+                .setXOffset(game.getView().xOff)
+                .setYOffset(game.getView().yOff)
+                .setZoom(game.getView().zoom);
+        state.setHuman(human);
+        return state.build();
     }
 }
