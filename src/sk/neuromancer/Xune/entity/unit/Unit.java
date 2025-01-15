@@ -1,17 +1,15 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Moveable;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.players.Player;
-import sk.neuromancer.Xune.gfx.Effect;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.graphics.Effect;
+import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
-import sk.neuromancer.Xune.net.proto.BaseProto;
 import sk.neuromancer.Xune.net.proto.EntityStateProto;
-import sk.neuromancer.Xune.sfx.SoundManager;
+import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.HashMap;
 import java.util.Map;

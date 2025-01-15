@@ -1,4 +1,4 @@
-package sk.neuromancer.Xune.gfx;
+package sk.neuromancer.Xune.graphics;
 
 import static org.lwjgl.opengl.GL11.*;
 

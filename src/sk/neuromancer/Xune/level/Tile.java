@@ -2,10 +2,10 @@ package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.game.Config;
-import sk.neuromancer.Xune.gfx.Renderable;
-import sk.neuromancer.Xune.gfx.Sprite;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
-import sk.neuromancer.Xune.gfx.Text;
+import sk.neuromancer.Xune.graphics.Renderable;
+import sk.neuromancer.Xune.graphics.Sprite;
+import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.graphics.Text;
 
 import java.util.HashMap;
 import java.util.Map;

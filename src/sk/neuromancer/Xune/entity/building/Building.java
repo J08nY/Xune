@@ -4,7 +4,7 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.players.Player;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.net.proto.BaseProto;
 import sk.neuromancer.Xune.net.proto.EntityStateProto;

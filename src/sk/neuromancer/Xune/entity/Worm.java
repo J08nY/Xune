@@ -2,13 +2,13 @@ package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Unit;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
+import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 import sk.neuromancer.Xune.net.proto.EntityStateProto;
-import sk.neuromancer.Xune.sfx.SoundManager;
+import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.Iterator;
 import java.util.LinkedList;

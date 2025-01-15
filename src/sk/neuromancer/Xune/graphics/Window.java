@@ -1,4 +1,4 @@
-package sk.neuromancer.Xune.gfx;
+package sk.neuromancer.Xune.graphics;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;

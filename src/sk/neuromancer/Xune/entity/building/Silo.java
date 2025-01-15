@@ -3,8 +3,8 @@ package sk.neuromancer.Xune.entity.building;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.game.players.Player;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
-import sk.neuromancer.Xune.sfx.SoundManager;
+import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.List;
 

@@ -9,13 +9,12 @@ import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
-import sk.neuromancer.Xune.gfx.Effect;
-import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.graphics.Effect;
+import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
-import sk.neuromancer.Xune.net.proto.EntityStateProto;
 import sk.neuromancer.Xune.net.proto.PlayerProto;
-import sk.neuromancer.Xune.sfx.SoundManager;
+import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;

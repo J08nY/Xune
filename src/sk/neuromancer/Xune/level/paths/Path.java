@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.level.paths;
 
-import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.net.proto.BaseProto;
 
 import java.util.Arrays;

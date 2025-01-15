@@ -8,13 +8,13 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.players.Player;
-import sk.neuromancer.Xune.gfx.Effect;
-import sk.neuromancer.Xune.gfx.LevelView;
-import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.graphics.Effect;
+import sk.neuromancer.Xune.graphics.LevelView;
+import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.net.proto.BaseProto;
 import sk.neuromancer.Xune.net.proto.LevelProto;
-import sk.neuromancer.Xune.sfx.SoundManager;
+import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,6 +49,14 @@ public class Level implements Renderable, Tickable {
         this.roads = new LinkedList<>();
         this.effects = new LinkedList<>();
         loadLevel(levelName);
+    }
+
+    public Level(Game game, LevelProto.FullLevelState savedState) {
+        this.game = game;
+        this.players = new ArrayList<>();
+        this.worms = new LinkedList<>();
+        this.roads = new LinkedList<>();
+        this.effects = new LinkedList();
     }
 
     @Override

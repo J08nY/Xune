@@ -6,7 +6,7 @@ import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.Tickable;
-import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 

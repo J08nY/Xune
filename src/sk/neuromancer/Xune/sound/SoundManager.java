@@ -1,9 +1,9 @@
-package sk.neuromancer.Xune.sfx;
+package sk.neuromancer.Xune.sound;
 
 import org.lwjgl.openal.*;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
-import sk.neuromancer.Xune.sfx.SoundPlayer.SoundPlayerState;
+import sk.neuromancer.Xune.sound.SoundPlayer.SoundPlayerState;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;

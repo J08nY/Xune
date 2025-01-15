@@ -9,19 +9,21 @@ import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.screens.Gameover;
 import sk.neuromancer.Xune.game.screens.Intro;
 import sk.neuromancer.Xune.game.screens.Pause;
-import sk.neuromancer.Xune.gfx.HUD;
-import sk.neuromancer.Xune.gfx.LevelView;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
-import sk.neuromancer.Xune.gfx.Window;
+import sk.neuromancer.Xune.graphics.HUD;
+import sk.neuromancer.Xune.graphics.LevelView;
+import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.graphics.Window;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.net.proto.LevelProto;
-import sk.neuromancer.Xune.sfx.SoundManager;
-import sk.neuromancer.Xune.sfx.SoundPlayer;
+import sk.neuromancer.Xune.sound.SoundManager;
+import sk.neuromancer.Xune.sound.SoundPlayer;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -210,8 +212,9 @@ public class Game implements Runnable {
     }
 
     private void save() {
-        try (FileOutputStream fos = new FileOutputStream("save.xune")) {
-            level.serializeFull().writeTo(fos);
+        try (FileOutputStream fos = new FileOutputStream("save.xune.gz");
+             GZIPOutputStream gos = new GZIPOutputStream(fos)) {
+            level.serializeFull().writeTo(gos);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -219,8 +222,9 @@ public class Game implements Runnable {
     }
 
     private void load() {
-        try (FileInputStream fis = new FileInputStream("save.xune")) {
-            System.out.println(LevelProto.FullLevelState.parseFrom(fis));
+        try (FileInputStream fis = new FileInputStream("save.xune.gz");
+             GZIPInputStream gis = new GZIPInputStream(fis)) {
+            System.out.println(LevelProto.FullLevelState.parseFrom(gis));
         } catch (IOException e) {
             e.printStackTrace();
         }

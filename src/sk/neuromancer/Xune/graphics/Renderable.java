@@ -1,4 +1,4 @@
-package sk.neuromancer.Xune.gfx;
+package sk.neuromancer.Xune.graphics;
 
 public interface Renderable {
     void render();

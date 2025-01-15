@@ -2,7 +2,7 @@ package sk.neuromancer.Xune.game.screens;
 
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
-import sk.neuromancer.Xune.gfx.Renderable;
+import sk.neuromancer.Xune.graphics.Renderable;
 
 import static org.lwjgl.opengl.GL11.*;
 

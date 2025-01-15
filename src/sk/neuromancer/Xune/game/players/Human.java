@@ -9,9 +9,9 @@ import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
-import sk.neuromancer.Xune.gfx.HUD;
+import sk.neuromancer.Xune.graphics.HUD;
 import sk.neuromancer.Xune.level.Level;
-import sk.neuromancer.Xune.sfx.SoundManager;
+import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.Comparator;
 import java.util.LinkedList;

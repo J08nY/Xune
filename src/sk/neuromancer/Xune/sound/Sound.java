@@ -1,4 +1,4 @@
-package sk.neuromancer.Xune.sfx;
+package sk.neuromancer.Xune.sound;
 
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;

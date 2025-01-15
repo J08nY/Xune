@@ -5,10 +5,10 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Bot;
-import sk.neuromancer.Xune.gfx.Renderable;
-import sk.neuromancer.Xune.gfx.Sprite;
-import sk.neuromancer.Xune.gfx.SpriteSheet;
-import sk.neuromancer.Xune.gfx.Text;
+import sk.neuromancer.Xune.graphics.Renderable;
+import sk.neuromancer.Xune.graphics.Sprite;
+import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.graphics.Text;
 
 import static org.lwjgl.opengl.GL11.*;
 

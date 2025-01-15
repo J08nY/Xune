@@ -15,7 +15,7 @@ import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 import sk.neuromancer.Xune.net.proto.BaseProto;
 import sk.neuromancer.Xune.net.proto.CommandProto;
-import sk.neuromancer.Xune.sfx.SoundManager;
+import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
