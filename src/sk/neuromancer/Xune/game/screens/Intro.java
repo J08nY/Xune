@@ -20,9 +20,12 @@ public class Intro implements Tickable, Renderable {
     private boolean worm;
     private int wormIndex;
     private int wormTicks;
-    private int selectedColor;
-    private int selectedBot;
+
+    private Menu flagMenu;
+    private Menu botMenu;
+
     private int column;
+
     private boolean done;
 
     public Intro(Game game) {
@@ -31,6 +34,9 @@ public class Intro implements Tickable, Renderable {
         this.scaleNew = 0.1f;
         this.oldLogo = SpriteSheet.TITLE.getSprite(0);
         this.newLogo = SpriteSheet.TITLE.getSprite(1);
+        this.flagMenu = new Menu(game.getInput(), "Flag", new String[]{"RED", "BLUE", "GREEN"}, 2f);
+        this.botMenu = new Menu(game.getInput(), "Bot", new String[]{"Army General", "Buggy Boy", "Heli Master", "Jack of All Trades", "Econ Graduate"}, 2f);
+        this.flagMenu.activate();
     }
 
     @Override
@@ -62,23 +68,17 @@ public class Intro implements Tickable, Renderable {
                     wormTicks = tickCount;
                 }
                 if (column == 0) {
-                    if ((input.W.wasPressed() || input.UP.wasPressed()) && selectedColor > 0) {
-                        selectedColor = (selectedColor - 1) % 3;
-                    }
-                    if ((input.S.wasPressed() || input.DOWN.wasPressed()) && selectedColor < 2) {
-                        selectedColor = (selectedColor + 1) % 3;
-                    }
+                    flagMenu.tick(tickCount);
                     if (input.D.wasPressed() || input.RIGHT.wasPressed()) {
+                        flagMenu.deactivate();
+                        botMenu.activate();
                         column = 1;
                     }
                 } else if (column == 1) {
-                    if ((input.W.wasPressed() || input.UP.wasPressed()) && selectedBot > 0) {
-                        selectedBot = (selectedBot - 1) % 5;
-                    }
-                    if ((input.S.wasPressed() || input.DOWN.wasPressed()) && selectedBot < 4) {
-                        selectedBot = (selectedBot + 1) % 5;
-                    }
+                    botMenu.tick(tickCount);
                     if (input.A.wasPressed() || input.LEFT.wasPressed()) {
+                        botMenu.deactivate();
+                        flagMenu.activate();
                         column = 0;
                     }
                 }
@@ -115,36 +115,12 @@ public class Intro implements Tickable, Renderable {
 
             glPushMatrix();
             glTranslatef(game.getWindow().getCenterX() / 2, game.getWindow().getCenterY() * 1.5f, 0);
-            float height = Text.heightOf("X", 2);
-            float w = Text.widthOf(">", 2);
-            Text selector = new Text(">", -w, selectedColor * height, true, 2);
-            glColor3fv(getSelectedFlag().getColor());
-            selector.render();
-            glColor3f(1, 1, 1);
-            new Text("Flag", 0, -height * 3, true, 2).render();
-            new Text("RED", 0, 0, true, 2).render();
-            new Text("BLUE", 0, height, true, 2).render();
-            new Text("GREEN", 0, 2 * height, true, 2).render();
-            if (column == 0) {
-                new Text("-----", 0, -height, true, 2).render();
-                new Text("-----", 0, 3 * height, true, 2).render();
-            }
+            flagMenu.render();
             glPopMatrix();
 
             glPushMatrix();
             glTranslatef(game.getWindow().getCenterX() * 0.75f, game.getWindow().getCenterY() * 1.5f, 0);
-            Text selectorBot = new Text(">", -w, selectedBot * height, true, 2);
-            selectorBot.render();
-            new Text("Bot", 0, -height * 3, true, 2).render();
-            new Text("Army General", 0, 0, true, 2).render();
-            new Text("Buggy Boy", 0, height, true, 2).render();
-            new Text("Heli Master", 0, 2 * height, true, 2).render();
-            new Text("Jack of All Trades", 0, 3 * height, true, 2).render();
-            new Text("Econ Graduate", 0, 4 * height, true, 2).render();
-            if (column == 1) {
-                new Text("------------------", 0, -height, true, 2).render();
-                new Text("------------------", 0, 5 * height, true, 2).render();
-            }
+            botMenu.render();
             glPopMatrix();
         }
 
@@ -165,11 +141,11 @@ public class Intro implements Tickable, Renderable {
     }
 
     public Flag getSelectedFlag() {
-        return Flag.values()[selectedColor];
+        return Flag.values()[flagMenu.getSelected()];
     }
 
     public Class<? extends Bot> getSelectedBot() {
-        return switch (selectedBot) {
+        return switch (botMenu.getSelected()) {
             case 0 -> Bot.ArmyGeneral.class;
             case 1 -> Bot.BuggyBoy.class;
             case 2 -> Bot.HeliMaster.class;

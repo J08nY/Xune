@@ -1,32 +1,26 @@
 package sk.neuromancer.Xune.game.screens;
 
 import sk.neuromancer.Xune.game.Game;
-import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.gfx.Renderable;
-import sk.neuromancer.Xune.gfx.Text;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class Pause implements Tickable, Renderable {
     private final Game game;
-    private int selected = 0;
+    private final Menu menu;
     private boolean confirmed;
 
     public Pause(Game game) {
         this.game = game;
+        this.menu = new Menu(game.getInput(), "Pause", new String[]{"Continue", "Save", "Exit"}, 5f);
+        this.menu.activate();
     }
 
     @Override
     public void tick(int tickCount) {
-        InputHandler input = game.getInput();
-        if ((input.W.wasPressed() || input.UP.wasPressed()) && selected > 0) {
-            selected = (selected - 1) % 3;
-        }
-        if ((input.S.wasPressed() || input.DOWN.wasPressed()) && selected < 2) {
-            selected = (selected + 1) % 3;
-        }
-        if (input.ENTER.wasPressed()) {
+        menu.tick(tickCount);
+        if (game.getInput().ENTER.wasPressed()) {
             confirmed = true;
         }
     }
@@ -40,36 +34,31 @@ public class Pause implements Tickable, Renderable {
         glVertex2i(game.getWindow().getWidth(), 0);
         glVertex2i(game.getWindow().getWidth(), game.getWindow().getHeight());
         glVertex2i(0, game.getWindow().getHeight());
-        glColor4f(1, 1,1, 1);
+        glColor4f(1, 1, 1, 1);
         glEnd();
 
+        glPushMatrix();
         glTranslatef(game.getWindow().getCenterX(), game.getWindow().getCenterY(), 0);
-        Text contText = new Text((selected == 0 ? "> ": "") + "Continue", true, 5f);
-        Text saveText = new Text((selected == 1 ? "> ": "") + "Save", true, 5f);
-        Text exitText = new Text((selected == 2 ? "> ": "") + "Exit", true, 5f);
-        contText.render();
-        glTranslatef(0, contText.getHeight(), 0);
-        saveText.render();
-        glTranslatef(0, saveText.getHeight(), 0);
-        exitText.render();
+        menu.render();
+        glPopMatrix();
 
         glEnable(GL_DEPTH_TEST);
     }
 
     public boolean shouldContinue() {
-        return confirmed && selected == 0;
+        return confirmed && menu.getSelected() == 0;
     }
 
     public boolean shouldSave() {
-        return confirmed && selected == 1;
+        return confirmed && menu.getSelected() == 1;
     }
 
     public boolean shouldExit() {
-        return confirmed && selected == 2;
+        return confirmed && menu.getSelected() == 2;
     }
 
     public void reset() {
         confirmed = false;
-        selected = 0;
+        menu.setSelected(0);
     }
 }
