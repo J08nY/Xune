@@ -5,6 +5,7 @@ import sk.neuromancer.Xune.entity.Flag;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class SpriteSheet {
     public static SpriteSheet ENTITY_SHEET = new SpriteSheet("entities.png", 24, 11);
@@ -58,27 +59,25 @@ public class SpriteSheet {
     }
 
     public void initSheet() {
-        BufferedImage img = null;
-        try {
-            img = ImageIO.read(getClass().getResourceAsStream("/sk/neuromancer/Xune/img/" + imageName));
+        try (InputStream stream = getClass().getResourceAsStream("/sk/neuromancer/Xune/img/" + imageName)) {
+            BufferedImage img = ImageIO.read(stream);
+
+            width = img.getWidth() / spriteWidth;
+            height = img.getHeight() / spriteHeight;
+
+            sprites = new Sprite[width * height];
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    int[] RGBAData = null;
+                    RGBAData = img.getData().getPixels(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight, RGBAData);
+                    sprites[y * width + x] = new Sprite(RGBAData, spriteWidth, spriteHeight, keepData);
+                }
+            }
+            isInitialized = true;
         } catch (IOException e) {
             e.printStackTrace();
-            System.exit(-1);
         }
-
-        width = img.getWidth() / spriteWidth;
-        height = img.getHeight() / spriteHeight;
-
-        sprites = new Sprite[width * height];
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int[] RGBAData = null;
-                RGBAData = img.getData().getPixels(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight, RGBAData);
-                sprites[y * width + x] = new Sprite(RGBAData, spriteWidth, spriteHeight, keepData);
-            }
-        }
-        isInitialized = true;
     }
 
     public int numSprites() {

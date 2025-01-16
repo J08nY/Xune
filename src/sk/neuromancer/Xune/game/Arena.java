@@ -67,6 +67,7 @@ public class Arena {
         return new int[]{oneWins, otherWins};
     }
 
+    @SuppressWarnings("unchecked")
     public void start() {
         Class<? extends Bot>[] classes = new Class[]{Bot.ArmyGeneral.class, Bot.BuggyBoy.class, Bot.HeliMaster.class, Bot.JackOfAllTrades.class, Bot.EconGraduate.class};
         int[][] results = new int[classes.length][classes.length];

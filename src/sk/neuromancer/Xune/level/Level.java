@@ -22,6 +22,7 @@ import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.function.Predicate;
@@ -35,8 +36,8 @@ public class Level implements Renderable, Tickable {
     private Human human;
     private List<Player> players;
     private Pathfinder pathfinder;
+    private Map<Long, Entity> entities;
     private List<Worm> worms;
-    private List<Road> roads;
     private List<Effect> effects;
 
     private Tile[][] level;
@@ -48,8 +49,8 @@ public class Level implements Renderable, Tickable {
     public Level(Game game, String levelName) {
         this.game = game;
         this.players = new ArrayList<>();
+        this.entities = new TreeMap<>();
         this.worms = new LinkedList<>();
-        this.roads = new LinkedList<>();
         this.effects = new LinkedList<>();
         loadLevel(levelName);
     }
@@ -76,6 +77,7 @@ public class Level implements Renderable, Tickable {
             this.spawns.add(tile);
         }
         this.pathfinder = new Pathfinder(this);
+        this.entities = new TreeMap<>();
 
         this.players = new ArrayList<>();
         for (PlayerProto.PlayerState playerState : savedState.getTransient().getPlayersList()) {
@@ -93,21 +95,15 @@ public class Level implements Renderable, Tickable {
             if (player == null) {
                 continue;
             }
-            this.players.add(player);
-            if (player instanceof Human h) {
-                this.human = h;
-            }
-            for (PlayableEntity entity : player.getEntities()) {
-                addEntity(entity);
-            }
+            addPlayer(player);
         }
 
         this.worms = new LinkedList<>();
         for (EntityStateProto.WormState wormState : savedState.getTransient().getWormsList()) {
             Worm worm = new Worm(this, wormState);
             this.worms.add(worm);
+            addEntity(worm);
         }
-        this.roads = new LinkedList<>();
         this.effects = new LinkedList<>();
     }
 
@@ -123,9 +119,6 @@ public class Level implements Renderable, Tickable {
         for (Worm dead : toRemove) {
             SoundManager.play(Entity.getDeathSound(dead.getClass()), false, 1.0f);
             worms.remove(dead);
-        }
-        for (Road road : roads) {
-            road.tick(tickCount);
         }
         for (Effect e : effects) {
             e.tick(tickCount);
@@ -161,9 +154,6 @@ public class Level implements Renderable, Tickable {
                     t.render();
                 }
             }
-        }
-        for (Road road : roads) {
-            road.render();
         }
         for (Player player : players) {
             player.render();
@@ -213,8 +203,8 @@ public class Level implements Renderable, Tickable {
     }
 
     private void loadLevel(String levelName) {
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/sk/neuromancer/Xune/lvl/" + levelName)));
+        try (InputStream stream = getClass().getResourceAsStream("/sk/neuromancer/Xune/lvl/" + levelName)) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             String line = br.readLine();
             String[] dimensions = line.split("x");
             this.width = Integer.parseInt(dimensions[0]);
@@ -239,6 +229,8 @@ public class Level implements Renderable, Tickable {
                     this.level[j][i] = new Tile(Byte.parseByte(entry), j, i);
                 }
             }
+            this.pathfinder = new Pathfinder(this);
+
             if (i < lines.size() - 1) {
                 for (; i < lines.size(); i++) {
                     String entry = lines.get(i).strip();
@@ -254,12 +246,12 @@ public class Level implements Renderable, Tickable {
                         int x = Integer.parseInt(parts[0]);
                         int y = Integer.parseInt(parts[1]);
                         LevelPoint point = new TilePoint(x, y).toLevelPoint();
-                        this.worms.add(new Worm(this, point.x, point.y));
+                        Worm worm = new Worm(this, point.x, point.y);
+                        this.worms.add(worm);
+                        addEntity(worm);
                     }
                 }
             }
-
-            this.pathfinder = new Pathfinder(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -290,23 +282,16 @@ public class Level implements Renderable, Tickable {
     }
 
     public List<Entity> getEntities() {
-        int size = worms.size();
-        for (Player player : players) {
-            size += player.getEntities().size();
-        }
-        List<Entity> entities = new ArrayList<>(size);
-        entities.addAll(worms);
-        for (Player player : players) {
-            entities.addAll(player.getEntities());
-        }
-        return entities;
+        return new ArrayList<>(entities.values());
     }
 
     public void addEntity(Entity e) {
+        entities.put(e.getId(), e);
         pathfinder.addEntity(e);
     }
 
     public void removeEntity(Entity e) {
+        entities.remove(e.getId());
         pathfinder.removeEntity(e);
     }
 
@@ -316,11 +301,9 @@ public class Level implements Renderable, Tickable {
                 return worm;
             }
         }
-        for (Player player : players) {
-            for (PlayableEntity entity : player.getEntities()) {
-                if (entity.intersects(levelX, levelY)) {
-                    return entity;
-                }
+        for (Entity entity : entities.values()) {
+            if (entity.intersects(levelX, levelY)) {
+                return entity;
             }
         }
         return null;

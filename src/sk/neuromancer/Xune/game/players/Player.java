@@ -78,6 +78,7 @@ public class Player implements Tickable, Renderable {
                 try {
                     Unit u = klass.getConstructor(EntityStateProto.UnitState.class, Player.class).newInstance(entity.getUnit(), this);
                     entities.add(u);
+                    level.addEntity(u);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
                     throw new RuntimeException(e);
@@ -87,6 +88,7 @@ public class Player implements Tickable, Renderable {
                 try {
                     Building b = klass.getConstructor(EntityStateProto.BuildingState.class, Player.class).newInstance(entity.getBuilding(), this);
                     entities.add(b);
+                    level.addEntity(b);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
                     throw new RuntimeException(e);

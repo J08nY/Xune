@@ -48,6 +48,7 @@ public class Bot extends Player {
         this.spawn = setupSpawn();
     }
 
+    @SuppressWarnings("unchecked")
     Bot(Game game, Level level, PlayerProto.PlayerState savedState) {
         super(game, level, savedState);
         this.spawn = new Tile(48, savedState.getBot().getSpawn().getX(), savedState.getBot().getSpawn().getY());
