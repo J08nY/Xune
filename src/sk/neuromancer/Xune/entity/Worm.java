@@ -28,7 +28,7 @@ public class Worm extends Entity implements Moveable {
     private State state;
     private int stateSince;
     private Position position;
-    private Unit target;
+    private EntityReference target;
     private float scale = 1f;
 
     private enum State {
@@ -93,8 +93,8 @@ public class Worm extends Entity implements Moveable {
             case BELOW -> Position.BELOW;
             default -> throw new IllegalStateException("Unexpected value: " + wormState.getPosition());
         };
-        //this.target = wormState.getTargetId() != -1 ? (Unit) level.getEntity(wormState.getTargetId()) : null;
-
+        this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6, false));
+        this.target = new EntityReference(wormState.getTargetId(), level);
     }
 
     @Override
@@ -125,21 +125,29 @@ public class Worm extends Entity implements Moveable {
 
 
     private State eating(int tickCount) {
-        target.setImmobile(true);
+        if (!target.isResolved()) {
+            target = null;
+            current = null;
+            nextPoint = 0;
+            return State.WANDERING;
+        }
+        Unit t = (Unit) target.resolve();
+
+        t.setImmobile(true);
         scale = 2f;
         position = Position.ABOVE;
         if (tickCount % 25 == 0) {
             float angleFrom = orientation.opposite().toAzimuthRadians();
             float dx = -(float) Math.sin(angleFrom);
             float dy = (float) Math.cos(angleFrom);
-            setPosition(target.x + dx * (animation - 3), target.y + dy * (animation - 3));
+            setPosition(t.x + dx * (animation - 3), t.y + dy * (animation - 3));
 
             if (animation == 0) {
                 SoundManager.play(SoundManager.SOUND_WORM_KILL, false, 1.0f);
             }
 
             if (animation == 3) {
-                target.takeDamage(target.health);
+                t.takeDamage(t.health);
             }
 
             if (animation == 7) {
@@ -164,7 +172,15 @@ public class Worm extends Entity implements Moveable {
             }
         }
 
-        Point targetGrid = new Point(Pathfinder.levelXToGrid(target.x), Pathfinder.levelYToGrid(target.y));
+        if (!target.isResolved()) {
+            target = null;
+            current = null;
+            nextPoint = 0;
+            return State.WANDERING;
+        }
+        Entity t = target.resolve();
+
+        Point targetGrid = new Point(Pathfinder.levelXToGrid(t.x), Pathfinder.levelYToGrid(t.y));
         Point currentEnd = current.getEnd();
         if (!targetGrid.equals(currentEnd)) {
             Point src = new Point(Pathfinder.levelXToGrid(x), Pathfinder.levelYToGrid(y));
@@ -216,7 +232,7 @@ public class Worm extends Entity implements Moveable {
                     plan.clear();
                     current = next;
                     nextPoint = 0;
-                    target = (Unit) close;
+                    target = new EntityReference(close);
                     return State.HUNTING;
                 }
             }

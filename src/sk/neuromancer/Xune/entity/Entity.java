@@ -8,11 +8,9 @@ import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.game.Clickable;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
-import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.graphics.Sprite;
 import sk.neuromancer.Xune.proto.BaseProto;
-import sk.neuromancer.Xune.proto.CommandProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
 
 import java.util.*;
@@ -36,8 +34,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected final List<Clickable> clickableAreas = new ArrayList<>();
 
     protected boolean attacking;
+    //TODO: Move to EntityReference
     protected Entity attackTarget;
     protected boolean underAttack;
+    //TODO: Move to EntityReference, also move to set of attackers
     protected Entity attacker;
 
     public Entity(float x, float y) {
@@ -59,11 +59,13 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         if (savedState.hasAttackingState()) {
             EntityStateProto.EntityState.AttackingState attackingState = savedState.getAttackingState();
             this.attacking = attackingState.getAttacking();
+            //TODO: Implement this
             //this.attackTarget = Game.getEntity(attackingState.getTargetId());
         }
         if (savedState.hasAttackedState()) {
             EntityStateProto.EntityState.AttackedState attackedState = savedState.getAttackedState();
             this.underAttack = attackedState.getUnderAttack();
+            //TODO: Implement this
             //this.attacker = Game.getEntity(attackedState.getAttackerId());
         }
         this.health = savedState.getHealth();

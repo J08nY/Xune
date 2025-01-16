@@ -26,6 +26,7 @@ public class Pathfinder implements Tickable, Renderable {
     private final BoolMap buildingMap;
     // EntityMap is true if the point is occupied by an entity
     private final BoolMap entityMap;
+    //TODO: Remove this and only keep it in the level.
     private final List<Entity> entities;
     private final List<Path> paths;
 
