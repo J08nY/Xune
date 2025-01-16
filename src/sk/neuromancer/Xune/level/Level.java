@@ -1,8 +1,6 @@
 package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.PlayableEntity;
-import sk.neuromancer.Xune.entity.Road;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.Game;
@@ -295,12 +293,11 @@ public class Level implements Renderable, Tickable {
         pathfinder.removeEntity(e);
     }
 
+    public Entity getEntity(long id) {
+        return entities.get(id);
+    }
+
     public Entity entityAt(float levelX, float levelY) {
-        for (Worm worm : worms) {
-            if (worm.intersects(levelX, levelY)) {
-                return worm;
-            }
-        }
         for (Entity entity : entities.values()) {
             if (entity.intersects(levelX, levelY)) {
                 return entity;

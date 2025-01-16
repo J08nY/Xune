@@ -4,6 +4,7 @@ import sk.neuromancer.Xune.game.Clickable;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.Renderable;
+import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.proto.CommandProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
 
@@ -36,42 +37,10 @@ public abstract class PlayableEntity extends Entity {
         this.owner = owner;
         this.flag = Flag.deserialize(savedState.getFlag());
         this.commands = new LinkedList<>();
+        Level level = owner.getLevel();
         for (CommandProto.Command commandState : savedState.getCommandsList()) {
-            switch (commandState.getCmdCase()) {
-                case FLY -> {
-                    Command.FlyCommand fly = new Command.FlyCommand(commandState.getFly());
-                    this.commands.add(fly);
-                }
-                case MOVE -> {
-                    Command.MoveCommand move = new Command.MoveCommand(commandState.getMove());
-                    this.commands.add(move);
-                }
-                case ATTACK -> {
-                    Command.AttackCommand attack = new Command.AttackCommand(commandState.getAttack());
-                    this.commands.add(attack);
-                }
-                case MOVEANDATTACK -> {
-                    //TODO this pathfinder thing is nasty.
-                    Command.MoveAndAttackCommand moveAndAttack = new Command.MoveAndAttackCommand(commandState.getMoveAndAttack(), owner.getLevel().getPathfinder());
-                    this.commands.add(moveAndAttack);
-                }
-                case FLYANDATTACK -> {
-                    Command.FlyAndAttackCommand flyAndAttack = new Command.FlyAndAttackCommand(commandState.getFlyAndAttack());
-                    this.commands.add(flyAndAttack);
-                }
-                case PRODUCE -> {
-                    Command.ProduceCommand produce = new Command.ProduceCommand(commandState.getProduce(), owner.getLevel().getPathfinder());
-                    this.commands.add(produce);
-                }
-                case COLLECTSPICE -> {
-                    Command.CollectSpiceCommand collectSpice = new Command.CollectSpiceCommand(commandState.getCollectSpice(), owner.getLevel());
-                    this.commands.add(collectSpice);
-                }
-                case DROPOFFSPICE -> {
-                    Command.DropOffSpiceCommand dropOffSpice = new Command.DropOffSpiceCommand(commandState.getDropOffSpice());
-                    this.commands.add(dropOffSpice);
-                }
-            }
+            Command command = Command.deserialize(commandState, level);
+            this.commands.add(command);
         }
     }
 
@@ -152,7 +121,7 @@ public abstract class PlayableEntity extends Entity {
         if (other instanceof Road) {
             return false;
         }
-        return ((sk.neuromancer.Xune.entity.PlayableEntity) other).owner != this.owner;
+        return ((PlayableEntity) other).owner != this.owner;
     }
 
     public abstract boolean isStatic();

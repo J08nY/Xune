@@ -9,6 +9,7 @@ import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
+import sk.neuromancer.Xune.level.TileReference;
 import sk.neuromancer.Xune.level.paths.NoPathFound;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
@@ -39,6 +40,38 @@ public abstract class Command {
     public abstract void finish(Entity entity, int tickCount, boolean done);
 
     public abstract CommandProto.Command serialize();
+
+    public static Command deserialize(CommandProto.Command command, Level level) {
+        switch (command.getCmdCase()) {
+            case FLY -> {
+                return new FlyCommand(command.getFly());
+            }
+            case MOVE -> {
+                return new MoveCommand(command.getMove());
+            }
+            case ATTACK -> {
+                return new AttackCommand(command.getAttack(), level);
+            }
+            case MOVEANDATTACK -> {
+                return new MoveAndAttackCommand(command.getMoveAndAttack(), level);
+            }
+            case FLYANDATTACK -> {
+                return new FlyAndAttackCommand(command.getFlyAndAttack(), level);
+            }
+            case PRODUCE -> {
+                return new ProduceCommand(command.getProduce(), level.getPathfinder());
+            }
+            case COLLECTSPICE -> {
+                return new CollectSpiceCommand(command.getCollectSpice(), level);
+            }
+            case DROPOFFSPICE -> {
+                return new DropOffSpiceCommand(command.getDropOffSpice(), level);
+            }
+            default -> {
+                throw new IllegalArgumentException("Unknown command type.");
+            }
+        }
+    }
 
     public static class FlyCommand extends Command {
         private final float fromX, fromY, toX, toY;
@@ -253,11 +286,11 @@ public abstract class Command {
     }
 
     public static class AttackCommand extends Command {
-        private final Entity target;
+        private final EntityReference target;
         private final boolean keep;
 
         public AttackCommand(Entity target, boolean keep) {
-            this.target = target;
+            this.target = new EntityReference(target);
             this.keep = keep;
         }
 
@@ -265,33 +298,43 @@ public abstract class Command {
             this(target, true);
         }
 
-        public AttackCommand(CommandProto.CommandAttack attack) {
-            //TODO:
-            // this.target = Entity.getEntity(attack.getTargetId());
-            this.target = null;
+        public AttackCommand(CommandProto.CommandAttack attack, Level level) {
+            this.target = new EntityReference(attack.getTargetId(), level);
             this.keep = attack.getKeep();
         }
 
-        public Entity getTarget() {
+        public EntityReference getTargetReference() {
             return target;
+        }
+
+        public Entity getTarget() {
+            return target.resolve();
         }
 
         @Override
         public boolean isFinished(Entity entity) {
+            if (!target.isResolved()) {
+                return false;
+            }
+            Entity t = target.resolve();
             if (keep) {
-                return target.health <= 0;
+                return t.health <= 0;
             } else {
-                return target.health <= 0 || !entity.inSight(target);
+                return t.health <= 0 || !entity.inSight(t);
             }
         }
 
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                unit.face(target.x, target.y);
-                unit.attack(target);
-                unit.setAttacking(true, target);
-                target.setUnderAttack(true, unit);
+                if (!target.isResolved()) {
+                    return;
+                }
+                Entity t = target.resolve();
+                unit.face(t.x, t.y);
+                unit.attack(t);
+                unit.setAttacking(true, t);
+                t.setUnderAttack(true, unit);
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
             }
@@ -299,8 +342,11 @@ public abstract class Command {
 
         @Override
         public void finish(Entity entity, int tickCount, boolean done) {
+            if (!target.isResolved()) {
+                return;
+            }
             entity.setAttacking(false, null);
-            target.setUnderAttack(false, null);
+            target.resolve().setUnderAttack(false, null);
         }
 
         @Override
@@ -318,25 +364,25 @@ public abstract class Command {
         private MoveCommand move;
         private AttackCommand attack;
         private Pathfinder pathfinder;
-        private Entity target;
+        private EntityReference target;
         private float targetX, targetY;
 
         public MoveAndAttackCommand(float fromX, float fromY, Pathfinder pathFinder, Entity target) {
             this.move = new MoveCommand(fromX, fromY, target.x, target.y, pathFinder);
             this.attack = new AttackCommand(target);
             this.pathfinder = pathFinder;
-            this.target = target;
+            this.target = new EntityReference(target);
             this.targetX = target.x;
             this.targetY = target.y;
         }
 
-        public MoveAndAttackCommand(CommandProto.CommandMoveAndAttack moveAndAttack, Pathfinder pathfinder) {
+        public MoveAndAttackCommand(CommandProto.CommandMoveAndAttack moveAndAttack, Level level) {
             this.move = new MoveCommand(moveAndAttack.getMove());
-            this.attack = new AttackCommand(moveAndAttack.getAttack());
-            this.pathfinder = pathfinder;
-            this.target = attack.getTarget();
-            this.targetX = target.x;
-            this.targetY = target.y;
+            this.attack = new AttackCommand(moveAndAttack.getAttack(), level);
+            this.pathfinder = level.getPathfinder();
+            this.target = attack.getTargetReference();
+            this.targetX = Float.NaN;
+            this.targetY = Float.NaN;
         }
 
         @Override
@@ -347,15 +393,19 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (unit.inRange(target)) {
+                if (!target.isResolved()) {
+                    return;
+                }
+                Entity t = target.resolve();
+                if (unit.inRange(t)) {
                     attack.execute(entity, tickCount);
                 } else {
-                    if ((target.x != targetX || target.y != targetY) && tickCount % 30 == 0) {
+                    if ((t.x != targetX || t.y != targetY) && tickCount % 30 == 0) {
                         // Target moved, update
                         try {
-                            move = new MoveCommand(entity.x, entity.y, target.x, target.y, pathfinder);
-                            targetX = target.x;
-                            targetY = target.y;
+                            targetX = t.x;
+                            targetY = t.y;
+                            move = new MoveCommand(entity.x, entity.y, t.x, t.y, pathfinder);
                         } catch (NoPathFound e) {
                             return;
                         }
@@ -394,23 +444,23 @@ public abstract class Command {
     public static class FlyAndAttackCommand extends Command {
         private FlyCommand move;
         private AttackCommand attack;
-        private Entity target;
+        private EntityReference target;
         private float targetX, targetY;
 
         public FlyAndAttackCommand(float fromX, float fromY, Entity target) {
             this.move = new FlyCommand(fromX, fromY, target.x, target.y);
             this.attack = new AttackCommand(target);
-            this.target = target;
+            this.target = new EntityReference(target);
             this.targetX = target.x;
             this.targetY = target.y;
         }
 
-        public FlyAndAttackCommand(CommandProto.CommandFlyAndAttack flyAndAttack) {
+        public FlyAndAttackCommand(CommandProto.CommandFlyAndAttack flyAndAttack, Level level) {
             this.move = new FlyCommand(flyAndAttack.getMove());
-            this.attack = new AttackCommand(flyAndAttack.getAttack());
-            this.target = attack.getTarget();
-            this.targetX = target.x;
-            this.targetY = target.y;
+            this.attack = new AttackCommand(flyAndAttack.getAttack(), level);
+            this.target = attack.getTargetReference();
+            this.targetX = Float.NaN;
+            this.targetY = Float.NaN;
         }
 
         @Override
@@ -421,14 +471,18 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (unit.inRange(target)) {
+                if (!target.isResolved()) {
+                    return;
+                }
+                Entity t = target.resolve();
+                if (unit.inRange(t)) {
                     attack.execute(entity, tickCount);
                 } else {
-                    if ((target.x != targetX || target.y != targetY) && tickCount % 30 == 0) {
+                    if ((t.x != targetX || t.y != targetY) && tickCount % 30 == 0) {
                         // Target moved, update
-                        targetX = target.x;
-                        targetY = target.y;
-                        move = new FlyCommand(unit.x, unit.y, target.x, target.y);
+                        targetX = t.x;
+                        targetY = t.y;
+                        move = new FlyCommand(unit.x, unit.y, t.x, t.y);
                     }
                     move.execute(entity, tickCount);
                 }
@@ -557,22 +611,26 @@ public abstract class Command {
 
     public static class CollectSpiceCommand extends Command {
         private final MoveCommand move;
-        private final Tile target;
+        private final TileReference target;
 
         public CollectSpiceCommand(float fromX, float fromY, Pathfinder pathfinder, Tile target) {
             float targetX = Level.tileToCenterLevelX(target.getX(), target.getY());
             float targetY = Level.tileToCenterLevelY(target.getX(), target.getY());
             this.move = new MoveCommand(fromX, fromY, targetX, targetY, pathfinder);
-            this.target = target;
+            this.target = new TileReference(target);
         }
 
         public CollectSpiceCommand(CommandProto.CommandCollectSpice collectSpice, Level level) {
             this.move = new MoveCommand(collectSpice.getMove());
-            this.target = level.getTile(collectSpice.getTarget().getX(), collectSpice.getTarget().getY());
+            this.target = new TileReference(collectSpice.getTarget().getX(), collectSpice.getTarget().getY(), level);
+        }
+
+        public TileReference getTargetReference() {
+            return target;
         }
 
         public Tile getTarget() {
-            return target;
+            return target.resolve();
         }
 
         public boolean collecting(Entity entity) {
@@ -582,10 +640,14 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Harvester harvester) {
+                if (!target.isResolved()) {
+                    return;
+                }
+                Tile t = target.resolve();
                 if (!move.isFinished(entity)) {
                     move.execute(entity, tickCount);
                 } else {
-                    harvester.collectSpice(target);
+                    harvester.collectSpice(t);
                 }
             } else {
                 throw new IllegalArgumentException("Entity must be a harvester.");
@@ -594,8 +656,12 @@ public abstract class Command {
 
         @Override
         public boolean isFinished(Entity entity) {
+            if (!target.isResolved()) {
+                return false;
+            }
+            Tile t = target.resolve();
             if (entity instanceof Harvester harvester) {
-                return harvester.isFull() || target.getSpice() == 0;
+                return harvester.isFull() || t.getSpice() == 0;
             } else {
                 throw new IllegalArgumentException("Entity must be a harvester.");
             }
@@ -623,7 +689,7 @@ public abstract class Command {
 
     public static class DropOffSpiceCommand extends Command {
         private final MoveCommand move;
-        private final Refinery target;
+        private final EntityReference target;
 
         public DropOffSpiceCommand(float fromX, float fromY, Pathfinder pathfinder, Refinery target) {
             float[][] offsets = new float[][]{
@@ -645,14 +711,12 @@ public abstract class Command {
                 throw new NoPathFound("No path to Refinery found.");
             }
             this.move = m;
-            this.target = target;
+            this.target = new EntityReference(target);
         }
 
-        public DropOffSpiceCommand(CommandProto.CommandDropOffSpice dropOffSpice) {
+        public DropOffSpiceCommand(CommandProto.CommandDropOffSpice dropOffSpice, Level level) {
             this.move = new MoveCommand(dropOffSpice.getMove());
-            // TODO: Fix this
-            //      this.target = (Refinery) Entity.getEntity(dropOffSpice.getTargetId());
-            this.target = null;
+            this.target = new EntityReference(dropOffSpice.getTargetId(), level);
         }
 
         public boolean dropping(Entity entity) {
@@ -662,10 +726,14 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Harvester harvester) {
+                if (!target.isResolved()) {
+                    return;
+                }
+                Entity t = target.resolve();
                 if (!move.isFinished(entity)) {
                     move.execute(entity, tickCount);
                 } else {
-                    harvester.dropOffSpice(target);
+                    harvester.dropOffSpice((Refinery) t);
                 }
             } else {
                 throw new IllegalArgumentException("Entity must be a harvester.");

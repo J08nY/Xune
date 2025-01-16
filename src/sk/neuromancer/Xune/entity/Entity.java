@@ -131,6 +131,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         return attackTarget;
     }
 
+    //TODO: This may get cleared when it shouldnt (multiple attackers).
     public void setUnderAttack(boolean underAttack, Entity attacker) {
         this.underAttack = underAttack;
         this.attacker = attacker;

@@ -13,7 +13,7 @@ public class Pause implements Tickable, Renderable {
 
     public Pause(Game game) {
         this.game = game;
-        this.menu = new Menu(game.getInput(), "Pause", new String[]{"Continue", "Save", "Exit"}, 5f);
+        this.menu = new Menu(game.getInput(), "Pause", new String[]{"Continue", "Save", "Load", "Exit"}, 5f);
         this.menu.activate();
     }
 
@@ -53,8 +53,12 @@ public class Pause implements Tickable, Renderable {
         return confirmed && menu.getSelected() == 1;
     }
 
-    public boolean shouldExit() {
+    public boolean shouldLoad() {
         return confirmed && menu.getSelected() == 2;
+    }
+
+    public boolean shouldExit() {
+        return confirmed && menu.getSelected() == 3;
     }
 
     public void reset() {

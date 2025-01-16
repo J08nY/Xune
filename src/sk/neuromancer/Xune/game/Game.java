@@ -22,8 +22,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -187,6 +185,10 @@ public class Game implements Runnable {
                     save();
                     cont();
                 }
+                if (pause.shouldLoad()) {
+                    load();
+                    cont();
+                }
                 if (pause.shouldExit()) {
                     stop();
                 }
@@ -213,7 +215,7 @@ public class Game implements Runnable {
 
     private void save() {
         try (FileOutputStream fos = new FileOutputStream("save.xune");
-             ) {
+        ) {
             //GZIPOutputStream gos = new GZIPOutputStream(fos)
             level.serializeFull().writeTo(fos);
         } catch (IOException e) {
@@ -223,7 +225,7 @@ public class Game implements Runnable {
 
     private void load() {
         try (FileInputStream fis = new FileInputStream("save.xune");
-             ) {
+        ) {
             //GZIPInputStream gis = new GZIPInputStream(fis)
             LevelProto.FullLevelState state = LevelProto.FullLevelState.parseFrom(fis);
             level = new Level(this, state);

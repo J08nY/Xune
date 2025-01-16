@@ -318,7 +318,6 @@ public class HUD implements Tickable, Renderable {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void updateCursor() {
         boolean hitEdge = false;
         if (mouseX < 10) {
@@ -350,7 +349,7 @@ public class HUD implements Tickable, Renderable {
                         Class<? extends PlayableEntity> klass = button.getKlass();
                         String text = klass.getSimpleName() + "\n" + PlayableEntity.getCost(klass) + "$";
                         if (Building.class.isAssignableFrom(klass)) {
-                            text += "\n" + Building.getPower((Class<? extends Building>) klass) + "&";
+                            text += "\n" + Building.getPower(klass.asSubclass(Building.class)) + "&";
                         }
                         tooltip = new Text(text, (float) mouseX, (float) mouseY + 20, true, 2f);
                     }
