@@ -8,6 +8,7 @@ import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.NoPathFound;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,7 +45,8 @@ public abstract class CommandStrategy {
                 try {
                     // If there is an enemy attacking us: respond
                     if (unit.isUnderAttack()) {
-                        return new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), unit.getAttacker());
+                        EntityReference attacker = unit.getAttackers().stream().min(Comparator.comparingDouble(e -> Math.hypot(e.resolve(level).x - unit.x, e.resolve(level).y - unit.y))).orElse(null);
+                        return new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), attacker.resolve(level));
                     }
                     // If there is an enemy in range: attack
                     for (Entity other : level.getEntities()) {
@@ -79,7 +81,8 @@ public abstract class CommandStrategy {
             if (entity instanceof Unit unit) {
                 // If there is an enemy attacking us: respond
                 if (unit.isUnderAttack()) {
-                    return new Command.FlyAndAttackCommand(unit.x, unit.y, unit.getAttacker());
+                    EntityReference attacker = unit.getAttackers().stream().min(Comparator.comparingDouble(e -> Math.hypot(e.resolve(level).x - unit.x, e.resolve(level).y - unit.y))).orElse(null);
+                    return new Command.FlyAndAttackCommand(unit.x, unit.y, attacker.resolve(level));
                 }
                 // If there is an enemy in range: attack
                 for (Entity other : level.getEntities()) {

@@ -169,17 +169,6 @@ public abstract class Unit extends PlayableEntity implements Moveable {
             glPopMatrix();
         }
         glPopMatrix();
-        if (Config.DEBUG_ATTACK) {
-            if (attackTarget != null) {
-                glLineWidth(5);
-                glColor4f(1, 0, 0, 0.5f);
-                glBegin(GL_LINES);
-                glVertex3f(x, y, 0);
-                glVertex3f(attackTarget.x, attackTarget.y, 0);
-                glEnd();
-                glColor4f(1, 1, 1, 1);
-            }
-        }
     }
 
     public EntityStateProto.UnitState serialize() {

@@ -10,6 +10,7 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.graphics.Sprite;
+import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
 
@@ -34,11 +35,9 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected final List<Clickable> clickableAreas = new ArrayList<>();
 
     protected boolean attacking;
-    //TODO: Move to EntityReference
-    protected Entity attackTarget;
+    protected EntityReference attackTarget;
     protected boolean underAttack;
-    //TODO: Move to EntityReference, also move to set of attackers
-    protected Entity attacker;
+    protected Set<EntityReference> attackers;
 
     public Entity(float x, float y) {
         this.id = rand.nextLong();
@@ -48,9 +47,10 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         this.maxHealth = getMaxHealth(getClass());
         this.sight = getSight(getClass());
         this.s2 = sight * sight;
+        this.attackers = new HashSet<>();
     }
 
-    public Entity(EntityStateProto.EntityState savedState) {
+    public Entity(EntityStateProto.EntityState savedState, Level level) {
         this.id = savedState.getId();
         this.x = savedState.getPosition().getX();
         this.y = savedState.getPosition().getY();
@@ -59,14 +59,13 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         if (savedState.hasAttackingState()) {
             EntityStateProto.EntityState.AttackingState attackingState = savedState.getAttackingState();
             this.attacking = attackingState.getAttacking();
-            //TODO: Implement this
-            //this.attackTarget = Game.getEntity(attackingState.getTargetId());
+            this.attackTarget = new EntityReference(attackingState.getTargetId(), level);
         }
         if (savedState.hasAttackedState()) {
             EntityStateProto.EntityState.AttackedState attackedState = savedState.getAttackedState();
             this.underAttack = attackedState.getUnderAttack();
-            //TODO: Implement this
-            //this.attacker = Game.getEntity(attackedState.getAttackerId());
+            this.attackers = new HashSet<>();
+            this.attackers.addAll(attackedState.getAttackerIdsList().stream().map(id -> new EntityReference(id, level)).toList());
         }
         this.health = savedState.getHealth();
         this.maxHealth = getMaxHealth(getClass());
@@ -120,31 +119,42 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
         return health <= 0;
     }
 
-    public void setAttacking(boolean attacking, Entity target) {
+    public void setAttacking(boolean attacking, EntityReference target) {
         this.attacking = attacking;
         this.attackTarget = target;
+    }
+
+    public void setAttacking(boolean attacking, Entity target) {
+        setAttacking(attacking, new EntityReference(target));
     }
 
     public boolean isAttacking() {
         return attacking;
     }
 
-    public Entity getAttackTarget() {
+    public EntityReference getAttackTarget() {
         return attackTarget;
     }
 
-    //TODO: This may get cleared when it shouldnt (multiple attackers).
+    public void setUnderAttack(boolean underAttack, EntityReference attacker) {
+        if (underAttack) {
+            this.attackers.add(attacker);
+        } else {
+            this.attackers.remove(attacker);
+        }
+        this.underAttack = !attackers.isEmpty();
+    }
+
     public void setUnderAttack(boolean underAttack, Entity attacker) {
-        this.underAttack = underAttack;
-        this.attacker = attacker;
+        setUnderAttack(underAttack, new EntityReference(attacker));
     }
 
     public boolean isUnderAttack() {
         return underAttack;
     }
 
-    public Entity getAttacker() {
-        return attacker;
+    public Set<EntityReference> getAttackers() {
+        return Collections.unmodifiableSet(attackers);
     }
 
     public long getId() {
@@ -210,7 +220,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
                         .setAttacking(this.attacking)
                         .build())
                 .setAttackedState(EntityStateProto.EntityState.AttackedState.newBuilder()
-                        .setAttackerId(this.attacker != null ? this.attacker.getId() : 0)
+                        .addAllAttackerIds(this.attackers.stream().map(EntityReference::getId).toList())
                         .setUnderAttack(this.underAttack)
                         .build()).build();
     }

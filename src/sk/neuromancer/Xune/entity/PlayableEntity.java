@@ -33,13 +33,12 @@ public abstract class PlayableEntity extends Entity {
     }
 
     public PlayableEntity(EntityStateProto.PlayableEntityState savedState, Player owner) {
-        super(savedState.getEntity());
+        super(savedState.getEntity(), owner.getLevel());
         this.owner = owner;
         this.flag = Flag.deserialize(savedState.getFlag());
         this.commands = new LinkedList<>();
-        Level level = owner.getLevel();
         for (CommandProto.Command commandState : savedState.getCommandsList()) {
-            Command command = Command.deserialize(commandState, level);
+            Command command = Command.deserialize(commandState, owner.getLevel());
             this.commands.add(command);
         }
     }

@@ -228,6 +228,7 @@ public class Game implements Runnable {
         ) {
             //GZIPInputStream gis = new GZIPInputStream(fis)
             LevelProto.FullLevelState state = LevelProto.FullLevelState.parseFrom(fis);
+            System.out.println(state);
             level = new Level(this, state);
             human = level.getHuman();
             bot = null;

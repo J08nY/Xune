@@ -73,7 +73,7 @@ public class Worm extends Entity implements Moveable {
     }
 
     public Worm(Level level, EntityStateProto.WormState wormState) {
-        super(wormState.getEntity());
+        super(wormState.getEntity(), level);
         this.level = level;
         this.animation = wormState.getAnimation();
         this.dir = wormState.getDir();
@@ -93,8 +93,9 @@ public class Worm extends Entity implements Moveable {
             case BELOW -> Position.BELOW;
             default -> throw new IllegalStateException("Unexpected value: " + wormState.getPosition());
         };
-        this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6, false));
         this.target = new EntityReference(wormState.getTargetId(), level);
+        this.sprite = SpriteSheet.WORM_SHEET.getSprite(animation);
+        this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6, false));
     }
 
     @Override
@@ -125,13 +126,13 @@ public class Worm extends Entity implements Moveable {
 
 
     private State eating(int tickCount) {
-        if (!target.isResolved()) {
+        if (!target.isResolvable()) {
             target = null;
             current = null;
             nextPoint = 0;
             return State.WANDERING;
         }
-        Unit t = (Unit) target.resolve();
+        Unit t = (Unit) target.resolve(level);
 
         t.setImmobile(true);
         scale = 2f;
@@ -172,13 +173,13 @@ public class Worm extends Entity implements Moveable {
             }
         }
 
-        if (!target.isResolved()) {
+        if (!target.isResolvable()) {
             target = null;
             current = null;
             nextPoint = 0;
             return State.WANDERING;
         }
-        Entity t = target.resolve();
+        Entity t = target.resolve(level);
 
         Point targetGrid = new Point(Pathfinder.levelXToGrid(t.x), Pathfinder.levelYToGrid(t.y));
         Point currentEnd = current.getEnd();

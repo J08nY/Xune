@@ -313,7 +313,7 @@ public abstract class Command {
 
         @Override
         public boolean isFinished(Entity entity) {
-            if (!target.isResolved()) {
+            if (!target.isResolvable()) {
                 return false;
             }
             Entity t = target.resolve();
@@ -327,7 +327,7 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (!target.isResolved()) {
+                if (!target.isResolvable()) {
                     return;
                 }
                 Entity t = target.resolve();
@@ -342,11 +342,11 @@ public abstract class Command {
 
         @Override
         public void finish(Entity entity, int tickCount, boolean done) {
-            if (!target.isResolved()) {
+            if (!target.isResolvable()) {
                 return;
             }
-            entity.setAttacking(false, null);
-            target.resolve().setUnderAttack(false, null);
+            entity.setAttacking(false, target);
+            target.resolve().setUnderAttack(false, entity);
         }
 
         @Override
@@ -393,7 +393,7 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (!target.isResolved()) {
+                if (!target.isResolvable()) {
                     return;
                 }
                 Entity t = target.resolve();
@@ -471,7 +471,7 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (!target.isResolved()) {
+                if (!target.isResolvable()) {
                     return;
                 }
                 Entity t = target.resolve();
@@ -726,7 +726,7 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Harvester harvester) {
-                if (!target.isResolved()) {
+                if (!target.isResolvable()) {
                     return;
                 }
                 Entity t = target.resolve();

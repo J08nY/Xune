@@ -9,7 +9,6 @@ public class Config {
     public static final boolean DEBUG_PATH_GRID_SOLID = false;
     public static final boolean DEBUG_PATH_GRID_BUILDING = false;
     public static final boolean DEBUG_PATH_GRID_ENTITY = false;
-    public static final boolean DEBUG_ATTACK = false;
     public static final boolean ANIMATE_HUD_BUTTONS = false;
     public static final boolean LOG_BOT_ACTIONS = false;
     public static final boolean DEBUG_VIEW = false;

@@ -1,9 +1,6 @@
 package sk.neuromancer.Xune.game.players;
 
-import sk.neuromancer.Xune.entity.Command;
-import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.entity.PlayableEntity;
+import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Config;
@@ -136,9 +133,10 @@ public class Bot extends Player {
             log("Defending with " + freeUnits.size() + " units.");
             for (int i = 0; i < freeUnits.size(); i++) {
                 PlayableEntity attacked = underAttack.get(i % underAttack.size());
+                Set<EntityReference> attackers = attacked.getAttackers();
                 Unit unit = freeUnits.get(i);
                 try {
-                    unit.sendCommand(new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), attacked.getAttacker()));
+                    unit.sendCommand(new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), attackers.stream().findFirst().get().resolve(level)));
                 } catch (NoPathFound ignored) {
                 }
             }

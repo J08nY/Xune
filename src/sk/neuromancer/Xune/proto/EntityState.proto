@@ -16,13 +16,13 @@ message EntityState {
   uint32 health = 5;
 
   message AttackingState {
-    uint64 targetId = 1;
-    bool attacking = 2;
+    bool attacking = 1;
+    uint64 targetId = 2;
   }
 
   message AttackedState {
-    uint64 attackerId = 1;
-    bool underAttack = 2;
+    bool underAttack = 1;
+    repeated uint64 attackerIds = 2;
   }
 
   AttackingState attackingState = 6;
