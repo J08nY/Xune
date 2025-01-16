@@ -310,18 +310,21 @@ public class Worm extends Entity implements Moveable {
     }
 
     public EntityStateProto.WormState serialize() {
-        return EntityStateProto.WormState.newBuilder()
+        EntityStateProto.WormState.Builder builder = EntityStateProto.WormState.newBuilder()
                 .setEntity(toEntityState())
                 .setAnimation(animation)
                 .setDir(dir)
                 .addAllPlan(plan.stream().map(Path::serialize).toList())
-                .setCurrent(current != null ? current.serialize() : null)
                 .setNextPoint(nextPoint)
                 .setSpeed(speed)
                 .setStatus(state.serialize())
                 .setStateSince(stateSince)
                 .setPosition(position.serialize())
                 .setTargetId(target != null ? target.getId() : -1)
-                .setScale(scale).build();
+                .setScale(scale);
+        if (current != null) {
+            builder.setCurrent(current.serialize());
+        }
+        return builder.build();
     }
 }

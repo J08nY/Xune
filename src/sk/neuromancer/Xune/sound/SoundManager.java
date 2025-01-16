@@ -65,14 +65,13 @@ public class SoundManager implements Tickable {
     private static SoundManager instance;
 
     public SoundManager(Game game) {
+        List<String> deviceList;
         if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATE_ALL_EXT")) {
-            System.out.println("ALC_ENUMERATE_ALL_EXT is supported.");
-            List<String> deviceList = ALUtil.getStringList(0, ALC_ALL_DEVICES_SPECIFIER);
-            System.out.println("OpenAL devices: " + deviceList);
+            deviceList = ALUtil.getStringList(0, ALC_ALL_DEVICES_SPECIFIER);
         } else {
-            List<String> deviceList = ALUtil.getStringList(0, ALC10.ALC_DEVICE_SPECIFIER);
-            System.out.println("OpenAL devices: " + deviceList);
+            deviceList = ALUtil.getStringList(0, ALC10.ALC_DEVICE_SPECIFIER);
         }
+        System.out.println("OpenAL devices: " + deviceList);
 
         this.game = game;
         this.device = alcOpenDevice((ByteBuffer) null);

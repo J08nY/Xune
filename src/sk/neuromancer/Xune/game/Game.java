@@ -212,19 +212,20 @@ public class Game implements Runnable {
     }
 
     private void save() {
-        try (FileOutputStream fos = new FileOutputStream("save.xune.gz");
-             GZIPOutputStream gos = new GZIPOutputStream(fos)) {
-            level.serializeFull().writeTo(gos);
+        try (FileOutputStream fos = new FileOutputStream("save.xune");
+             ) {
+            //GZIPOutputStream gos = new GZIPOutputStream(fos)
+            level.serializeFull().writeTo(fos);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        load();
     }
 
     private void load() {
-        try (FileInputStream fis = new FileInputStream("save.xune.gz");
-             GZIPInputStream gis = new GZIPInputStream(fis)) {
-            LevelProto.FullLevelState state = LevelProto.FullLevelState.parseFrom(gis);
+        try (FileInputStream fis = new FileInputStream("save.xune");
+             ) {
+            //GZIPInputStream gis = new GZIPInputStream(fis)
+            LevelProto.FullLevelState state = LevelProto.FullLevelState.parseFrom(fis);
             level = new Level(this, state);
             human = level.getHuman();
             bot = null;
