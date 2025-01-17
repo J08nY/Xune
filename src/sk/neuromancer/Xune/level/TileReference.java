@@ -24,11 +24,15 @@ public class TileReference {
         return tileY;
     }
 
-    public Tile resolve() {
+    public Tile resolve(Level level) {
         if (resolved == null && level != null) {
             resolved = level.getTile(tileX, tileY);
         }
         return resolved;
+    }
+
+    public Tile resolve() {
+        return resolve(level);
     }
 
     public boolean isResolved() {

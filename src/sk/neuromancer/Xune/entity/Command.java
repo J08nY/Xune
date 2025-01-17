@@ -313,10 +313,12 @@ public abstract class Command {
 
         @Override
         public boolean isFinished(Entity entity) {
-            if (!target.isResolvable()) {
+            Entity t = target.resolve();
+            if (t == null) {
+                // TODO: Maybe raise?
                 return false;
             }
-            Entity t = target.resolve();
+
             if (keep) {
                 return t.health <= 0;
             } else {
@@ -327,10 +329,10 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (!target.isResolvable()) {
+                Entity t = target.resolve();
+                if (t == null) {
                     return;
                 }
-                Entity t = target.resolve();
                 unit.face(t.x, t.y);
                 unit.attack(t);
                 unit.setAttacking(true, t);
@@ -342,11 +344,12 @@ public abstract class Command {
 
         @Override
         public void finish(Entity entity, int tickCount, boolean done) {
-            if (!target.isResolvable()) {
+            Entity t = target.resolve();
+            if (t == null) {
                 return;
             }
             entity.setAttacking(false, target);
-            target.resolve().setUnderAttack(false, entity);
+            t.setUnderAttack(false, entity);
         }
 
         @Override
@@ -393,10 +396,11 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (!target.isResolvable()) {
+                Entity t = target.resolve();
+                if (t == null) {
                     return;
                 }
-                Entity t = target.resolve();
+
                 if (unit.inRange(t)) {
                     attack.execute(entity, tickCount);
                 } else {
@@ -471,10 +475,10 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Unit unit) {
-                if (!target.isResolvable()) {
+                Entity t = target.resolve();
+                if (t == null) {
                     return;
                 }
-                Entity t = target.resolve();
                 if (unit.inRange(t)) {
                     attack.execute(entity, tickCount);
                 } else {
@@ -640,10 +644,11 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Harvester harvester) {
-                if (!target.isResolved()) {
+                Tile t = target.resolve();
+                if (t == null) {
                     return;
                 }
-                Tile t = target.resolve();
+
                 if (!move.isFinished(entity)) {
                     move.execute(entity, tickCount);
                 } else {
@@ -656,10 +661,11 @@ public abstract class Command {
 
         @Override
         public boolean isFinished(Entity entity) {
-            if (!target.isResolved()) {
+            Tile t = target.resolve();
+            if (t == null) {
                 return false;
             }
-            Tile t = target.resolve();
+
             if (entity instanceof Harvester harvester) {
                 return harvester.isFull() || t.getSpice() == 0;
             } else {
@@ -726,10 +732,11 @@ public abstract class Command {
         @Override
         public void execute(Entity entity, int tickCount) {
             if (entity instanceof Harvester harvester) {
-                if (!target.isResolvable()) {
+                Entity t = target.resolve();
+                if (t == null) {
                     return;
                 }
-                Entity t = target.resolve();
+
                 if (!move.isFinished(entity)) {
                     move.execute(entity, tickCount);
                 } else {

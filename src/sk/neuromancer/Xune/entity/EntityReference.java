@@ -26,15 +26,14 @@ public class EntityReference {
     }
 
     public Entity resolve(Level level) {
-        resolved = level.getEntity(id);
-        return resolved;
-    }
-
-    public Entity resolve() {
         if (resolved == null && level != null) {
             resolved = level.getEntity(id);
         }
         return resolved;
+    }
+
+    public Entity resolve() {
+        return resolve(level);
     }
 
     public boolean isResolved() {

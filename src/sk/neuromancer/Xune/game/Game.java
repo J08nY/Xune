@@ -155,7 +155,12 @@ public class Game implements Runnable {
                 input.tick(tickCount);
                 sound.tick(tickCount);
                 if (intro.isDone()) {
-                    play();
+                    if (intro.shouldPlayNew()) {
+                        play();
+                    } else if (intro.shouldLoad()) {
+                        load();
+                        cont();
+                    }
                 }
                 if (input.ESC.isPressed()) {
                     stop();
@@ -228,7 +233,12 @@ public class Game implements Runnable {
         ) {
             //GZIPInputStream gis = new GZIPInputStream(fis)
             LevelProto.FullLevelState state = LevelProto.FullLevelState.parseFrom(fis);
-            System.out.println(state);
+            if (hud == null) {
+                hud = new HUD(this);
+            }
+            if (view == null) {
+                view = new LevelView(this);
+            }
             level = new Level(this, state);
             human = level.getHuman();
             bot = null;

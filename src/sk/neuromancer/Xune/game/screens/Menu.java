@@ -60,7 +60,9 @@ public class Menu implements Renderable, Tickable {
 
     @Override
     public void render() {
-        new Text(">", -w, selected * h, true, scale).render();
+        if (options.length > 1) {
+            new Text(">", -w, selected * h, true, scale).render();
+        }
         new Text(name, 0, -h * 3, true, scale).render();
         for (int i = 0; i < options.length; i++) {
             new Text(options[i], 0, i * h, true, scale).render();

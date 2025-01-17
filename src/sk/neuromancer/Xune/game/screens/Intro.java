@@ -23,6 +23,7 @@ public class Intro implements Tickable, Renderable {
 
     private Menu flagMenu;
     private Menu botMenu;
+    private Menu loadMenu;
 
     private int column;
 
@@ -36,6 +37,7 @@ public class Intro implements Tickable, Renderable {
         this.newLogo = SpriteSheet.TITLE.getSprite(1);
         this.flagMenu = new Menu(game.getInput(), "Flag", new String[]{"RED", "BLUE", "GREEN"}, 2f);
         this.botMenu = new Menu(game.getInput(), "Bot", new String[]{"Army General", "Buggy Boy", "Heli Master", "Jack of All Trades", "Econ Graduate"}, 2f);
+        this.loadMenu = new Menu(game.getInput(), "", new String[]{"Load Game"}, 2f);
         this.flagMenu.activate();
     }
 
@@ -81,6 +83,18 @@ public class Intro implements Tickable, Renderable {
                         flagMenu.activate();
                         column = 0;
                     }
+                    if (input.D.wasPressed() || input.RIGHT.wasPressed()) {
+                        botMenu.deactivate();
+                        loadMenu.activate();
+                        column = 2;
+                    }
+                } else if (column == 2) {
+                    loadMenu.tick(tickCount);
+                    if (input.A.wasPressed() || input.LEFT.wasPressed()) {
+                        loadMenu.deactivate();
+                        botMenu.activate();
+                        column = 1;
+                    }
                 }
             }
             scaleStart = 0.9f + (float) Math.sin(Math.toRadians(tickCount * 1.7f)) * 0.2f;
@@ -114,13 +128,18 @@ public class Intro implements Tickable, Renderable {
             glPopMatrix();
 
             glPushMatrix();
-            glTranslatef(game.getWindow().getCenterX() / 2, game.getWindow().getCenterY() * 1.5f, 0);
+            glTranslatef(game.getWindow().getCenterX() * 0.5f, game.getWindow().getCenterY() * 1.5f, 0);
             flagMenu.render();
             glPopMatrix();
 
             glPushMatrix();
-            glTranslatef(game.getWindow().getCenterX() * 0.75f, game.getWindow().getCenterY() * 1.5f, 0);
+            glTranslatef(game.getWindow().getCenterX() * 1.0f, game.getWindow().getCenterY() * 1.5f, 0);
             botMenu.render();
+            glPopMatrix();
+
+            glPushMatrix();
+            glTranslatef(game.getWindow().getCenterX() * 1.5f, game.getWindow().getCenterY() * 1.5f, 0);
+            loadMenu.render();
             glPopMatrix();
         }
 
@@ -157,5 +176,13 @@ public class Intro implements Tickable, Renderable {
 
     public boolean isDone() {
         return done;
+    }
+
+    public boolean shouldPlayNew() {
+        return done && (column == 0 || column == 1);
+    }
+
+    public boolean shouldLoad() {
+        return done && column == 2;
     }
 }

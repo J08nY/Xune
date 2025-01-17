@@ -124,15 +124,14 @@ public class Worm extends Entity implements Moveable {
         updateSprite();
     }
 
-
     private State eating(int tickCount) {
-        if (!target.isResolvable()) {
+        Unit t = (Unit) target.resolve(level);
+        if (t == null) {
             target = null;
             current = null;
             nextPoint = 0;
             return State.WANDERING;
         }
-        Unit t = (Unit) target.resolve(level);
 
         t.setImmobile(true);
         scale = 2f;
@@ -173,13 +172,13 @@ public class Worm extends Entity implements Moveable {
             }
         }
 
-        if (!target.isResolvable()) {
+        Unit t = (Unit) target.resolve(level);
+        if (t == null) {
             target = null;
             current = null;
             nextPoint = 0;
             return State.WANDERING;
         }
-        Entity t = target.resolve(level);
 
         Point targetGrid = new Point(Pathfinder.levelXToGrid(t.x), Pathfinder.levelYToGrid(t.y));
         Point currentEnd = current.getEnd();
