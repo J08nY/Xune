@@ -53,7 +53,8 @@ public class Gameover implements Tickable, Renderable {
         // Always allow them to exit
         glPushMatrix();
         glTranslatef(game.getWindow().getCenterX(), game.getWindow().getCenterY(), 0);
-        menu.render();
+        if (menu != null)
+        	menu.render();
         glPopMatrix();
 
         glEnable(GL_DEPTH_TEST);

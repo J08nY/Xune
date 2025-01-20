@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package sk.neuromancer.Xune.proto;
+
+option java_outer_classname = "MessageProto";
+
+import "sk/neuromancer/Xune/proto/Level.proto";
+import "sk/neuromancer/Xune/proto/Base.proto";
+
+message Message {
+  uint64 timestamp = 1;
+  oneof message {
+    State state = 2;
+    Action action = 3;
+  }
+}
+
+message State {
+  // Goes from server to client
+  LevelState level = 1;
+}
+
+message Action {
+  // Goes from client to server
+  oneof action {
+    EntityProduceAction entityProduce = 1;
+    BuildingProduceAction buildingProduce = 2;
+    BuildingPlaceAction buildingPlace = 3;
+    CommandAction command = 4;
+  }
+}
+
+message EntityProduceAction {
+  EntityClass klass = 1;
+}
+
+message BuildingProduceAction {
+  EntityClass klass = 1;
+}
+
+message BuildingPlaceAction {
+  EntityClass klass = 1;
+  Tile position = 2;
+}
+
+message CommandAction {
+  repeated uint64 entityIds = 1;
+  float levelX = 2;
+  float levelY = 3;
+}

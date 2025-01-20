@@ -32,7 +32,7 @@ public class Level implements Renderable, Tickable {
     private final Game game;
 
     private Human human;
-    private List<Player> players;
+    private Map<Long, Player> players;
     private Pathfinder pathfinder;
     private Map<Long, Entity> entities;
     private List<Worm> worms;
@@ -46,7 +46,7 @@ public class Level implements Renderable, Tickable {
 
     public Level(Game game, String levelName) {
         this.game = game;
-        this.players = new ArrayList<>();
+        this.players = new TreeMap<>();
         this.entities = new TreeMap<>();
         this.worms = new LinkedList<>();
         this.effects = new LinkedList<>();
@@ -77,7 +77,7 @@ public class Level implements Renderable, Tickable {
         this.pathfinder = new Pathfinder(this);
         this.entities = new TreeMap<>();
 
-        this.players = new ArrayList<>();
+        this.players = new TreeMap<>();
         for (PlayerProto.PlayerState playerState : savedState.getTransient().getPlayersList()) {
             PlayerProto.PlayerClass playerClass = playerState.getPlayerClass();
             Player player = null;
@@ -107,7 +107,7 @@ public class Level implements Renderable, Tickable {
 
     @Override
     public void tick(int tickCount) {
-        for (Player player : players) {
+        for (Player player : players.values()) {
             player.tick(tickCount);
         }
         for (Worm worm : worms) {
@@ -153,7 +153,7 @@ public class Level implements Renderable, Tickable {
                 }
             }
         }
-        for (Player player : players) {
+        for (Player player : players.values()) {
             player.render();
         }
         for (Worm worm : worms) {
@@ -256,23 +256,24 @@ public class Level implements Renderable, Tickable {
     }
 
     public long addPlayer(Player player) {
-        this.players.add(player);
+        long id = players.size();
+        this.players.put(id, player);
         if (player instanceof Human h) {
             this.human = h;
         }
-        return players.size();
+        return id;
     }
 
     public Human getHuman() {
         return this.human;
     }
 
-    public List<Player> getPlayers() {
-        return this.players;
+    public Collection<Player> getPlayers() {
+        return this.players.values();
     }
 
     public Tile spawnOf(Player player) {
-        return this.spawns.get(this.players.indexOf(player));
+        return this.spawns.get((int) player.getId());
     }
 
     public Pathfinder getPathfinder() {
@@ -458,14 +459,14 @@ public class Level implements Renderable, Tickable {
 
     public boolean isDone() {
         if (human == null) {
-            return players.stream().anyMatch(Player::isEliminated);
+            return players.values().stream().anyMatch(Player::isEliminated);
         }
-        return human.isEliminated() || players.stream().allMatch(player -> player.getFlag() == human.getFlag() || player.isEliminated());
+        return human.isEliminated() || players.values().stream().allMatch(player -> player.getFlag() == human.getFlag() || player.isEliminated());
     }
 
     public LevelProto.LevelState serializeTransient() {
         LevelProto.LevelState.Builder builder = LevelProto.LevelState.newBuilder();
-        for (Player player : players) {
+        for (Player player : players.values()) {
             builder.addPlayers(player.serialize());
         }
         for (Worm worm : worms) {
@@ -485,6 +486,23 @@ public class Level implements Renderable, Tickable {
         return builder.build();
     }
 
+    public void deserializeTransient(LevelProto.LevelState state) {
+        for (PlayerProto.PlayerState playerState : state.getPlayersList()) {
+            long id = playerState.getId();
+            Player player = players.get(id);
+            player.deserialize(playerState);
+        }
+        for (LevelProto.SpiceEntry entry : state.getSpiceMap().getEntriesList()) {
+            BaseProto.Tile tile = entry.getKey();
+            this.level[tile.getX()][tile.getY()].setSpice(entry.getValue());
+        }
+        for (EntityStateProto.WormState wormState : state.getWormsList()) {
+            long id = wormState.getEntity().getId();
+            Worm worm = (Worm) getEntity(id);
+            worm.deserialize(wormState, this);
+        }
+    }
+
     public LevelProto.FullLevelState serializeFull() {
         LevelProto.FullLevelState.Builder builder = LevelProto.FullLevelState.newBuilder();
         builder.setWidth(this.width);
@@ -500,6 +518,30 @@ public class Level implements Renderable, Tickable {
             builder.addSpawns(BaseProto.Tile.newBuilder().setX(spawn.getX()).setY(spawn.getY()));
         }
         return builder.build();
+    }
+
+    public void deserializeFull(LevelProto.FullLevelState state) {
+        deserializeTransient(state.getTransient());
+        this.width = state.getWidth();
+        this.height = state.getHeight();
+        this.level = new Tile[this.width][this.height];
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                int type = state.getTiles(x * this.height + y);
+                this.level[x][y] = new Tile(type, x, y);
+            }
+        }
+        this.spawns = new LinkedList<>();
+        for (BaseProto.Tile spawn : state.getSpawnsList()) {
+            Tile tile = new Tile(48, spawn.getX(), spawn.getY());
+            this.level[tile.getX()][tile.getY()] = tile;
+            this.spawns.add(tile);
+        }
+        for (LevelProto.SpiceEntry entry : state.getTransient().getSpiceMap().getEntriesList()) {
+            BaseProto.Tile tile = entry.getKey();
+            this.level[tile.getX()][tile.getY()].setSpice(entry.getValue());
+        }
+        this.pathfinder = new Pathfinder(this);
     }
 
     public static class TileFinder implements Iterator<Tile> {

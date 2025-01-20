@@ -390,8 +390,7 @@ public class Player implements Tickable, Renderable {
         return buffer.array();
     }
 
-    private boolean[][] deserializeVisibility(byte[] data, int width, int height) {
-        boolean[][] array = new boolean[width][height];
+    private void deserializeVisibility(byte[] data, int width, int height, boolean[][] array) {
         int byteIndex = 0;
         int bitIndex = 0;
 
@@ -399,6 +398,8 @@ public class Player implements Tickable, Renderable {
             for (int y = 0; y < height; y++) {
                 if ((data[byteIndex] & (1 << (7 - bitIndex))) != 0) {
                     array[x][y] = true;
+                } else {
+                    array[x][y] = false;
                 }
                 bitIndex++;
                 if (bitIndex == 8) {
@@ -407,7 +408,11 @@ public class Player implements Tickable, Renderable {
                 }
             }
         }
+    }
 
+    private boolean[][] deserializeVisibility(byte[] data, int width, int height) {
+        boolean[][] array = new boolean[width][height];
+        deserializeVisibility(data, width, height, array);
         return array;
     }
 
@@ -433,6 +438,33 @@ public class Player implements Tickable, Renderable {
             }
         }
         return builder.build();
+    }
+
+    public void deserialize(PlayerProto.PlayerState savedState) {
+        this.money = savedState.getMoney();
+        this.id = savedState.getId();
+        this.powerProduction = savedState.getPowerProduction();
+        this.powerConsumption = savedState.getPowerConsumption();
+        if (savedState.getBuildingKlass() != BaseProto.EntityClass.NULL) {
+            this.buildingToBuild = Entity.fromEntityClass(savedState.getBuildingKlass()).asSubclass(Building.class);
+            this.buildDuration = savedState.getBuildDuration();
+            this.buildProgress = savedState.getBuildProgress();
+        }
+        for (PlayerProto.PlayerEntity entity : savedState.getEntitiesList()) {
+            if (entity.hasUnit()) {
+                EntityStateProto.UnitState unitState = entity.getUnit();
+                long id = unitState.getPlayable().getEntity().getId();
+                Unit unit = (Unit) level.getEntity(id);
+                unit.deserialize(unitState);
+            } else if (entity.hasBuilding()) {
+                EntityStateProto.BuildingState buildingState = entity.getBuilding();
+                long id = buildingState.getPlayable().getEntity().getId();
+                Building building = (Building) level.getEntity(id);
+                building.deserialize(buildingState);
+            }
+        }
+        deserializeVisibility(savedState.getVisible().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.visible);
+        deserializeVisibility(savedState.getDiscovered().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.discovered);
     }
 
     public static PlayerProto.PlayerClass toPlayerClass(Class<? extends Player> klass) {

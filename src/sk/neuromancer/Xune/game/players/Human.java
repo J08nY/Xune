@@ -180,10 +180,12 @@ public class Human extends Player {
                 if (Building.class.isAssignableFrom(klass)) {
                     if (buildingToBuild == null) {
                         if (PlayableEntity.canBeBuilt(klass, this)) {
+                            // Building produce.
                             startBuild(klass);
                         }
                     } else {
                         if (buildingToBuild == klass && isBuildDone()) {
+                            // Building place.
                             float levelX = game.getView().getLevelX(mouseX);
                             float levelY = game.getView().getLevelY(mouseY);
                             int tileX = Level.levelToTileX(levelX, levelY);
@@ -195,6 +197,7 @@ public class Human extends Player {
                     if (PlayableEntity.canBeBuilt(klass, this)) {
                         List<Building> producers = entities.stream().filter(e -> e instanceof Building building && building.getProduces().contains(klass)).map(e -> (Building) e).sorted(Comparator.comparingInt(building -> building.getCommands().size())).toList();
                         if (!producers.isEmpty()) {
+                            // Unit produce.
                             Building building = producers.getFirst();
                             takeMoney(PlayableEntity.getCost(klass));
                             building.sendCommand(new Command.ProduceCommand(PlayableEntity.getBuildTime(klass), klass.asSubclass(Unit.class), level.getPathfinder()));
