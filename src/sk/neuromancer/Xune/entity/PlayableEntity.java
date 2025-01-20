@@ -112,6 +112,25 @@ public abstract class PlayableEntity extends Entity {
         return builder.build();
     }
 
+    protected void fromPlayableEntityState(EntityStateProto.PlayableEntityState state, Player owner) {
+        Level level = owner.getLevel();
+
+        // Convert EntityState
+        fromEntityState(state.getEntity(), level);
+
+        // Set other PlayableEntityState fields
+        this.flag = Flag.deserialize(state.getFlag());
+        this.owner = owner;
+
+        // Convert commands
+        // TODO: Handle command diffs.
+        this.commands = new LinkedList<>();
+        for (CommandProto.Command commandState : state.getCommandsList()) {
+            Command command = Command.deserialize(commandState, level);
+            this.commands.add(command);
+        }
+    }
+
     @Override
     public boolean isEnemyOf(Entity other) {
         if (other instanceof Worm) {

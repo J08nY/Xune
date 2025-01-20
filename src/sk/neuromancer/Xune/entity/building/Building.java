@@ -96,6 +96,14 @@ public abstract class Building extends PlayableEntity {
                 .setTilePosition(BaseProto.Tile.newBuilder().setX(tileX).setY(tileY).build()).build();
     }
 
+    public void deserialize(EntityStateProto.BuildingState state) {
+        fromPlayableEntityState(state.getPlayable(), owner);
+        if (state.hasTilePosition()) {
+            this.tileX = state.getTilePosition().getX();
+            this.tileY = state.getTilePosition().getY();
+        }
+    }
+
     public int getPower() {
         return powerMap.getOrDefault(this.getClass(), 0);
     }

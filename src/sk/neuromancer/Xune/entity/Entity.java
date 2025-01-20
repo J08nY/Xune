@@ -225,6 +225,35 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
                         .build()).build();
     }
 
+    protected void fromEntityState(EntityStateProto.EntityState savedState, Level level) {
+        //this.id = savedState.getId();
+        if (savedState.hasPosition()) {
+            this.x = savedState.getPosition().getX();
+            this.y = savedState.getPosition().getY();
+            for (Clickable area : clickableAreas) {
+                area.setPosition(x, y);
+            }
+        }
+        if (savedState.hasOrientation()) {
+            this.orientation = Orientation.deserialize(savedState.getOrientation());
+        }
+
+        if (savedState.hasAttackingState()) {
+            EntityStateProto.EntityState.AttackingState attackingState = savedState.getAttackingState();
+            this.attacking = attackingState.getAttacking();
+            this.attackTarget = new EntityReference(attackingState.getTargetId(), level);
+        }
+        if (savedState.hasAttackedState()) {
+            EntityStateProto.EntityState.AttackedState attackedState = savedState.getAttackedState();
+            this.underAttack = attackedState.getUnderAttack();
+            this.attackers = new HashSet<>();
+            this.attackers.addAll(attackedState.getAttackerIdsList().stream().map(id -> new EntityReference(id, level)).toList());
+        }
+        if (savedState.hasHealth()) {
+            this.health = savedState.getHealth();
+        }
+    }
+
     protected static void setMaxHealth(Class<? extends Entity> klass, int health) {
         healthMap.put(klass, health);
     }

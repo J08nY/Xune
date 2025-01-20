@@ -4,7 +4,6 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Moveable;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.PlayableEntity;
-import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.Effect;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
@@ -177,6 +176,16 @@ public abstract class Unit extends PlayableEntity implements Moveable {
                 .setReady(this.ready)
                 .setImmobile(this.immobile)
                 .build();
+    }
+
+    public void deserialize(EntityStateProto.UnitState state) {
+        fromPlayableEntityState(state.getPlayable(), owner);
+        if (state.hasReady()) {
+            this.ready = state.getReady();
+        }
+        if (state.hasImmobile()) {
+            this.immobile = state.getImmobile();
+        }
     }
 
     protected static void setSpeed(Class<? extends Unit> klass, float speed) {

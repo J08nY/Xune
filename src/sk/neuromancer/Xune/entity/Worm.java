@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Unit;
+import sk.neuromancer.Xune.game.Clickable;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.paths.Path;
@@ -68,7 +69,7 @@ public class Worm extends Entity implements Moveable {
         this.position = Position.BELOW;
         this.level = level;
         this.orientation = Orientation.SOUTH;
-        this.sprite = SpriteSheet.WORM_SHEET.getSprite(animation);
+        updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6, false));
     }
 
@@ -94,7 +95,7 @@ public class Worm extends Entity implements Moveable {
             default -> throw new IllegalStateException("Unexpected value: " + wormState.getPosition());
         };
         this.target = new EntityReference(wormState.getTargetId(), level);
-        this.sprite = SpriteSheet.WORM_SHEET.getSprite(animation);
+        updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6, false));
     }
 
@@ -342,5 +343,55 @@ public class Worm extends Entity implements Moveable {
             builder.setCurrent(current.serialize());
         }
         return builder.build();
+    }
+
+    public void deserialize(EntityStateProto.WormState savedState, Level level) {
+        if (savedState.hasEntity()) {
+            fromEntityState(savedState.getEntity(), level);
+        }
+        if (savedState.hasAnimation()) {
+            this.animation = savedState.getAnimation();
+            this.sprite = SpriteSheet.WORM_SHEET.getSprite(animation);
+        }
+        if (savedState.hasDir()) {
+            this.dir = savedState.getDir();
+        }
+        if (!savedState.getPlanList().isEmpty()) {
+            this.plan = new LinkedList<>(savedState.getPlanList().stream().map(Path::new).toList());
+        }
+        if (savedState.hasCurrent()) {
+            this.current = new Path(savedState.getCurrent());
+        }
+        if (savedState.hasNextPoint()) {
+            this.nextPoint = savedState.getNextPoint();
+        }
+        if (savedState.hasSpeed()) {
+            this.speed = savedState.getSpeed();
+        }
+        if (savedState.hasStatus()) {
+            this.state = switch (savedState.getStatus()) {
+                case EntityStateProto.WormState.WormStatus.WANDERING -> State.WANDERING;
+                case EntityStateProto.WormState.WormStatus.HUNTING -> State.HUNTING;
+                case EntityStateProto.WormState.WormStatus.EATING -> State.EATING;
+                default -> throw new IllegalStateException("Unexpected value: " + savedState.getStatus());
+            };
+        }
+        if (savedState.hasStateSince()) {
+            this.stateSince = savedState.getStateSince();
+        }
+        if (savedState.hasPosition()) {
+            this.position = switch (savedState.getPosition()) {
+                case EntityStateProto.WormState.WormPosition.ABOVE -> Position.ABOVE;
+                case EntityStateProto.WormState.WormPosition.BELOW -> Position.BELOW;
+                default -> throw new IllegalStateException("Unexpected value: " + savedState.getPosition());
+            };
+        }
+        if (savedState.hasTargetId()) {
+            this.target = new EntityReference(savedState.getTargetId(), level);
+        }
+        if (savedState.hasScale()) {
+            this.scale = savedState.getScale();
+        }
+
     }
 }

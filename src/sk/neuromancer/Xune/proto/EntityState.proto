@@ -11,9 +11,9 @@ message EntityState {
   uint64 id = 1;
   EntityClass klass = 2;
 
-  Position position = 3;
-  Orientation orientation = 4;
-  uint32 health = 5;
+  optional Position position = 3;
+  optional Orientation orientation = 4;
+  optional uint32 health = 5;
 
   message AttackingState {
     bool attacking = 1;
@@ -25,8 +25,8 @@ message EntityState {
     repeated uint64 attackerIds = 2;
   }
 
-  AttackingState attackingState = 6;
-  AttackedState attackedState = 7;
+  optional AttackingState attackingState = 6;
+  optional AttackedState attackedState = 7;
 }
 
 message PlayableEntityState {
@@ -38,23 +38,23 @@ message PlayableEntityState {
 
 message UnitState {
   PlayableEntityState playable = 1;
-  uint32 ready = 2;
-  bool immobile = 3;
+  optional uint32 ready = 2;
+  optional bool immobile = 3;
 }
 
 message BuildingState {
   PlayableEntityState playable = 1;
-  Tile tilePosition = 2;
+  optional Tile tilePosition = 2;
 }
 
 message WormState {
   EntityState entity = 1;
-  uint32 animation = 2;
-  uint32 dir = 3;
+  optional uint32 animation = 2;
+  optional uint32 dir = 3;
   repeated Path plan = 4;
-  Path current = 5;
-  uint32 nextPoint = 6;
-  float speed = 7;
+  optional Path current = 5;
+  optional uint32 nextPoint = 6;
+  optional float speed = 7;
 
   enum WormStatus {
     WANDERING = 0;
@@ -62,15 +62,15 @@ message WormState {
     EATING = 2;
   }
 
-  WormStatus status = 8;
-  uint32 stateSince = 9;
+  optional WormStatus status = 8;
+  optional uint32 stateSince = 9;
 
   enum WormPosition {
     ABOVE = 0;
     BELOW = 1;
   }
 
-  WormPosition position = 10;
-  uint64 targetId = 11;
-  float scale = 12;
+  optional WormPosition position = 10;
+  optional uint64 targetId = 11;
+  optional float scale = 12;
 }
