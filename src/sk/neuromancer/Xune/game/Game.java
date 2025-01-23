@@ -54,7 +54,6 @@ public class Game implements Runnable {
     @CommandLine.Option(names = {"-f", "--fullscreen"}, description = "Run in fullscreen mode.")
     private boolean fullscreen;
 
-
     public enum GameState {
         INTRO, PLAYING, PAUSED, GAMEOVER
     }

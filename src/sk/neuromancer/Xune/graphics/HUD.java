@@ -215,10 +215,9 @@ public class HUD implements Tickable, Renderable {
                 }
                 Tile tile = level.getTile(x, y);
                 Sprite sprite = SpriteSheet.MAP_SHEET.getSprite(tile.type);
-                int[] pixels = sprite.getPixels();
-                byte red = (byte) pixels[0];
-                byte green = (byte) pixels[1];
-                byte blue = (byte) pixels[2];
+                byte red = (byte) sprite.getRedAt(0, 0);
+                byte green = (byte) sprite.getGreenAt(0, 0);
+                byte blue = (byte) sprite.getBlueAt(0, 0);
                 byte alpha;
                 if (thisVisible) {
                     alpha = (byte) 255;

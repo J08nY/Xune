@@ -1,7 +1,8 @@
 package sk.neuromancer.Xune.graphics;
 
+import org.lwjgl.glfw.GLFW;
+
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -9,17 +10,18 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 public class Sprite implements Renderable {
-    private final int textureId;
+    private boolean initialized = false;
+    private int textureId;
     private final int width;
     private final int height;
-    private final int[] pixels;
+    private final ByteBuffer buff;
 
     public static final int TEXTURE_UNIT = GL_TEXTURE0;
 
-    public Sprite(int[] pixels, int width, int height, boolean keepData) {
+    public Sprite(int[] pixels, int width, int height) {
         this.width = width;
         this.height = height;
-        ByteBuffer buff = ByteBuffer.allocateDirect((width) * (height) * 4);
+        buff = ByteBuffer.allocateDirect((width) * (height) * 4);
         for (int i = 0; i < pixels.length / 4; i++) {
             buff.put((byte) pixels[i * 4]);
             buff.put((byte) pixels[i * 4 + 1]);
@@ -27,12 +29,20 @@ public class Sprite implements Renderable {
             buff.put((byte) pixels[i * 4 + 3]);
         }
         buff.flip();
-        if (keepData) {
-            this.pixels = Arrays.copyOf(pixels, pixels.length);
-        } else {
-            this.pixels = null;
+
+        init();
+    }
+
+    private void init() {
+        if (initialized) {
+            return;
         }
 
+        if (GLFW.glfwGetCurrentContext() == 0) {
+            return;
+        }
+
+        this.initialized = true;
         this.textureId = glGenTextures();
         glActiveTexture(TEXTURE_UNIT);
         glBindTexture(GL_TEXTURE_2D, textureId);
@@ -51,6 +61,10 @@ public class Sprite implements Renderable {
 
     @Override
     public void render() {
+        if (!initialized) {
+            init();
+        }
+
         glEnable(GL_TEXTURE_2D);
         glActiveTexture(TEXTURE_UNIT);
         glBindTexture(GL_TEXTURE_2D, textureId);
@@ -81,18 +95,28 @@ public class Sprite implements Renderable {
         return height;
     }
 
-    public int[] getPixels() {
-        return pixels;
+    public int getRedAt(int x, int y) {
+        return buff.get((y * width + x) * 4) & 0xff;
+    }
+
+    public int getGreenAt(int x, int y) {
+        return buff.get((y * width + x) * 4 + 1) & 0xff;
+    }
+
+    public int getBlueAt(int x, int y) {
+        return buff.get((y * width + x) * 4 + 2) & 0xff;
     }
 
     public int getPixelAt(int x, int y, boolean withAlpha) {
-        if (pixels == null) {
-            return 0;
-        }
         if (withAlpha) {
-            return pixels[(y * width + x) * 4] << 24 | pixels[(y * width + x) * 4 + 1] << 16 | pixels[(y * width + x) * 4 + 2] << 8 | pixels[(y * width + x) * 4 + 3];
+            return ((int) buff.get((y * width + x) * 4) & 0xff) << 24 |
+                    ((int) buff.get((y * width + x) * 4 + 1) & 0xff) << 16 |
+                    ((int) buff.get((y * width + x) * 4 + 2) & 0xff) << 8 |
+                    ((int) buff.get((y * width + x) * 4 + 3) & 0xff);
         } else {
-            return pixels[(y * width + x) * 4] << 16 | pixels[(y * width + x) * 4 + 1] << 8 | pixels[(y * width + x) * 4 + 2];
+            return ((int) buff.get((y * width + x) * 4) & 0xff) << 16 |
+                    ((int) buff.get((y * width + x) * 4 + 1) & 0xff) << 8 |
+                    ((int) buff.get((y * width + x) * 4 + 2) & 0xff);
         }
     }
 

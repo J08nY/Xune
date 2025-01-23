@@ -4,17 +4,14 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
-import sk.neuromancer.Xune.graphics.Window;
 import sk.neuromancer.Xune.level.Level;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 
 public class Arena {
-    private Window window;
 
     public Arena() {
-        this.window = new Window();
         SpriteSheet.initSheets();
         Entity.initClasses();
     }

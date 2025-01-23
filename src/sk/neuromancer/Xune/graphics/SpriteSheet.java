@@ -10,9 +10,9 @@ import java.io.InputStream;
 public class SpriteSheet {
     public static SpriteSheet ENTITY_SHEET = new SpriteSheet("entities.png", 24, 11);
     public static SpriteSheet TILE_SHEET = new SpriteSheet("tiles.png", 24, 11);
-    public static SpriteSheet PASSMAP_SHEET = new SpriteSheet("passmap.png", 5, 5, true);
-    public static SpriteSheet SOLIDMAP_SHEET = new SpriteSheet("solidmap.png", 5, 5, true);
-    public static SpriteSheet MAP_SHEET = new SpriteSheet("minimap.png", 1, 1, true);
+    public static SpriteSheet PASSMAP_SHEET = new SpriteSheet("passmap.png", 5, 5);
+    public static SpriteSheet SOLIDMAP_SHEET = new SpriteSheet("solidmap.png", 5, 5);
+    public static SpriteSheet MAP_SHEET = new SpriteSheet("minimap.png", 1, 1);
     public static SpriteSheet EFFECTS_SHEET = new SpriteSheet("effects.png", 24, 11);
     public static SpriteSheet MISC_SHEET = new SpriteSheet("misc.png", 24, 11);
     public static SpriteSheet CURSOR_SHEET = new SpriteSheet("cursors.png", 19, 19);
@@ -25,7 +25,6 @@ public class SpriteSheet {
     private int width, height;
     private String imageName;
     private int spriteWidth, spriteHeight;
-    private boolean keepData;
     private Sprite[] sprites;
     private boolean isInitialized;
 
@@ -47,15 +46,10 @@ public class SpriteSheet {
     public static final int SPRITE_OFFSET_GREEN = SPRITE_ROW_LENGTH * 2;
     public static final int SPRITE_OFFSET_BLUE = SPRITE_ROW_LENGTH * 4;
 
-    public SpriteSheet(String imageName, int spriteWidth, int spriteHeight, boolean keepData) {
+    public SpriteSheet(String imageName, int spriteWidth, int spriteHeight) {
         this.imageName = imageName;
         this.spriteWidth = spriteWidth;
         this.spriteHeight = spriteHeight;
-        this.keepData = keepData;
-    }
-
-    public SpriteSheet(String imageName, int spriteWidth, int spriteHeight) {
-        this(imageName, spriteWidth, spriteHeight, false);
     }
 
     public void initSheet() {
@@ -71,7 +65,7 @@ public class SpriteSheet {
                 for (int y = 0; y < height; y++) {
                     int[] RGBAData = null;
                     RGBAData = img.getData().getPixels(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight, RGBAData);
-                    sprites[y * width + x] = new Sprite(RGBAData, spriteWidth, spriteHeight, keepData);
+                    sprites[y * width + x] = new Sprite(RGBAData, spriteWidth, spriteHeight);
                 }
             }
             isInitialized = true;
@@ -85,6 +79,8 @@ public class SpriteSheet {
     }
 
     public Sprite getSprite(int index) {
+        if (!isInitialized)
+            return null;
         return sprites[index];
     }
 
