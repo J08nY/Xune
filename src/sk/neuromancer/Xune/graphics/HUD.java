@@ -33,7 +33,6 @@ public class HUD implements Tickable, Renderable {
     private final float hudTop;
     private final float hudLeft;
 
-
     private Level level;
     private Human human;
     private List<Button<?>> buttons;

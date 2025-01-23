@@ -42,7 +42,6 @@ public class Game implements Runnable {
     private Level level;
     private LevelView view;
     private Human human;
-    private Bot bot;
     private HUD hud;
 
     public static final int DEFAULT_WIDTH = 1920;
@@ -235,7 +234,7 @@ public class Game implements Runnable {
                 hud = new HUD(this);
             }
             if (view == null) {
-                view = new LevelView(this);
+                view = new LevelView(input, window, hud);
             }
             level = new Level(this, state);
             level.setView(view);
@@ -244,7 +243,6 @@ public class Game implements Runnable {
             human.setView(view);
             human.setInput(input);
 
-            bot = null;
             hud.setLevel(level);
             view.setLevel(level, false);
         } catch (IOException e) {
@@ -267,13 +265,13 @@ public class Game implements Runnable {
         human = new Human(level, humanFlag, 1000);
         Class<? extends Bot> botClass = intro.getSelectedBot();
         try {
-            bot = botClass.getDeclaredConstructor(Level.class, Flag.class, int.class).newInstance(level, botFlag, 1000);
+            Bot bot = botClass.getDeclaredConstructor(Level.class, Flag.class, int.class).newInstance(level, botFlag, 1000);
         } catch (Exception ignored) {
         }
 
         hud = new HUD(this);
         hud.setLevel(level);
-        view = new LevelView(this);
+        view = new LevelView(input, window, hud);
         view.setLevel(level, true);
         level.setView(view);
 

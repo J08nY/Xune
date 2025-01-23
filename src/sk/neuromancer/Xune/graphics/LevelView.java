@@ -1,6 +1,5 @@
 package sk.neuromancer.Xune.graphics;
 
-import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.level.Level;
@@ -10,7 +9,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class LevelView implements Tickable, Renderable {
-    private final Game game;
+    private final InputHandler input;
     private Level level;
 
     private final int screenWidth, screenHeight;
@@ -27,14 +26,14 @@ public class LevelView implements Tickable, Renderable {
     public static final float EDGE_MARGIN_X = Tile.TILE_WIDTH * 4;
     public static final float EDGE_MARGIN_Y = Tile.TILE_HEIGHT * 8;
 
-    public LevelView(Game game) {
-        this.game = game;
+    public LevelView(InputHandler input, Window window, HUD hud) {
+        this.input = input;
 
-        this.screenWidth = game.getWindow().getWidth();
-        this.screenHeight = game.getWindow().getHeight();
-        this.screenCenterX = game.getWindow().getCenterX();
-        this.screenCenterY = game.getWindow().getCenterY();
-        this.hudTop = game.getHud().getHudTop();
+        this.screenWidth = window.getWidth();
+        this.screenHeight = window.getHeight();
+        this.screenCenterX = window.getCenterX();
+        this.screenCenterY = window.getCenterY();
+        this.hudTop = hud.getHudTop();
     }
 
     public void setLevel(Level level, boolean reset) {
@@ -47,8 +46,6 @@ public class LevelView implements Tickable, Renderable {
 
     @Override
     public void tick(int tickCount) {
-        InputHandler input = this.game.getInput();
-
         if (input.PLUS.isPressed()) {
             zoomIn(ZOOM_SPEED);
         } else if (input.MINUS.isPressed()) {
@@ -76,9 +73,9 @@ public class LevelView implements Tickable, Renderable {
             moveUp();
         } else if (input.A.isPressed() || mouseX < 10) {
             moveLeft();
-        } else if (input.S.isPressed() || mouseY > game.getWindow().getHeight() - 10) {
+        } else if (input.S.isPressed() || mouseY > screenHeight - 10) {
             moveDown();
-        } else if (input.D.isPressed() || mouseX > game.getWindow().getWidth() - 10) {
+        } else if (input.D.isPressed() || mouseX > screenWidth - 10) {
             moveRight();
         }
     }
