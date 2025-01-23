@@ -1,15 +1,12 @@
 package sk.neuromancer.Xune.game.players;
 
-import sk.neuromancer.Xune.entity.Command;
-import sk.neuromancer.Xune.entity.CommandStrategy;
-import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.entity.PlayableEntity;
-import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.InputHandler;
 import sk.neuromancer.Xune.graphics.HUD;
+import sk.neuromancer.Xune.graphics.LevelView;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.proto.PlayerProto;
 import sk.neuromancer.Xune.sound.SoundManager;
@@ -26,6 +23,10 @@ public class Human extends Player {
     private final List<PlayableEntity> selected = new LinkedList<>();
     private Building buildingToPlace;
     private boolean canPlace;
+
+    private InputHandler input;
+    private LevelView view;
+    private HUD hud;
 
     public Human(Game g, Level level, Flag flag, int money) {
         super(g, level, flag, money);
@@ -52,23 +53,23 @@ public class Human extends Player {
     }
 
     private void handleInput() {
-        InputHandler.Mouse mouse = game.getInput().mouse;
+        InputHandler.Mouse mouse = input.mouse;
         float mouseX = (float) mouse.getX();
         float mouseY = (float) mouse.getY();
         float fromX = (float) mouse.getLastLeftX();
         float fromY = (float) mouse.getLastLeftY();
 
-        if (game.getHud().isMouseOverHud(mouseY)) {
-            if (game.getInput().mouse.isLeftReleased()) {
+        if (hud.isMouseOverHud(mouseY)) {
+            if (mouse.isLeftReleased()) {
                 handleHUDClick(mouseX, mouseY);
             }
             return;
         }
 
-        float levelX = game.getView().getLevelX(mouseX);
-        float levelY = game.getView().getLevelY(mouseY);
-        float fromLevelX = game.getView().getLevelX(fromX);
-        float fromLevelY = game.getView().getLevelY(fromY);
+        float levelX = view.getLevelX(mouseX);
+        float levelY = view.getLevelY(mouseY);
+        float fromLevelX = view.getLevelX(fromX);
+        float fromLevelY = view.getLevelY(fromY);
 
         if (buildingToPlace != null) {
             int tileX = Level.levelToTileX(levelX, levelY);
@@ -79,8 +80,8 @@ public class Human extends Player {
             canPlace = isTileDiscovered(tileX, tileY) && level.isTileBuildable(tileX, tileY, buildingToPlace.getPassable());
         }
 
-        if (game.getInput().mouse.isLeftReleased()) {
-            if (game.getInput().mouse.wasLeftDrag()) {
+        if (mouse.isLeftReleased()) {
+            if (mouse.wasLeftDrag()) {
                 if (Math.abs(fromX - mouseX) < 5 && Math.abs(fromY - mouseY) < 5) {
                     handleLeftClick(levelX, levelY);
                 } else {
@@ -90,7 +91,7 @@ public class Human extends Player {
                 handleLeftClick(levelX, levelY);
             }
         }
-        if (game.getInput().mouse.isRightReleased()) {
+        if (mouse.isRightReleased()) {
             handleRightClick();
         }
     }
@@ -174,7 +175,7 @@ public class Human extends Player {
     }
 
     private void handleHUDClick(float mouseX, float mouseY) {
-        for (HUD.Button<?> button : game.getHud().getButtons()) {
+        for (HUD.Button<?> button : hud.getButtons()) {
             if (button.intersects(mouseX, mouseY)) {
                 Class<? extends PlayableEntity> klass = button.getKlass();
                 if (Building.class.isAssignableFrom(klass)) {
@@ -186,8 +187,8 @@ public class Human extends Player {
                     } else {
                         if (buildingToBuild == klass && isBuildDone()) {
                             // Building place.
-                            float levelX = game.getView().getLevelX(mouseX);
-                            float levelY = game.getView().getLevelY(mouseY);
+                            float levelX = view.getLevelX(mouseX);
+                            float levelY = view.getLevelY(mouseY);
                             int tileX = Level.levelToTileX(levelX, levelY);
                             int tileY = Level.levelToTileY(levelX, levelY);
                             buildingToPlace = getBuildResult(tileX, tileY);
@@ -234,10 +235,22 @@ public class Human extends Player {
     public PlayerProto.PlayerState serialize() {
         PlayerProto.PlayerState.Builder state = super.serialize().toBuilder();
         PlayerProto.HumanState.Builder human = PlayerProto.HumanState.newBuilder()
-                .setXOffset(game.getView().xOff)
-                .setYOffset(game.getView().yOff)
-                .setZoom(game.getView().zoom);
+                .setXOffset(view.xOff)
+                .setYOffset(view.yOff)
+                .setZoom(view.zoom);
         state.setHuman(human);
         return state.build();
+    }
+
+    public void setInput(InputHandler input) {
+        this.input = input;
+    }
+
+    public void setView(LevelView view) {
+        this.view = view;
+    }
+
+    public void setHud(HUD hud) {
+        this.hud = hud;
     }
 }

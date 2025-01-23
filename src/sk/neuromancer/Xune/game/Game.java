@@ -16,7 +16,6 @@ import sk.neuromancer.Xune.graphics.Window;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.proto.LevelProto;
 import sk.neuromancer.Xune.sound.SoundManager;
-import sk.neuromancer.Xune.sound.SoundPlayer;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -83,7 +82,7 @@ public class Game implements Runnable {
         pause = new Pause(this);
         gameover = new Gameover(this);
 
-        SoundPlayer player = SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
+        SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
         window.show();
     }
 
@@ -240,6 +239,10 @@ public class Game implements Runnable {
             }
             level = new Level(this, state);
             human = level.getHuman();
+            human.setHud(hud);
+            human.setView(view);
+            human.setInput(input);
+
             bot = null;
             hud.setLevel(level);
             view.setLevel(level, false);
@@ -271,6 +274,10 @@ public class Game implements Runnable {
         hud.setLevel(level);
         view = new LevelView(this);
         view.setLevel(level, true);
+
+        human.setHud(hud);
+        human.setView(view);
+        human.setInput(input);
     }
 
     private void pause() {
