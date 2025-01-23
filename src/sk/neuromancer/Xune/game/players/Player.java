@@ -7,7 +7,6 @@ import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.building.Powerplant;
 import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.entity.unit.*;
-import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.graphics.Effect;
 import sk.neuromancer.Xune.graphics.Renderable;
@@ -247,8 +246,8 @@ public class Player implements Tickable, Renderable {
             e.tick(tickCount);
         }
         handleBuild();
-        handleDead();
-        handleUnitBehavior();
+        handleDead(tickCount);
+        handleUnitBehavior(tickCount);
         entities.removeAll(toRemove);
         toRemove.clear();
         updateVisibility();
@@ -260,11 +259,11 @@ public class Player implements Tickable, Renderable {
         }
     }
 
-    private void handleDead() {
+    private void handleDead(int tickCount) {
         for (PlayableEntity e : entities) {
             if (e.health <= 0) {
                 if (e.hasCommands()) {
-                    e.getCommands().forEach(c -> c.finish(e, Game.currentTick(), false));
+                    e.getCommands().forEach(c -> c.finish(e, tickCount, false));
                 }
                 removeEntity(e);
                 if (!(e instanceof Soldier)) {
@@ -278,14 +277,14 @@ public class Player implements Tickable, Renderable {
         }
     }
 
-    private void handleUnitBehavior() {
+    private void handleUnitBehavior(int tickCount) {
         for (PlayableEntity entity : entities) {
             if (!entity.hasCommands() && !toRemove.contains(entity)) {
                 CommandStrategy strategy = commandStrategies.get(entity.getClass());
                 if (strategy != null) {
                     Command defaultCommand = strategy.defaultBehavior(entity, level);
                     if (defaultCommand != null) {
-                        entity.pushCommand(defaultCommand);
+                        entity.pushCommand(defaultCommand, tickCount);
                     }
                 }
             }

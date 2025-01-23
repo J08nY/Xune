@@ -1,7 +1,6 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.game.Clickable;
-import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.level.Level;
@@ -159,14 +158,18 @@ public abstract class PlayableEntity extends Entity {
         return this.commands.isEmpty() ? null : this.commands.getFirst();
     }
 
+    public void finishCommands(int tickCount) {
+        this.commands.forEach(cmd -> cmd.finish(this, tickCount, false));
+        this.commands.clear();
+    }
+
     public void sendCommand(Command c) {
         this.commands.add(c);
     }
 
-    public void pushCommand(Command c) {
-        this.commands.forEach(cmd -> cmd.finish(this, Game.currentTick(), false));
-        this.commands.clear();
-        this.commands.add(c);
+    public void pushCommand(Command c, int tickCount) {
+        finishCommands(tickCount);
+        sendCommand(c);
     }
 
     protected static void setCost(Class<? extends sk.neuromancer.Xune.entity.PlayableEntity> klass, int cost) {

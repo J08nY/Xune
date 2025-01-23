@@ -48,11 +48,11 @@ public class Human extends Player {
 
     @Override
     public void tick(int tickCount) {
-        handleInput();
+        handleInput(tickCount);
         super.tick(tickCount);
     }
 
-    private void handleInput() {
+    private void handleInput(int tickCount) {
         InputHandler.Mouse mouse = input.mouse;
         float mouseX = (float) mouse.getX();
         float mouseY = (float) mouse.getY();
@@ -83,12 +83,12 @@ public class Human extends Player {
         if (mouse.isLeftReleased()) {
             if (mouse.wasLeftDrag()) {
                 if (Math.abs(fromX - mouseX) < 5 && Math.abs(fromY - mouseY) < 5) {
-                    handleLeftClick(levelX, levelY);
+                    handleLeftClick(levelX, levelY, tickCount);
                 } else {
                     handleDrag(fromLevelX, fromLevelY, levelX, levelY);
                 }
             } else {
-                handleLeftClick(levelX, levelY);
+                handleLeftClick(levelX, levelY, tickCount);
             }
         }
         if (mouse.isRightReleased()) {
@@ -123,7 +123,7 @@ public class Human extends Player {
         }
     }
 
-    private void handleLeftClick(float levelX, float levelY) {
+    private void handleLeftClick(float levelX, float levelY, int tickCount) {
         // Handle building placement first
         if (buildingToPlace != null) {
             if (canPlace) {
@@ -168,7 +168,7 @@ public class Human extends Player {
             if (strategy != null) {
                 Command command = strategy.onClick(only, other, level, levelX, levelY);
                 if (command != null) {
-                    only.pushCommand(command);
+                    only.pushCommand(command, tickCount);
                 }
             }
         }

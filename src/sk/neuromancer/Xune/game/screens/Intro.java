@@ -13,7 +13,7 @@ import sk.neuromancer.Xune.graphics.Text;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Intro implements Tickable, Renderable {
-    private Game game;
+    private final Game game;
     private float scaleOld, scaleNew, scaleStart;
     private final Sprite oldLogo;
     private final Sprite newLogo;
@@ -21,9 +21,9 @@ public class Intro implements Tickable, Renderable {
     private int wormIndex;
     private int wormTicks;
 
-    private Menu flagMenu;
-    private Menu botMenu;
-    private Menu loadMenu;
+    private final Menu flagMenu;
+    private final Menu botMenu;
+    private final Menu loadMenu;
 
     private int column;
 

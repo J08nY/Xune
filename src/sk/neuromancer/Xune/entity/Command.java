@@ -574,7 +574,7 @@ public abstract class Command {
                     }
                     if (resultClass != Heli.class) {
                         try {
-                            result.pushCommand(new MoveCommand(result.x, result.y, result.x, result.y, pathfinder));
+                            result.pushCommand(new MoveCommand(result.x, result.y, result.x, result.y, pathfinder), tickCount);
                         } catch (NoPathFound ignored) {
 
                         }
