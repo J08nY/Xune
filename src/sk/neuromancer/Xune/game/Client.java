@@ -1,11 +1,13 @@
 package sk.neuromancer.Xune.game;
 
+import com.github.quantranuk.protobuf.nio.ProtoChannelFactory;
+import com.github.quantranuk.protobuf.nio.ProtoSocketChannel;
+import org.lwjgl.system.Library;
 import picocli.CommandLine;
+import sk.neuromancer.Xune.network.Utils;
 import sk.neuromancer.Xune.proto.MessageProto;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
+import static java.lang.Thread.sleep;
 
 @CommandLine.Command(name = "XuneClient", mixinStandardHelpOptions = true, version = "1.0", description = "Xune 2025 client.")
 public class Client implements Runnable {
@@ -16,27 +18,38 @@ public class Client implements Runnable {
     @CommandLine.Option(names = {"-p", "--port"}, description = "Port to connect to.", defaultValue = "7531")
     private int port;
 
+    private ProtoSocketChannel clientChannel;
+
     @Override
     public void run() {
-        connectToServer();
+        setup();
+
+        clientChannel.connect();
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        clientChannel.sendMessage(MessageProto.Note.newBuilder().setType(MessageProto.NoteType.CONNECT).build());
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        clientChannel.sendMessage(MessageProto.Note.newBuilder().setType(MessageProto.NoteType.DISCONNECT).build());
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        clientChannel.disconnect();
     }
 
-    private void connectToServer() {
-        try (Socket socket = new Socket(host, port)) {
-            System.out.println("Connected to the server");
+    private void setup() {
+        Library.initialize();
 
-            // Create a protobuf message
-            MessageProto.Message message = MessageProto.Message.newBuilder()
-                    .build();
-
-            // Send the message to the server
-            try (OutputStream output = socket.getOutputStream()) {
-                message.writeTo(output);
-                System.out.println("Message sent to the server: " + message);
-            }
-        } catch (IOException e) {
-            System.err.println("Connection error: " + e.getMessage());
-        }
+        ProtoChannelFactory.ClientBuilder clientBuilder = ProtoChannelFactory.newClient(host, port).setSerializer(Utils.getIdSerializer());
+        clientChannel = clientBuilder.build();
     }
 
     public static void main(String[] args) {

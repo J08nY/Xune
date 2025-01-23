@@ -7,14 +7,6 @@ option java_outer_classname = "MessageProto";
 import "sk/neuromancer/Xune/proto/Level.proto";
 import "sk/neuromancer/Xune/proto/Base.proto";
 
-message Message {
-  uint64 timestamp = 1;
-  oneof message {
-    State state = 2;
-    Action action = 3;
-  }
-}
-
 message State {
   // Goes from server to client
   LevelState level = 1;
@@ -28,6 +20,18 @@ message Action {
     BuildingPlaceAction buildingPlace = 3;
     CommandAction command = 4;
   }
+}
+
+enum NoteType {
+  CONNECT = 0;
+  DISCONNECT = 1;
+  PING = 2;
+}
+
+message Note {
+  // Goes both ways
+  NoteType type = 1;
+  optional bytes data = 2;
 }
 
 message EntityProduceAction {

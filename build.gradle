@@ -53,6 +53,8 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-java:4.29.2'
 
     implementation 'info.picocli:picocli:4.7.6'
+    implementation 'sk.neuromancer:protobuf-nio-core:1.0.4'
+    runtimeOnly 'org.slf4j:slf4j-reload4j:2.0.16'
 }
 
 sourceSets {
