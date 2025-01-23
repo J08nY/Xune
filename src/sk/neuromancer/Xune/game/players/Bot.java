@@ -4,7 +4,6 @@ import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Config;
-import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.level.paths.NoPathFound;

@@ -5,6 +5,9 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 
+
+import sk.neuromancer.Xune.graphics.Window;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class InputHandler implements Tickable {
@@ -212,9 +215,9 @@ public class InputHandler implements Tickable {
 
     public Scroller scroller = new Scroller();
 
-    public InputHandler(Game game) {
-        long window = game.getWindow().getHandle();
-        glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
+    public InputHandler(Window window) {
+        long handle = window.getHandle();
+        glfwSetKeyCallback(handle, keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 boolean isPress = action != GLFW_RELEASE;
@@ -259,13 +262,13 @@ public class InputHandler implements Tickable {
                 }
             }
         });
-        glfwSetCursorPosCallback(window, cursorCallback = new GLFWCursorPosCallback() {
+        glfwSetCursorPosCallback(handle, cursorCallback = new GLFWCursorPosCallback() {
             @Override
             public void invoke(long window, double xpos, double ypos) {
                 mouse.setPosition(xpos, ypos);
             }
         });
-        glfwSetMouseButtonCallback(window, mouseCallback = new GLFWMouseButtonCallback() {
+        glfwSetMouseButtonCallback(handle, mouseCallback = new GLFWMouseButtonCallback() {
             @Override
             public void invoke(long window, int button, int action, int mods) {
                 if (action == GLFW_PRESS) {
@@ -281,7 +284,7 @@ public class InputHandler implements Tickable {
                 }
             }
         });
-        glfwSetScrollCallback(window, scrollCallback = new GLFWScrollCallback() {
+        glfwSetScrollCallback(handle, scrollCallback = new GLFWScrollCallback() {
             @Override
             public void invoke(long window, double xoffset, double yoffset) {
                 scroller.scroll(xoffset, yoffset);

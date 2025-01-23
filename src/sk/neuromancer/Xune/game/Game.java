@@ -74,8 +74,8 @@ public class Game implements Runnable {
         SpriteSheet.initSheets();
         Entity.initClasses();
 
-        input = new InputHandler(this);
-        sound = new SoundManager(this);
+        input = new InputHandler(window);
+        sound = new SoundManager();
 
         intro = new Intro(this);
         pause = new Pause(this);
@@ -231,12 +231,12 @@ public class Game implements Runnable {
             //GZIPInputStream gis = new GZIPInputStream(fis)
             LevelProto.FullLevelState state = LevelProto.FullLevelState.parseFrom(fis);
             if (hud == null) {
-                hud = new HUD(this);
+                hud = new HUD(input, window);
             }
             if (view == null) {
                 view = new LevelView(input, window, hud);
             }
-            level = new Level(this, state);
+            level = new Level(state);
             level.setView(view);
             human = level.getHuman();
             human.setHud(hud);
@@ -244,6 +244,7 @@ public class Game implements Runnable {
             human.setInput(input);
 
             hud.setLevel(level);
+            hud.setView(view);
             view.setLevel(level, false);
         } catch (IOException e) {
             e.printStackTrace();
@@ -265,13 +266,14 @@ public class Game implements Runnable {
         human = new Human(level, humanFlag, 1000);
         Class<? extends Bot> botClass = intro.getSelectedBot();
         try {
-            Bot bot = botClass.getDeclaredConstructor(Level.class, Flag.class, int.class).newInstance(level, botFlag, 1000);
+            botClass.getDeclaredConstructor(Level.class, Flag.class, int.class).newInstance(level, botFlag, 1000);
         } catch (Exception ignored) {
         }
 
-        hud = new HUD(this);
+        hud = new HUD(input, window);
         hud.setLevel(level);
         view = new LevelView(input, window, hud);
+        hud.setView(view);
         view.setLevel(level, true);
         level.setView(view);
 

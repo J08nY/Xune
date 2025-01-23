@@ -21,7 +21,8 @@ import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.game.Game.TPS;
 
 public class HUD implements Tickable, Renderable {
-    private final Game game;
+    private final InputHandler input;
+    private final Window window;
     private final float screenWidth;
     private final float screenHeight;
 
@@ -34,6 +35,7 @@ public class HUD implements Tickable, Renderable {
     private final float hudLeft;
 
     private Level level;
+    private LevelView view;
     private Human human;
     private List<Button<?>> buttons;
 
@@ -43,14 +45,16 @@ public class HUD implements Tickable, Renderable {
 
     public static final int MAX_POWER = 1000;
 
-    public HUD(Game game) {
-        this.game = game;
-        this.screenWidth = game.getWindow().getWidth();
-        this.screenHeight = game.getWindow().getHeight();
-        glfwSetInputMode(game.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    public HUD(InputHandler input, Window window) {
+        this.input = input;
+
+        this.window = window;
+        this.screenWidth = window.getWidth();
+        this.screenHeight = window.getHeight();
+        glfwSetInputMode(window.getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // TODO: This does nothing. Why?
-        glfwSetCursorPos(game.getWindow().getHandle(), (double) screenWidth / 2, (double) screenHeight / 2);
+        glfwSetCursorPos(window.getHandle(), (double) screenWidth / 2, (double) screenHeight / 2);
         this.currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(2);
 
         this.hudPanel = SpriteSheet.HUD_PANEL.getSprite(0);
@@ -80,13 +84,15 @@ public class HUD implements Tickable, Renderable {
         this.buttons.add(new Button<>(Harvester.class, human, 2, 4, buttonsLeft + hudScale * 25 * 3, buttonsTop + hudScale * 12, hudScale));
     }
 
+    public void setView(LevelView view) {
+        this.view = view;
+    }
+
     @Override
     public void render() {
         glDisable(GL_DEPTH_TEST);
         renderPanel();
         renderCursor();
-
-        //logo.render();
         glEnable(GL_DEPTH_TEST);
     }
 
@@ -126,7 +132,6 @@ public class HUD implements Tickable, Renderable {
         renderText(20, 110, selected);
 
         if (Config.DEBUG_VIEW) {
-            LevelView view = game.getView();
             float levelX = view.getLevelX(mouseX);
             float levelY = view.getLevelY(mouseY);
 
@@ -248,12 +253,12 @@ public class HUD implements Tickable, Renderable {
         glColor3f(1, 1, 1);
         glEnd();
 
-        float startX = game.getView().getLevelX(0);
-        float startY = game.getView().getLevelY(0);
+        float startX = view.getLevelX(0);
+        float startY = view.getLevelY(0);
         float sX = Math.max(Level.levelToFullTileX(startX, startY), 0);
         float sY = Math.max(Level.levelToFullTileY(startX, startY), 0);
-        float endX = game.getView().getLevelX(screenWidth);
-        float endY = game.getView().getLevelY(hudTop);
+        float endX = view.getLevelX(screenWidth);
+        float endY = view.getLevelY(hudTop);
         float eX = Math.min(Level.levelToFullTileX(endX, endY), level.getWidthInTiles());
         float eY = Math.min(Level.levelToFullTileY(endX, endY), level.getHeightInTiles());
         glBegin(GL_LINE_LOOP);
@@ -292,7 +297,7 @@ public class HUD implements Tickable, Renderable {
     }
 
     private void updateMinimap() {
-        if (game.getInput().mouse.isLeftReleased() && isMouseOverHud((float) mouseY)) {
+        if (input.mouse.isLeftReleased() && isMouseOverHud((float) mouseY)) {
             float mapStartX = hudScale * 5;
             float mapStartY = hudTop + hudScale * 5;
             float mapEndX = hudScale * 55;
@@ -305,7 +310,7 @@ public class HUD implements Tickable, Renderable {
                 int ty = Math.round((float) (mouseY - mapStartY) * level.getHeightInTiles() / (hudScale * 50));
                 float lx = Level.tileToLevelX(tx, ty);
                 float ly = Level.tileToLevelY(tx, ty);
-                game.getView().centerOn(lx, ly);
+                view.centerOn(lx, ly);
             }
         }
     }
@@ -336,7 +341,7 @@ public class HUD implements Tickable, Renderable {
             currentCursor = SpriteSheet.CURSOR_SHEET.getSprite(6);
             hitEdge = true;
         }
-        glfwSetCursorPos(game.getWindow().getHandle(), mouseX, mouseY);
+        glfwSetCursorPos(window.getHandle(), mouseX, mouseY);
 
         tooltip = null;
         if (!hitEdge) {
@@ -353,7 +358,7 @@ public class HUD implements Tickable, Renderable {
                     }
                 }
             } else {
-                Entity entity = level.entityAt(game.getView().getLevelX(mouseX), game.getView().getLevelY(mouseY));
+                Entity entity = level.entityAt(view.getLevelX(mouseX), view.getLevelY(mouseY));
                 if (entity != null && human.isTileVisible(level.tileAt(entity))) {
                     tooltip = new Text(entity.getClass().getSimpleName(), (float) mouseX, (float) mouseY + 20, true, 1f);
                 }
@@ -379,7 +384,7 @@ public class HUD implements Tickable, Renderable {
     }
 
     private void updateInputs() {
-        InputHandler.Mouse mouse = game.getInput().mouse;
+        InputHandler.Mouse mouse = input.mouse;
         mouseX = mouse.getX();
         mouseY = mouse.getY();
         drag = mouse.wasLeftDrag();

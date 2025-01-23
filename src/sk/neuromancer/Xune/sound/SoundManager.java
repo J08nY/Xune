@@ -1,7 +1,6 @@
 package sk.neuromancer.Xune.sound;
 
 import org.lwjgl.openal.*;
-import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.sound.SoundPlayer.SoundPlayerState;
 
@@ -17,7 +16,6 @@ import static org.lwjgl.openal.ALC11.ALC_ALL_DEVICES_SPECIFIER;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class SoundManager implements Tickable {
-    private final Game game;
     private final long device;
     private final long context;
 
@@ -64,7 +62,7 @@ public class SoundManager implements Tickable {
 
     private static SoundManager instance;
 
-    public SoundManager(Game game) {
+    public SoundManager() {
         List<String> deviceList;
         if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATE_ALL_EXT")) {
             deviceList = ALUtil.getStringList(0, ALC_ALL_DEVICES_SPECIFIER);
@@ -73,7 +71,6 @@ public class SoundManager implements Tickable {
         }
         System.out.println("OpenAL devices: " + deviceList);
 
-        this.game = game;
         this.device = alcOpenDevice((ByteBuffer) null);
         if (device == NULL) {
             throw new IllegalStateException("Failed to open the default OpenAL device.");

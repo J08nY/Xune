@@ -4,7 +4,6 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.Config;
-import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.game.players.Human;
@@ -52,7 +51,7 @@ public class Level implements Renderable, Tickable {
         loadLevel(levelName);
     }
 
-    public Level(Game game, LevelProto.FullLevelState savedState) {
+    public Level(LevelProto.FullLevelState savedState) {
         this.width = savedState.getWidth();
         this.height = savedState.getHeight();
         this.level = new Tile[this.width][this.height];
