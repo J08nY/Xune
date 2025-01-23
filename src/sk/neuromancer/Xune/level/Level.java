@@ -1,6 +1,7 @@
 package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.entity.Worm;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.Game;
@@ -458,10 +459,8 @@ public class Level implements Renderable, Tickable {
     }
 
     public boolean isDone() {
-        if (human == null) {
-            return players.values().stream().anyMatch(Player::isEliminated);
-        }
-        return human.isEliminated() || players.values().stream().allMatch(player -> player.getFlag() == human.getFlag() || player.isEliminated());
+        Set<Flag> flags = players.values().stream().filter(player -> !player.isEliminated()).map(Player::getFlag).collect(Collectors.toSet());
+        return flags.size() <= 1;
     }
 
     public LevelProto.LevelState serializeTransient() {

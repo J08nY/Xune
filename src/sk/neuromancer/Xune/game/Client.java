@@ -2,10 +2,13 @@ package sk.neuromancer.Xune.game;
 
 import com.github.quantranuk.protobuf.nio.ProtoChannelFactory;
 import com.github.quantranuk.protobuf.nio.ProtoSocketChannel;
+import com.google.protobuf.Message;
 import org.lwjgl.system.Library;
 import picocli.CommandLine;
 import sk.neuromancer.Xune.network.Utils;
 import sk.neuromancer.Xune.proto.MessageProto;
+
+import java.net.SocketAddress;
 
 import static java.lang.Thread.sleep;
 
@@ -25,23 +28,8 @@ public class Client implements Runnable {
         setup();
 
         clientChannel.connect();
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         clientChannel.sendMessage(MessageProto.Note.newBuilder().setType(MessageProto.NoteType.CONNECT).build());
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         clientChannel.sendMessage(MessageProto.Note.newBuilder().setType(MessageProto.NoteType.DISCONNECT).build());
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         clientChannel.disconnect();
     }
 
@@ -50,6 +38,11 @@ public class Client implements Runnable {
 
         ProtoChannelFactory.ClientBuilder clientBuilder = ProtoChannelFactory.newClient(host, port).setSerializer(Utils.getIdSerializer());
         clientChannel = clientBuilder.build();
+        clientChannel.addMessageReceivedHandler(this::onMessageReceived);
+    }
+
+    private void onMessageReceived(SocketAddress socketAddress, Message message) {
+        System.out.println("Received message from " + socketAddress);
     }
 
     public static void main(String[] args) {
