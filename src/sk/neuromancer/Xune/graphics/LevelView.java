@@ -1,12 +1,12 @@
 package sk.neuromancer.Xune.graphics;
 
-import sk.neuromancer.Xune.game.InputHandler;
+import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.game.Config.TPS;
 
 public class LevelView implements Tickable, Renderable {
     private final InputHandler input;

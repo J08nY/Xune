@@ -1,4 +1,4 @@
-package sk.neuromancer.Xune.game;
+package sk.neuromancer.Xune.input;
 
 import sk.neuromancer.Xune.graphics.Renderable;
 

@@ -1,4 +1,4 @@
-package sk.neuromancer.Xune.game;
+package sk.neuromancer.Xune.input;
 
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 
 
+import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.graphics.Window;
 
 import static org.lwjgl.glfw.GLFW.*;

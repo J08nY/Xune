@@ -1,6 +1,6 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.Command;
+import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Factory;
@@ -16,7 +16,7 @@ import sk.neuromancer.Xune.sound.SoundManager;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.game.Config.TPS;
 
 public class Harvester extends Unit {
     private int spice;

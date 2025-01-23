@@ -2,7 +2,6 @@ package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Unit;
-import sk.neuromancer.Xune.game.Clickable;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.paths.Path;
@@ -16,7 +15,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.game.Config.TPS;
 
 public class Worm extends Entity implements Moveable {
     private final Level level;

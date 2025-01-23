@@ -13,6 +13,7 @@ import sk.neuromancer.Xune.graphics.HUD;
 import sk.neuromancer.Xune.graphics.LevelView;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.graphics.Window;
+import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.proto.LevelProto;
 import sk.neuromancer.Xune.sound.SoundManager;
@@ -27,6 +28,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 @CommandLine.Command(name = "Xune", mixinStandardHelpOptions = true, version = "1.0", description = "Xune 2025.")
 public class Game implements Runnable {
+
     private boolean keepRunning = false;
     private static int tickCount = 0;
     private GameState state;
@@ -43,11 +45,6 @@ public class Game implements Runnable {
     private LevelView view;
     private Human human;
     private HUD hud;
-
-    public static final int DEFAULT_WIDTH = 1920;
-    public static final int DEFAULT_HEIGHT = 1080;
-
-    public static final int TPS = 60;
 
     @CommandLine.Option(names = {"-f", "--fullscreen"}, description = "Run in fullscreen mode.")
     private boolean fullscreen;
@@ -68,7 +65,7 @@ public class Game implements Runnable {
         if (fullscreen) {
             window = new Window();
         } else {
-            window = new Window(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+            window = new Window(Config.DEFAULT_WIDTH, Config.DEFAULT_HEIGHT);
         }
 
         SpriteSheet.initSheets();
@@ -88,7 +85,7 @@ public class Game implements Runnable {
     private void loop() {
         long lastRender = System.nanoTime();
         double unprocessed = 0;
-        double nsPerTick = 1000000000.0 / TPS;
+        double nsPerTick = 1000000000.0 / Config.TPS;
         int frames = 0;
         int ticks = 0;
         long lastSecond = System.currentTimeMillis();

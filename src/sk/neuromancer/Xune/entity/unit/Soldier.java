@@ -1,10 +1,10 @@
 package sk.neuromancer.Xune.entity.unit;
 
-import sk.neuromancer.Xune.entity.Command;
+import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Barracks;
-import sk.neuromancer.Xune.game.Clickable;
+import sk.neuromancer.Xune.input.Clickable;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
@@ -15,7 +15,7 @@ import sk.neuromancer.Xune.sound.SoundManager;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.game.Config.TPS;
 
 public class Soldier extends Unit {
     private int step;

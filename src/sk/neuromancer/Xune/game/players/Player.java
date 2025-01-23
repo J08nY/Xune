@@ -6,6 +6,8 @@ import sk.neuromancer.Xune.entity.building.Base;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.building.Powerplant;
 import sk.neuromancer.Xune.entity.building.Refinery;
+import sk.neuromancer.Xune.entity.command.Command;
+import sk.neuromancer.Xune.entity.command.CommandStrategy;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.graphics.Effect;

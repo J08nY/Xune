@@ -1,12 +1,14 @@
 package sk.neuromancer.Xune.graphics;
 
-import sk.neuromancer.Xune.entity.Command;
+import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.*;
 import sk.neuromancer.Xune.game.players.Human;
+import sk.neuromancer.Xune.input.Clickable;
+import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
 
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.game.Config.TPS;
 
 public class HUD implements Tickable, Renderable {
     private final InputHandler input;

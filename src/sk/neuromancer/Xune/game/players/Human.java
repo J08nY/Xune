@@ -2,8 +2,10 @@ package sk.neuromancer.Xune.game.players;
 
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.entity.command.Command;
+import sk.neuromancer.Xune.entity.command.CommandStrategy;
 import sk.neuromancer.Xune.entity.unit.Unit;
-import sk.neuromancer.Xune.game.InputHandler;
+import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.graphics.HUD;
 import sk.neuromancer.Xune.graphics.LevelView;
 import sk.neuromancer.Xune.level.Level;

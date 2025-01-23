@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.game.players;
 
 import sk.neuromancer.Xune.entity.*;
 import sk.neuromancer.Xune.entity.building.*;
+import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.level.Level;
@@ -13,7 +14,7 @@ import sk.neuromancer.Xune.proto.PlayerProto;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.game.Config.TPS;
 
 
 public class Bot extends Player {

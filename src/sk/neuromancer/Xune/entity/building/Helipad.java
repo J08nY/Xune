@@ -11,7 +11,7 @@ import sk.neuromancer.Xune.sound.SoundManager;
 
 import java.util.List;
 
-import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.game.Config.TPS;
 import static sk.neuromancer.Xune.level.Tile.EAST_WEST;
 
 public class Helipad extends Building {

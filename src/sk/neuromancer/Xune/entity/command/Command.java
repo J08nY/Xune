@@ -1,5 +1,9 @@
-package sk.neuromancer.Xune.entity;
+package sk.neuromancer.Xune.entity.command;
 
+import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.EntityReference;
+import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.entity.unit.Harvester;
@@ -565,7 +569,7 @@ public abstract class Command {
                     Unit result;
                     try {
                         Constructor<? extends Unit> con = resultClass.getConstructor(float.class, float.class, Orientation.class, Player.class);
-                        result = con.newInstance(building.x, building.y + Tile.TILE_CENTER_Y, building.orientation, building.owner);
+                        result = con.newInstance(building.x, building.y + Tile.TILE_CENTER_Y, Orientation.SOUTH, building.getOwner());
                     } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                              IllegalAccessException ex) {
                         System.out.println("Failed to create unit." + ex);
@@ -579,13 +583,13 @@ public abstract class Command {
 
                         }
                     }
-                    if (building.owner instanceof Human) {
+                    if (building.getOwner() instanceof Human) {
                         SoundManager.play(SoundManager.SOUND_TADA_1, false, 1.0f);
                     }
-                    building.owner.addEntity(result);
+                    building.getOwner().addEntity(result);
                     finished = true;
                 } else {
-                    progress += Math.min(building.owner.getPowerFactor(), 1.0f);
+                    progress += Math.min(building.getOwner().getPowerFactor(), 1.0f);
                 }
             } else {
                 throw new IllegalArgumentException("Entity must be a building.");

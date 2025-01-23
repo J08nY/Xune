@@ -2,7 +2,7 @@ package sk.neuromancer.Xune.game.screens;
 
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.game.Game;
-import sk.neuromancer.Xune.game.InputHandler;
+import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.graphics.Renderable;

@@ -7,7 +7,7 @@ import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
-import static sk.neuromancer.Xune.game.Game.TPS;
+import static sk.neuromancer.Xune.game.Config.TPS;
 import static sk.neuromancer.Xune.level.Tile.CORNERS;
 
 public class Powerplant extends Building {

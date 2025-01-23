@@ -5,7 +5,7 @@ import sk.neuromancer.Xune.entity.unit.Buggy;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Soldier;
-import sk.neuromancer.Xune.game.Clickable;
+import sk.neuromancer.Xune.input.Clickable;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.graphics.Sprite;
