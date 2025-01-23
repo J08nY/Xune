@@ -26,8 +26,6 @@ public class Pathfinder implements Tickable, Renderable {
     private final BoolMap buildingMap;
     // EntityMap is true if the point is occupied by an entity
     private final BoolMap entityMap;
-    //TODO: Remove this and only keep it in the level.
-    private final List<Entity> entities;
     private final List<Path> paths;
 
     public Pathfinder(Level l) {
@@ -36,7 +34,6 @@ public class Pathfinder implements Tickable, Renderable {
         this.solidMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
         this.buildingMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
         this.entityMap = new BoolMap(l.getWidthInTiles(), l.getHeightInTiles());
-        this.entities = new LinkedList<>();
         this.paths = new LinkedList<>();
 
         fillLevelMap(l);
@@ -174,7 +171,7 @@ public class Pathfinder implements Tickable, Renderable {
                     v = 'E';
                 } else if (levelMap[i][j] == 0) {
                     v = '#';
-                } else if (solidMap[i][j]){
+                } else if (solidMap[i][j]) {
                     v = '*';
                 } else {
                     v = '-';
@@ -249,7 +246,6 @@ public class Pathfinder implements Tickable, Renderable {
         if (e instanceof Building building) {
             buildingMap.setTile(building.tileX, building.tileY, negate(building.getPassable()));
         } else if (e instanceof Unit unit) {
-            entities.add(unit);
             for (Point point : unit.getOccupied()) {
                 entityMap.set(point);
             }
@@ -268,7 +264,6 @@ public class Pathfinder implements Tickable, Renderable {
         if (e instanceof Building building) {
             buildingMap.resetTile(building.tileX, building.tileY);
         } else if (e instanceof Unit unit) {
-            entities.remove(unit);
             for (Point point : unit.getOccupied()) {
                 entityMap.reset(point);
             }
@@ -295,7 +290,7 @@ public class Pathfinder implements Tickable, Renderable {
     public void tick(int tickCount) {
         paths.clear();
         entityMap.resetAll();
-        for (Entity e : entities) {
+        for (Entity e : l.getEntities()) {
             if (e instanceof Unit unit) {
                 for (Point point : unit.getOccupied()) {
                     entityMap.set(point);
