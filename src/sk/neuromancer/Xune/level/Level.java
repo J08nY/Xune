@@ -30,8 +30,7 @@ import java.util.stream.Collectors;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Level implements Renderable, Tickable {
-    private final Game game;
-
+    private LevelView view;
     private Human human;
     private Map<Long, Player> players;
     private Pathfinder pathfinder;
@@ -45,8 +44,7 @@ public class Level implements Renderable, Tickable {
 
     public static final String LEVEL_1 = "level1.lvl";
 
-    public Level(Game game, String levelName) {
-        this.game = game;
+    public Level(String levelName) {
         this.players = new TreeMap<>();
         this.entities = new TreeMap<>();
         this.worms = new LinkedList<>();
@@ -55,7 +53,6 @@ public class Level implements Renderable, Tickable {
     }
 
     public Level(Game game, LevelProto.FullLevelState savedState) {
-        this.game = game;
         this.width = savedState.getWidth();
         this.height = savedState.getHeight();
         this.level = new Tile[this.width][this.height];
@@ -128,17 +125,24 @@ public class Level implements Renderable, Tickable {
 
     @Override
     public void render() {
-        boolean[][] visible = human.getVisible();
-        boolean[][] discovered = human.getDiscovered();
-        LevelView view = game.getView();
-        float left = view.getLevelX(0);
-        float right = view.getLevelX(view.getScreenWidth());
-        float top = view.getLevelY(0);
-        float bottom = view.getLevelY(view.getScreenHeight());
-        int minX = levelToTileX(left, top) - 1;
-        int maxX = levelToTileX(right, bottom) + 1;
-        int minY = levelToTileY(left, top) - 1;
-        int maxY = levelToTileY(right, bottom) + 1;
+        boolean[][] visible = human == null ? null : human.getVisible();
+        boolean[][] discovered = human == null ? null : human.getDiscovered();
+        int minX, maxX, minY, maxY;
+        if (view != null) {
+            float left = view.getLevelX(0);
+            float right = view.getLevelX(view.getScreenWidth());
+            float top = view.getLevelY(0);
+            float bottom = view.getLevelY(view.getScreenHeight());
+            minX = levelToTileX(left, top) - 1;
+            maxX = levelToTileX(right, bottom) + 1;
+            minY = levelToTileY(left, top) - 1;
+            maxY = levelToTileY(right, bottom) + 1;
+        } else {
+            minX = 0;
+            maxX = this.width;
+            minY = 0;
+            maxY = this.height;
+        }
 
         for (int x = 0; x < this.width; x++) {
             if (x < minX || x > maxX) {
@@ -148,7 +152,7 @@ public class Level implements Renderable, Tickable {
                 if (y < minY || y > maxY) {
                     continue;
                 }
-                if (discovered[x][y]) {
+                if (human == null || discovered[x][y]) {
                     Tile t = this.level[x][y];
                     t.render();
                 }
@@ -158,12 +162,12 @@ public class Level implements Renderable, Tickable {
             player.render();
         }
         for (Worm worm : worms) {
-            if (human.isTileVisible(tileAt(worm))) {
+            if (human == null || human.isTileVisible(tileAt(worm))) {
                 worm.render();
             }
         }
         for (Effect e : effects) {
-            if (human.isTileVisible(tileAt(e))) {
+            if (human == null || human.isTileVisible(tileAt(e))) {
                 e.render();
             }
         }
@@ -176,7 +180,7 @@ public class Level implements Renderable, Tickable {
         glColor4f(1, 1, 1, 0.5f);
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                if (discovered[x][y] && !visible[x][y]) {
+                if (human == null || (discovered[x][y] && !visible[x][y])) {
                     new Tile(50, x, y).render();
                 }
             }
@@ -279,6 +283,10 @@ public class Level implements Renderable, Tickable {
 
     public Pathfinder getPathfinder() {
         return this.pathfinder;
+    }
+
+    public void setView(LevelView view) {
+        this.view = view;
     }
 
     public List<Entity> getEntities() {

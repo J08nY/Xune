@@ -238,6 +238,7 @@ public class Game implements Runnable {
                 view = new LevelView(this);
             }
             level = new Level(this, state);
+            level.setView(view);
             human = level.getHuman();
             human.setHud(hud);
             human.setView(view);
@@ -262,7 +263,7 @@ public class Game implements Runnable {
             botFlag = flags[r.nextInt(flags.length)];
         }
 
-        level = new Level(this, Level.LEVEL_1);
+        level = new Level(Level.LEVEL_1);
         human = new Human(this, level, humanFlag, 1000);
         Class<? extends Bot> botClass = intro.getSelectedBot();
         try {
@@ -274,6 +275,7 @@ public class Game implements Runnable {
         hud.setLevel(level);
         view = new LevelView(this);
         view.setLevel(level, true);
+        level.setView(view);
 
         human.setHud(hud);
         human.setView(view);

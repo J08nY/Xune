@@ -22,7 +22,7 @@ public class Arena {
         int otherWins = 0;
         int totalTicks = 0;
         for (int i = 0; i < games; i++) {
-            Level level = new Level(null, Level.LEVEL_1);
+            Level level = new Level(Level.LEVEL_1);
             Bot one = oneClass.getConstructor(Game.class, Level.class, Flag.class, int.class).newInstance(null, level, Flag.BLUE, 1000);
             Bot other = otherClass.getConstructor(Game.class, Level.class, Flag.class, int.class).newInstance(null, level, Flag.RED, 1000);
             int tickCount = 0;

@@ -84,7 +84,7 @@ public class Server implements Runnable {
             keepRunning = false;
         }));
 
-        level = new Level(null, Level.LEVEL_1);
+        level = new Level(Level.LEVEL_1);
     }
 
     private boolean start() {
