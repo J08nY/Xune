@@ -40,14 +40,14 @@ public class Bot extends Player {
     private int units;
     private int harvesters;
 
-    Bot(Game game, Level level, Flag flag, int money) {
-        super(game, level, flag, money);
+    Bot(Level level, Flag flag, int money) {
+        super(level, flag, money);
         this.spawn = setupSpawn();
     }
 
     @SuppressWarnings("unchecked")
-    Bot(Game game, Level level, PlayerProto.PlayerState savedState) {
-        super(game, level, savedState);
+    Bot(Level level, PlayerProto.PlayerState savedState) {
+        super(level, savedState);
         this.spawn = new Tile(48, savedState.getBot().getSpawn().getX(), savedState.getBot().getSpawn().getY());
         this.buildingPlan = savedState.getBot().getBuildingPlanList().stream().map(Entity::fromEntityClass).map(e -> (Class<? extends Building>) e).collect(Collectors.toCollection(LinkedList::new));
         this.unitPlan = savedState.getBot().getUnitPlanList().stream().map(Entity::fromEntityClass).map(e -> (Class<? extends Unit>) e).collect(Collectors.toCollection(LinkedList::new));
@@ -258,8 +258,8 @@ public class Bot extends Player {
     }
 
     public static class ArmyGeneral extends Bot {
-        public ArmyGeneral(Game game, Level level, Flag flag, int money) {
-            super(game, level, flag, money);
+        public ArmyGeneral(Level level, Flag flag, int money) {
+            super(level, flag, money);
             buildingPlan.add(Barracks.class);
             buildingPlan.add(Powerplant.class);
             buildingPlan.add(Barracks.class);
@@ -275,14 +275,14 @@ public class Bot extends Player {
             heliPriority = 0;
         }
 
-        public ArmyGeneral(Game game, Level level, PlayerProto.PlayerState savedState) {
-            super(game, level, savedState);
+        public ArmyGeneral(Level level, PlayerProto.PlayerState savedState) {
+            super(level, savedState);
         }
     }
 
     public static class BuggyBoy extends Bot {
-        public BuggyBoy(Game game, Level level, Flag flag, int money) {
-            super(game, level, flag, money);
+        public BuggyBoy(Level level, Flag flag, int money) {
+            super(level, flag, money);
             buildingPlan.add(Factory.class);
             buildingPlan.add(Powerplant.class);
             buildingPlan.add(Factory.class);
@@ -298,14 +298,14 @@ public class Bot extends Player {
             heliPriority = 0;
         }
 
-        public BuggyBoy(Game game, Level level, PlayerProto.PlayerState playerState) {
-            super(game, level, playerState);
+        public BuggyBoy(Level level, PlayerProto.PlayerState playerState) {
+            super(level, playerState);
         }
     }
 
     public static class HeliMaster extends Bot {
-        public HeliMaster(Game game, Level level, Flag flag, int money) {
-            super(game, level, flag, money);
+        public HeliMaster(Level level, Flag flag, int money) {
+            super(level, flag, money);
             buildingPlan.add(Helipad.class);
             buildingPlan.add(Powerplant.class);
             buildingPlan.add(Helipad.class);
@@ -321,14 +321,14 @@ public class Bot extends Player {
             heliPriority = 90;
         }
 
-        public HeliMaster(Game game, Level level, PlayerProto.PlayerState playerState) {
-            super(game, level, playerState);
+        public HeliMaster(Level level, PlayerProto.PlayerState playerState) {
+            super(level, playerState);
         }
     }
 
     public static class JackOfAllTrades extends Bot {
-        public JackOfAllTrades(Game game, Level level, Flag flag, int money) {
-            super(game, level, flag, money);
+        public JackOfAllTrades(Level level, Flag flag, int money) {
+            super(level, flag, money);
             buildingPlan.add(Powerplant.class);
             buildingPlan.add(Barracks.class);
             buildingPlan.add(Factory.class);
@@ -343,14 +343,14 @@ public class Bot extends Player {
             heliPriority = 10;
         }
 
-        public JackOfAllTrades(Game game, Level level, PlayerProto.PlayerState playerState) {
-            super(game, level, playerState);
+        public JackOfAllTrades(Level level, PlayerProto.PlayerState playerState) {
+            super(level, playerState);
         }
     }
 
     public static class EconGraduate extends Bot {
-        public EconGraduate(Game game, Level level, Flag flag, int money) {
-            super(game, level, flag, money);
+        public EconGraduate(Level level, Flag flag, int money) {
+            super(level, flag, money);
             buildingPlan.add(Factory.class);
             buildingPlan.add(Barracks.class);
             buildingPlan.add(Powerplant.class);
@@ -366,8 +366,8 @@ public class Bot extends Player {
             heliPriority = 10;
         }
 
-        public EconGraduate(Game game, Level level, PlayerProto.PlayerState playerState) {
-            super(game, level, playerState);
+        public EconGraduate(Level level, PlayerProto.PlayerState playerState) {
+            super(level, playerState);
         }
     }
 }

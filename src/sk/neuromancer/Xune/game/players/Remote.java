@@ -5,8 +5,8 @@ import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.level.Level;
 
 public class Remote extends Player {
-    public Remote(Game game, Level level, Flag flag, int money) {
-        super(game, level, flag, money);
+    public Remote(Level level, Flag flag, int money) {
+        super(level, flag, money);
     }
 
     //Use commandstrategies?

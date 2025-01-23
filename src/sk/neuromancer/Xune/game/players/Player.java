@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 public class Player implements Tickable, Renderable {
-    protected final Game game;
     protected final Level level;
     private final boolean[][] visible;
     private final boolean[][] discovered;
@@ -43,8 +42,7 @@ public class Player implements Tickable, Renderable {
     protected float buildProgress;
     protected int buildDuration;
 
-    protected Player(Game game, Level level, Flag flag, int money) {
-        this.game = game;
+    protected Player(Level level, Flag flag, int money) {
         this.level = level;
         this.flag = flag;
         this.money = money;
@@ -59,8 +57,7 @@ public class Player implements Tickable, Renderable {
         commandStrategies.put(Soldier.class, new CommandStrategy.GroundAttackStrategy());
     }
 
-    protected Player(Game game, Level level, PlayerProto.PlayerState savedState) {
-        this.game = game;
+    protected Player(Level level, PlayerProto.PlayerState savedState) {
         this.level = level;
         this.flag = Flag.deserialize(savedState.getFlag());
         this.money = savedState.getMoney();
@@ -135,10 +132,6 @@ public class Player implements Tickable, Renderable {
 
     public List<PlayableEntity> getEntities() {
         return entities;
-    }
-
-    public Game getGame() {
-        return game;
     }
 
     public Level getLevel() {

@@ -23,8 +23,8 @@ public class Arena {
         int totalTicks = 0;
         for (int i = 0; i < games; i++) {
             Level level = new Level(Level.LEVEL_1);
-            Bot one = oneClass.getConstructor(Game.class, Level.class, Flag.class, int.class).newInstance(null, level, Flag.BLUE, 1000);
-            Bot other = otherClass.getConstructor(Game.class, Level.class, Flag.class, int.class).newInstance(null, level, Flag.RED, 1000);
+            Bot one = oneClass.getConstructor(Level.class, Flag.class, int.class).newInstance(level, Flag.BLUE, 1000);
+            Bot other = otherClass.getConstructor(Level.class, Flag.class, int.class).newInstance(level, Flag.RED, 1000);
             int tickCount = 0;
             System.out.println("Starting game");
             while (!level.isDone()) {
@@ -47,8 +47,8 @@ public class Arena {
             System.out.println();
             Duration duration = Duration.ofSeconds(tickCount / 60);
             System.out.println("Game over " + tickCount + " ticks -> " + duration.toString().replace("PT", "").toLowerCase());
-            System.out.println(one.getClass().getSimpleName() + " is " + (one.isEliminated() ? "eliminated": "alive"));
-            System.out.println(other.getClass().getSimpleName() + " is " + (other.isEliminated() ? "eliminated": "alive"));
+            System.out.println(one.getClass().getSimpleName() + " is " + (one.isEliminated() ? "eliminated" : "alive"));
+            System.out.println(other.getClass().getSimpleName() + " is " + (other.isEliminated() ? "eliminated" : "alive"));
             totalTicks += tickCount;
             if (one.isEliminated() && !other.isEliminated()) {
                 otherWins++;
@@ -76,7 +76,8 @@ public class Arena {
                     int[] wins = runGames(oneClass, otherClass);
                     results[i][j] += wins[0];
                     results[j][i] += wins[1];
-                } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                         IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }

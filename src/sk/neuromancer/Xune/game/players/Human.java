@@ -28,16 +28,17 @@ public class Human extends Player {
     private LevelView view;
     private HUD hud;
 
-    public Human(Game g, Level level, Flag flag, int money) {
-        super(g, level, flag, money);
+    public Human(Level level, Flag flag, int money) {
+        super(level, flag, money);
         setupSpawn();
     }
 
-    public Human(Game game, Level level, PlayerProto.PlayerState playerState) {
-        super(game, level, playerState);
-        game.getView().xOff = playerState.getHuman().getXOffset();
-        game.getView().yOff = playerState.getHuman().getYOffset();
-        game.getView().zoom = playerState.getHuman().getZoom();
+    public Human(Level level, PlayerProto.PlayerState playerState) {
+        super(level, playerState);
+        // TODO: Handle this somewhere else
+        //game.getView().xOff = playerState.getHuman().getXOffset();
+        //game.getView().yOff = playerState.getHuman().getYOffset();
+        //game.getView().zoom = playerState.getHuman().getZoom();
     }
 
     @Override

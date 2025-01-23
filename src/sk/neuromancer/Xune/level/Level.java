@@ -80,12 +80,12 @@ public class Level implements Renderable, Tickable {
             PlayerProto.PlayerClass playerClass = playerState.getPlayerClass();
             Player player = null;
             switch (playerClass) {
-                case HUMAN -> player = new Human(game, this, playerState);
-                case BOT_ARMY_GENERAL -> player = new Bot.ArmyGeneral(game, this, playerState);
-                case BOT_BUGGY_BOY -> player = new Bot.BuggyBoy(game, this, playerState);
-                case BOT_HELI_MASTER -> player = new Bot.HeliMaster(game, this, playerState);
-                case BOT_JACK_OF_ALL_TRADES -> player = new Bot.JackOfAllTrades(game, this, playerState);
-                case BOT_ECON_GRADUATE -> player = new Bot.EconGraduate(game, this, playerState);
+                case HUMAN -> player = new Human(this, playerState);
+                case BOT_ARMY_GENERAL -> player = new Bot.ArmyGeneral(this, playerState);
+                case BOT_BUGGY_BOY -> player = new Bot.BuggyBoy(this, playerState);
+                case BOT_HELI_MASTER -> player = new Bot.HeliMaster(this, playerState);
+                case BOT_JACK_OF_ALL_TRADES -> player = new Bot.JackOfAllTrades(this, playerState);
+                case BOT_ECON_GRADUATE -> player = new Bot.EconGraduate(this, playerState);
                 case REMOTE -> player = null; //TODO
             }
             if (player == null) {
