@@ -158,9 +158,13 @@ public class Level implements Renderable, Tickable {
                 }
             }
         }
+        glPushMatrix();
+        glScalef(1, 1, 1 / getHeight());
         for (Player player : players.values()) {
             player.render();
         }
+        glPopMatrix();
+
         for (Worm worm : worms) {
             if (human == null || human.isTileVisible(tileAt(worm))) {
                 worm.render();

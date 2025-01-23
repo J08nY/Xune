@@ -164,7 +164,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, 0);
+        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, y);
         this.sprite.render();
         glPopMatrix();
     }
@@ -289,12 +289,6 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     }
 
     public abstract boolean isEnemyOf(Entity other);
-
-    protected float computeDepth() {
-        return 0;
-        // TODO: Implement depth computation
-        //return game.getView().getScreenY(y) / game.getWindow().getHeight();
-    }
 
     public static void initClasses() {
         String[] classes = new String[]{

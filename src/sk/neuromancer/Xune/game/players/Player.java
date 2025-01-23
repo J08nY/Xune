@@ -224,6 +224,9 @@ public class Player implements Tickable, Renderable {
     private boolean renderFilter(Entity e) {
         Tile at = level.tileAt(e);
         Human human = level.getHuman();
+        if (human == null) {
+            return true;
+        }
         if (e instanceof Building) {
             return human.isTileDiscovered(at);
         } else {

@@ -45,8 +45,7 @@ public abstract class Building extends PlayableEntity {
     @Override
     public void render() {
         glPushMatrix();
-        float depth = computeDepth();
-        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, depth);
+        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, y);
         this.sprite.render();
         if (isSelected) {
             SpriteSheet.MISC_SHEET.getSprite(1, 0).render();
