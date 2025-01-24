@@ -3,7 +3,7 @@ package sk.neuromancer.Xune.game;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.game.players.Bot;
-import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 
 import java.lang.reflect.InvocationTargetException;

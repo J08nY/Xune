@@ -13,7 +13,7 @@ import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.command.CommandStrategy;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Tickable;
-import sk.neuromancer.Xune.graphics.Effect;
+import sk.neuromancer.Xune.graphics.elements.Effect;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;

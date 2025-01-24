@@ -6,7 +6,7 @@ import sk.neuromancer.Xune.entity.Moveable;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Unit;
-import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
@@ -395,6 +395,6 @@ public class Worm extends Entity implements Moveable {
         if (savedState.hasScale()) {
             this.scale = savedState.getScale();
         }
-
+        updateSprite();
     }
 }

@@ -3,9 +3,9 @@ package sk.neuromancer.Xune.level;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.graphics.Renderable;
-import sk.neuromancer.Xune.graphics.Sprite;
-import sk.neuromancer.Xune.graphics.SpriteSheet;
-import sk.neuromancer.Xune.graphics.Text;
+import sk.neuromancer.Xune.graphics.elements.Sprite;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
+import sk.neuromancer.Xune.graphics.elements.Text;
 
 import java.util.HashMap;
 import java.util.Map;

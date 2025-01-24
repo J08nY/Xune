@@ -6,10 +6,11 @@ import com.google.protobuf.Message;
 import org.lwjgl.system.Library;
 import picocli.CommandLine;
 import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.graphics.HUD;
 import sk.neuromancer.Xune.graphics.LevelView;
-import sk.neuromancer.Xune.graphics.SpriteSheet;
 import sk.neuromancer.Xune.graphics.Window;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.network.Utils;
@@ -33,8 +34,12 @@ public class Client implements Runnable {
     @CommandLine.Option(names = {"-p", "--port"}, description = "Port to connect to.", defaultValue = "7531")
     private int port;
 
+    @CommandLine.Option(names = {"-f", "--fullscreen"}, description = "Run in fullscreen mode.")
+    private boolean fullscreen;
+
     private Window window;
     private Level level;
+    private Human human;
     private LevelView view;
     private HUD hud;
     private long id;
@@ -89,7 +94,7 @@ public class Client implements Runnable {
         SpriteSheet.initSheets();
         Entity.initClasses();
 
-        window = new Window(false);
+        window = new Window(fullscreen, false);
         sound = new SoundManager();
         input = new InputHandler(window);
         state = State.Init;
@@ -126,15 +131,16 @@ public class Client implements Runnable {
             case Init, Lobby, Done:
                 break;
             case InGame:
+                level.getHuman().tick(tickCount);
                 view.tick(tickCount);
                 hud.tick(tickCount);
                 input.tick(tickCount);
                 sound.tick(tickCount);
                 break;
         }
-        if (tickCount % TPS == 0) {
-            clientChannel.sendMessage(MessageProto.Connection.newBuilder().setPing(MessageProto.Ping.newBuilder().setTimestamp(System.currentTimeMillis()).build()).build());
-        }
+        //if (tickCount % TPS == 0) {
+        //    clientChannel.sendMessage(MessageProto.Connection.newBuilder().setPing(MessageProto.Ping.newBuilder().setTimestamp(System.currentTimeMillis()).build()).build());
+        //}
 
         if (glfwWindowShouldClose(window.getHandle())) {
             keepRunning = false;
@@ -172,12 +178,18 @@ public class Client implements Runnable {
         } else if (message instanceof MessageProto.Event event) {
             if (event.getEventCase() == MessageProto.Event.EventCase.GAMESTART) {
                 level = new Level(event.getGameStart().getLevel(), id);
+                human = level.getHuman();
                 hud = new HUD(input, window);
                 view = new LevelView(input, window, hud);
-                view.setLevel(level, true);
+
                 level.setView(view);
+                human.setInput(input);
+                human.setView(view);
+                human.setHud(hud);
                 hud.setView(view);
                 hud.setLevel(level);
+                view.setLevel(level, true);
+
                 window.show();
                 this.state = State.InGame;
             } else if (event.getEventCase() == MessageProto.Event.EventCase.GAMEEND) {

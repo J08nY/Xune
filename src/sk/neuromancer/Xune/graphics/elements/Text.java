@@ -1,4 +1,6 @@
-package sk.neuromancer.Xune.graphics;
+package sk.neuromancer.Xune.graphics.elements;
+
+import sk.neuromancer.Xune.graphics.Renderable;
 
 import static org.lwjgl.opengl.GL11.*;
 

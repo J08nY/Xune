@@ -11,7 +11,7 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.game.players.Remote;
-import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.network.Utils;
 import sk.neuromancer.Xune.proto.MessageProto;

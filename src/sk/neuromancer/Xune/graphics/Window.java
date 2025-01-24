@@ -26,6 +26,10 @@ public class Window {
         this(width, height, true);
     }
 
+    public Window(boolean fullscreen, boolean vsync) {
+        init(fullscreen, vsync);
+    }
+
     public Window(boolean vsync) {
         init(true, vsync);
     }

@@ -1,6 +1,8 @@
-package sk.neuromancer.Xune.graphics;
+package sk.neuromancer.Xune.graphics.elements;
 
 import sk.neuromancer.Xune.game.Tickable;
+import sk.neuromancer.Xune.graphics.Ease;
+import sk.neuromancer.Xune.graphics.Renderable;
 
 import java.util.function.DoubleUnaryOperator;
 

@@ -9,7 +9,7 @@ import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.game.players.Remote;
-import sk.neuromancer.Xune.graphics.Effect;
+import sk.neuromancer.Xune.graphics.elements.Effect;
 import sk.neuromancer.Xune.graphics.LevelView;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.level.paths.Pathfinder;

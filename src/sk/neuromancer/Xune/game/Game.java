@@ -11,7 +11,7 @@ import sk.neuromancer.Xune.game.screens.Intro;
 import sk.neuromancer.Xune.game.screens.Pause;
 import sk.neuromancer.Xune.graphics.HUD;
 import sk.neuromancer.Xune.graphics.LevelView;
-import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.graphics.Window;
 import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.level.Level;

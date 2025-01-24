@@ -6,9 +6,9 @@ import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.graphics.Renderable;
-import sk.neuromancer.Xune.graphics.Sprite;
-import sk.neuromancer.Xune.graphics.SpriteSheet;
-import sk.neuromancer.Xune.graphics.Text;
+import sk.neuromancer.Xune.graphics.elements.Sprite;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
+import sk.neuromancer.Xune.graphics.elements.Text;
 
 import static org.lwjgl.opengl.GL11.*;
 

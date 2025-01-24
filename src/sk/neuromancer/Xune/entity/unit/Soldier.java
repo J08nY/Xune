@@ -6,7 +6,7 @@ import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Barracks;
 import sk.neuromancer.Xune.input.Clickable;
 import sk.neuromancer.Xune.game.players.Player;
-import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
 import sk.neuromancer.Xune.proto.EntityStateProto;

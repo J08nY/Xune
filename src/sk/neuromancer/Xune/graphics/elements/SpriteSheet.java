@@ -1,4 +1,4 @@
-package sk.neuromancer.Xune.graphics;
+package sk.neuromancer.Xune.graphics.elements;
 
 import sk.neuromancer.Xune.entity.Flag;
 

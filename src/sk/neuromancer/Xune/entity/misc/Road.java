@@ -1,7 +1,7 @@
 package sk.neuromancer.Xune.entity.misc;
 
 import sk.neuromancer.Xune.entity.Entity;
-import sk.neuromancer.Xune.graphics.SpriteSheet;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelX;
 import static sk.neuromancer.Xune.level.Level.tileToCenterLevelY;

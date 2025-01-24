@@ -1,6 +1,7 @@
-package sk.neuromancer.Xune.graphics;
+package sk.neuromancer.Xune.graphics.elements;
 
 import org.lwjgl.glfw.GLFW;
+import sk.neuromancer.Xune.graphics.Renderable;
 
 import java.nio.ByteBuffer;
 

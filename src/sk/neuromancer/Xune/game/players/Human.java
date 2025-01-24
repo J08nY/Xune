@@ -55,6 +55,7 @@ public class Human extends Player {
     }
 
     private void handleInput(int tickCount) {
+        //TODO: How is Human input called when the player is not getting ticked?
         InputHandler.Mouse mouse = input.mouse;
         float mouseX = (float) mouse.getX();
         float mouseY = (float) mouse.getY();

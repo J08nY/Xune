@@ -9,7 +9,7 @@ import sk.neuromancer.Xune.entity.unit.Soldier;
 import sk.neuromancer.Xune.input.Clickable;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.graphics.Renderable;
-import sk.neuromancer.Xune.graphics.Sprite;
+import sk.neuromancer.Xune.graphics.elements.Sprite;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
