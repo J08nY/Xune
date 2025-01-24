@@ -90,6 +90,7 @@ public class Player implements Tickable, Renderable {
                     Building b = klass.getConstructor(EntityStateProto.BuildingState.class, Player.class).newInstance(entity.getBuilding(), this);
                     entities.add(b);
                     level.addEntity(b);
+                    //TODO: Add power production/consumption computation, or is it already done by the deserializetion?
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
                     throw new RuntimeException(e);
@@ -458,17 +459,38 @@ public class Player implements Tickable, Renderable {
                 EntityStateProto.UnitState unitState = entity.getUnit();
                 long id = unitState.getPlayable().getEntity().getId();
                 Unit unit = (Unit) level.getEntity(id);
-                unit.deserialize(unitState);
+                if (unit == null) {
+                    Class<? extends Unit> klass = Entity.fromEntityClass(unitState.getPlayable().getEntity().getKlass()).asSubclass(Unit.class);
+                    try {
+                        unit = klass.getConstructor(EntityStateProto.UnitState.class, Player.class).newInstance(unitState, this);
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                             NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                    level.addEntity(unit);
+                } else {
+                    unit.deserialize(unitState);
+                }
                 this.entities.add(unit);
             } else if (entity.hasBuilding()) {
                 EntityStateProto.BuildingState buildingState = entity.getBuilding();
                 long id = buildingState.getPlayable().getEntity().getId();
                 Building building = (Building) level.getEntity(id);
-                building.deserialize(buildingState);
+                if (building == null) {
+                    Class<? extends Building> klass = Entity.fromEntityClass(buildingState.getPlayable().getEntity().getKlass()).asSubclass(Building.class);
+                    try {
+                        building = klass.getConstructor(EntityStateProto.BuildingState.class, Player.class).newInstance(buildingState, this);
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                             NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                    level.addEntity(building);
+                } else {
+                    building.deserialize(buildingState);
+                }
                 this.entities.add(building);
             }
         }
-        System.out.println("Entities count: " + entities.size());
         deserializeVisibility(savedState.getVisible().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.visible);
         deserializeVisibility(savedState.getDiscovered().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.discovered);
     }

@@ -13,11 +13,4 @@ public class Remote extends Player {
     public Remote(Level level, PlayerProto.PlayerState playerState) {
         super(level, playerState);
     }
-
-    //Use commandstrategies?
-
-    @Override
-    public void tick(int tickCount) {
-        //Nothing
-    }
 }

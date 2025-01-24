@@ -2,7 +2,7 @@ package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.entity.Worm;
+import sk.neuromancer.Xune.entity.misc.Worm;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Bot;
@@ -277,7 +277,6 @@ public class Level implements Renderable, Tickable {
         if (player instanceof Human h) {
             this.human = h;
         }
-        System.out.println("Adding player " + id + " as " + player.getFlag() + " class " + player.getClass().getSimpleName() + " entities " + player.getEntities().size());
         return id;
     }
 
@@ -533,7 +532,6 @@ public class Level implements Renderable, Tickable {
         for (PlayerProto.PlayerState playerState : state.getPlayersList()) {
             long id = playerState.getId();
             Player player = players.get(id);
-            System.out.println("Deserializing player " + id);
             player.deserialize(playerState);
         }
         for (LevelProto.SpiceEntry entry : state.getSpiceMap().getEntriesList()) {

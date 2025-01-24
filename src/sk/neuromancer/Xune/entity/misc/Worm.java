@@ -1,5 +1,9 @@
-package sk.neuromancer.Xune.entity;
+package sk.neuromancer.Xune.entity.misc;
 
+import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.EntityReference;
+import sk.neuromancer.Xune.entity.Moveable;
+import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.graphics.SpriteSheet;

@@ -185,6 +185,7 @@ public abstract class Unit extends PlayableEntity implements Moveable {
         if (state.hasImmobile()) {
             this.immobile = state.getImmobile();
         }
+        updateSprite();
     }
 
     protected static void setSpeed(Class<? extends Unit> klass, float speed) {

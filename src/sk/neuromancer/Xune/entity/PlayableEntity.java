@@ -1,6 +1,8 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.command.Command;
+import sk.neuromancer.Xune.entity.misc.Road;
+import sk.neuromancer.Xune.entity.misc.Worm;
 import sk.neuromancer.Xune.input.Clickable;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.Renderable;

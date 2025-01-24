@@ -122,7 +122,6 @@ public class Client implements Runnable {
         tickCount++;
         glfwPollEvents();
 
-        System.out.print(".");
         switch (state) {
             case Init, Lobby, Done:
                 break;
@@ -153,7 +152,6 @@ public class Client implements Runnable {
     }
 
     private void handleMessage(Message message) {
-        System.out.println("Handling message: " + message.getClass().getSimpleName());
         if (message instanceof MessageProto.Connection conn) {
             if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.PING) {
                 MessageProto.Ping ping = conn.getPing();
@@ -193,8 +191,7 @@ public class Client implements Runnable {
     }
 
     private void onMessageReceived(SocketAddress socketAddress, Message message) {
-        boolean res = messageQueue.offer(message);
-        System.out.println("Received message: " + message.getClass().getSimpleName() + " " + res);
+        messageQueue.offer(message);
     }
 
     public static void main(String[] args) {
