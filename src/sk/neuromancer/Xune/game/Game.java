@@ -6,15 +6,17 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.game.players.Human;
+import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.game.screens.Gameover;
 import sk.neuromancer.Xune.game.screens.Intro;
 import sk.neuromancer.Xune.game.screens.Pause;
 import sk.neuromancer.Xune.graphics.HUD;
 import sk.neuromancer.Xune.graphics.LevelView;
-import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.graphics.Window;
+import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.network.controllers.LocalController;
 import sk.neuromancer.Xune.proto.LevelProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
@@ -239,6 +241,9 @@ public class Game implements Runnable {
             human.setHud(hud);
             human.setView(view);
             human.setInput(input);
+            for (Player p : level.getPlayers()) {
+                p.setController(new LocalController(level, p));
+            }
 
             hud.setLevel(level);
             hud.setView(view);
@@ -261,9 +266,11 @@ public class Game implements Runnable {
 
         level = new Level(Level.LEVEL_1);
         human = new Human(level, humanFlag, 1000);
+        human.setController(new LocalController(level, human));
         Class<? extends Bot> botClass = intro.getSelectedBot();
         try {
-            botClass.getDeclaredConstructor(Level.class, Flag.class, int.class).newInstance(level, botFlag, 1000);
+            Bot bot = botClass.getDeclaredConstructor(Level.class, Flag.class, int.class).newInstance(level, botFlag, 1000);
+            bot.setController(new LocalController(level, bot));
         } catch (Exception ignored) {
         }
 

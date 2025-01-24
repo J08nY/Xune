@@ -13,10 +13,11 @@ import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.command.CommandStrategy;
 import sk.neuromancer.Xune.entity.unit.*;
 import sk.neuromancer.Xune.game.Tickable;
-import sk.neuromancer.Xune.graphics.elements.Effect;
 import sk.neuromancer.Xune.graphics.Renderable;
+import sk.neuromancer.Xune.graphics.elements.Effect;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
+import sk.neuromancer.Xune.network.controllers.Controller;
 import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.proto.PlayerProto;
@@ -45,6 +46,8 @@ public class Player implements Tickable, Renderable {
     protected Class<? extends Building> buildingToBuild;
     protected float buildProgress;
     protected int buildDuration;
+
+    protected Controller controller;
 
     protected Player(Level level, Flag flag, int money) {
         this.level = level;
@@ -188,7 +191,7 @@ public class Player implements Tickable, Renderable {
         return (float) getPowerProduction() / getPowerConsumption();
     }
 
-    protected void startBuild(Class<? extends PlayableEntity> klass) {
+    public void startBuild(Class<? extends PlayableEntity> klass) {
         takeMoney(PlayableEntity.getCost(klass));
         buildingToBuild = klass.asSubclass(Building.class);
         buildProgress = 0;
@@ -210,7 +213,7 @@ public class Player implements Tickable, Renderable {
         return Math.min(buildProgress / buildDuration, 1.0f);
     }
 
-    protected Building getBuildResult(int tileX, int tileY) {
+    public Building getBuildResult(int tileX, int tileY) {
         try {
             return buildingToBuild.getConstructor(int.class, int.class, Orientation.class, Player.class).newInstance(tileX, tileY, Orientation.NORTH, this);
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException |
@@ -219,7 +222,7 @@ public class Player implements Tickable, Renderable {
         }
     }
 
-    protected void finishBuild(Building building) {
+    public void finishBuild(Building building) {
         addEntity(building);
         buildProgress = 0;
         buildDuration = 0;
@@ -359,6 +362,14 @@ public class Player implements Tickable, Renderable {
 
     public long getId() {
         return id;
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+    public Controller getController() {
+        return this.controller;
     }
 
     private byte[] serializeVisibility(boolean[][] array) {

@@ -9,14 +9,22 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.PlayableEntity;
+import sk.neuromancer.Xune.entity.building.Building;
+import sk.neuromancer.Xune.entity.command.Command;
+import sk.neuromancer.Xune.entity.unit.Unit;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.game.players.Remote;
 import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.network.Utils;
+import sk.neuromancer.Xune.network.controllers.Controller;
+import sk.neuromancer.Xune.network.controllers.LocalController;
 import sk.neuromancer.Xune.proto.MessageProto;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -160,6 +168,7 @@ public class Server implements Runnable {
                 clients.add(client);
                 // TODO: This is nasty.
                 Player player = new Remote(level, Flag.values()[client.id() % 3], 1000);
+                player.setController(new LocalController(level, player));
                 LOGGER.info("Player flag: {}", player.getFlag());
                 players.add(player);
                 assert player.getId() == client.id;
@@ -179,7 +188,38 @@ public class Server implements Runnable {
             }
         } else if (message instanceof MessageProto.Action action) {
             LOGGER.info("It is an action {}", action.getActionCase());
-            //TODO: Handle cases
+            clients.stream().filter(c -> c.address().equals(address)).findFirst().ifPresent(client -> {
+                Player player = players.get(client.id());
+                Controller controller = player.getController();
+                if (action.getActionCase() == MessageProto.Action.ActionCase.ENTITYPRODUCE) {
+                    MessageProto.EntityProduceAction produce = action.getEntityProduce();
+                    Building producer = (Building) level.getEntity(produce.getProducerId());
+                    controller.produceUnit(PlayableEntity.fromEntityClass(produce.getKlass()).asSubclass(Unit.class), producer);
+                } else if (action.getActionCase() == MessageProto.Action.ActionCase.BUILDINGPRODUCE) {
+                    MessageProto.BuildingProduceAction produce = action.getBuildingProduce();
+                    controller.produceBuilding(PlayableEntity.fromEntityClass(produce.getKlass()).asSubclass(Building.class));
+                } else if (action.getActionCase() == MessageProto.Action.ActionCase.BUILDINGPLACE) {
+                    MessageProto.BuildingPlaceAction place = action.getBuildingPlace();
+                    Class<? extends Building> buildingClass = PlayableEntity.fromEntityClass(place.getKlass()).asSubclass(Building.class);
+                    try {
+                        Building building = buildingClass.getConstructor(int.class, int.class, Orientation.class, Player.class).newInstance(place.getPosition().getX(), place.getPosition().getY(), Orientation.NORTH, player);
+                        controller.placeBuilding(building);
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                             NoSuchMethodException e) {
+                        LOGGER.error("Failed to create building", e);
+                    }
+                } else if (action.getActionCase() == MessageProto.Action.ActionCase.SENDCOMMAND) {
+                    MessageProto.SendCommandAction send = action.getSendCommand();
+                    Unit unit = (Unit) level.getEntity(send.getEntityId());
+                    controller.sendCommand(unit, Command.deserialize(send.getCommand(), level));
+                } else if (action.getActionCase() == MessageProto.Action.ActionCase.PUSHCOMMAND) {
+                    MessageProto.PushCommandAction push = action.getPushCommand();
+                    Unit unit = (Unit) level.getEntity(push.getEntityId());
+                    controller.pushCommand(unit, Command.deserialize(push.getCommand(), level));
+                } else {
+                    LOGGER.warn("Should not happen, client sent unknown action.");
+                }
+            });
         } else if (message instanceof MessageProto.State || message instanceof MessageProto.Event) {
             LOGGER.warn("Should not happen, client sent or event");
         }

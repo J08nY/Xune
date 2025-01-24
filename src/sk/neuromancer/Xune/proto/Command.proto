@@ -41,7 +41,6 @@ message CommandProduce {
   EntityClass resultClass = 1;
   float progress = 2;
   uint32 duration = 3;
-  //TODO: consider the finished bool?
 }
 
 message CommandCollectSpice {

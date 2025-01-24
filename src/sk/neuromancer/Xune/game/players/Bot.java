@@ -1,6 +1,9 @@
 package sk.neuromancer.Xune.game.players;
 
-import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.EntityReference;
+import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.*;
 import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.unit.*;
@@ -136,7 +139,7 @@ public class Bot extends Player {
                 Set<EntityReference> attackers = attacked.getAttackers();
                 Unit unit = freeUnits.get(i);
                 try {
-                    unit.sendCommand(new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), attackers.stream().findFirst().get().resolve(level)));
+                    controller.sendCommand(unit, new Command.MoveAndAttackCommand(unit.x, unit.y, level.getPathfinder(), attackers.stream().findFirst().get().resolve(level)));
                 } catch (NoPathFound ignored) {
                 }
             }
@@ -172,15 +175,15 @@ public class Bot extends Player {
                     }
                     Unit attacker = attackers.removeFirst();
                     if (attacker instanceof Heli) {
-                        attacker.sendCommand(new Command.FlyAndAttackCommand(attacker.x, attacker.y, target));
+                        controller.sendCommand(attacker, new Command.FlyAndAttackCommand(attacker.x, attacker.y, target));
                         successful++;
                     } else {
                         if (attacker.inRange(target) && target.isStatic()) {
-                            attacker.sendCommand(new Command.AttackCommand(target));
+                            controller.sendCommand(attacker, new Command.AttackCommand(target));
                             successful++;
                         } else {
                             try {
-                                attacker.sendCommand(new Command.MoveAndAttackCommand(attacker.x, attacker.y, level.getPathfinder(), target));
+                                controller.sendCommand(attacker, new Command.MoveAndAttackCommand(attacker.x, attacker.y, level.getPathfinder(), target));
                                 successful++;
                             } catch (NoPathFound ignored) {
                                 i--;
@@ -203,9 +206,7 @@ public class Bot extends Player {
                 List<Building> producers = entities.stream().filter(e -> e instanceof Building building && building.getProduces().contains(klass)).map(e -> (Building) e).sorted(Comparator.comparingInt(building -> building.getCommands().size())).toList();
                 if (!producers.isEmpty()) {
                     log("Producing " + klass.getSimpleName());
-                    Building building = producers.getFirst();
-                    takeMoney(PlayableEntity.getCost(klass));
-                    building.sendCommand(new Command.ProduceCommand(PlayableEntity.getBuildTime(klass), klass, level.getPathfinder()));
+                    controller.produceUnit(klass, producers.getFirst());
                     unitPlan.removeFirst();
                 }
             }
@@ -219,7 +220,7 @@ public class Bot extends Player {
         Class<? extends Building> building = buildingPlan.getFirst();
         if (PlayableEntity.canBeBuilt(building, this) && !isBuilding()) {
             log("Building " + building);
-            startBuild(building);
+            controller.produceBuilding(building);
             buildingPlan.removeFirst();
         }
     }
@@ -237,7 +238,7 @@ public class Bot extends Player {
 
         if (last != null) {
             Building result = getBuildResult(last.getX(), last.getY());
-            finishBuild(result);
+            controller.placeBuilding(result);
         }
     }
 

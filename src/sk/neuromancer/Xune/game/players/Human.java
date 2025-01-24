@@ -1,13 +1,15 @@
 package sk.neuromancer.Xune.game.players;
 
-import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.command.CommandStrategy;
 import sk.neuromancer.Xune.entity.unit.Unit;
-import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.graphics.HUD;
 import sk.neuromancer.Xune.graphics.LevelView;
+import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.proto.PlayerProto;
 import sk.neuromancer.Xune.sound.SoundManager;
@@ -55,7 +57,6 @@ public class Human extends Player {
     }
 
     private void handleInput(int tickCount) {
-        //TODO: How is Human input called when the player is not getting ticked?
         InputHandler.Mouse mouse = input.mouse;
         float mouseX = (float) mouse.getX();
         float mouseY = (float) mouse.getY();
@@ -130,7 +131,8 @@ public class Human extends Player {
         // Handle building placement first
         if (buildingToPlace != null) {
             if (canPlace) {
-                finishBuild(buildingToPlace);
+                // Building place.
+                controller.placeBuilding(buildingToPlace);
                 buildingToPlace = null;
                 SoundManager.play(SoundManager.SOUND_TADA_1, false, 0.5f);
             }
@@ -171,7 +173,7 @@ public class Human extends Player {
             if (strategy != null) {
                 Command command = strategy.onClick(only, other, level, levelX, levelY);
                 if (command != null) {
-                    only.pushCommand(command);
+                    controller.pushCommand((Unit) only, command);
                 }
             }
         }
@@ -185,11 +187,10 @@ public class Human extends Player {
                     if (buildingToBuild == null) {
                         if (PlayableEntity.canBeBuilt(klass, this)) {
                             // Building produce.
-                            startBuild(klass);
+                            controller.produceBuilding(klass.asSubclass(Building.class));
                         }
                     } else {
                         if (buildingToBuild == klass && isBuildDone()) {
-                            // Building place.
                             float levelX = view.getLevelX(mouseX);
                             float levelY = view.getLevelY(mouseY);
                             int tileX = Level.levelToTileX(levelX, levelY);
@@ -202,9 +203,7 @@ public class Human extends Player {
                         List<Building> producers = entities.stream().filter(e -> e instanceof Building building && building.getProduces().contains(klass)).map(e -> (Building) e).sorted(Comparator.comparingInt(building -> building.getCommands().size())).toList();
                         if (!producers.isEmpty()) {
                             // Unit produce.
-                            Building building = producers.getFirst();
-                            takeMoney(PlayableEntity.getCost(klass));
-                            building.sendCommand(new Command.ProduceCommand(PlayableEntity.getBuildTime(klass), klass.asSubclass(Unit.class), level.getPathfinder()));
+                            controller.produceUnit(klass.asSubclass(Unit.class), producers.getFirst());
                             SoundManager.play(SoundManager.SOUND_BLIP_1, false, 0.5f);
                         }
                     }

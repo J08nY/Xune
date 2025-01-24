@@ -4,8 +4,9 @@ package sk.neuromancer.Xune.proto;
 
 option java_outer_classname = "MessageProto";
 
-import "sk/neuromancer/Xune/proto/Level.proto";
 import "sk/neuromancer/Xune/proto/Base.proto";
+import "sk/neuromancer/Xune/proto/Level.proto";
+import "sk/neuromancer/Xune/proto/Command.proto";
 
 message State {
   // Goes from server to client
@@ -18,7 +19,8 @@ message Action {
     EntityProduceAction entityProduce = 1;
     BuildingProduceAction buildingProduce = 2;
     BuildingPlaceAction buildingPlace = 3;
-    CommandAction command = 4;
+    PushCommandAction pushCommand = 4;
+    SendCommandAction sendCommand = 5;
   }
 }
 
@@ -67,6 +69,7 @@ message GameEnd {
 
 message EntityProduceAction {
   EntityClass klass = 1;
+  uint64 producerId = 2;
 }
 
 message BuildingProduceAction {
@@ -78,8 +81,12 @@ message BuildingPlaceAction {
   Tile position = 2;
 }
 
-message CommandAction {
-  repeated uint64 entityIds = 1;
-  float levelX = 2;
-  float levelY = 3;
+message PushCommandAction {
+  uint64 entityId = 1;
+  Command command = 2;
+}
+
+message SendCommandAction {
+  uint64 entityId = 1;
+  Command command = 2;
 }
