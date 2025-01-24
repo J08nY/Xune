@@ -22,16 +22,47 @@ message Action {
   }
 }
 
-enum NoteType {
-  CONNECT = 0;
-  DISCONNECT = 1;
-  PING = 2;
+message Event {
+  // Goes from server to client
+  oneof event {
+    GameStart gameStart = 1;
+    GameEnd gameEnd = 2;
+  }
 }
 
-message Note {
+message Connection {
   // Goes both ways
-  NoteType type = 1;
-  optional bytes data = 2;
+  oneof connection {
+    ConnectionRequest request = 1;
+    ConnectionResponse response = 2;
+    Ping ping = 3;
+    Pong pong = 4;
+  }
+}
+
+message ConnectionRequest {
+
+}
+
+message ConnectionResponse {
+  uint64 playerId = 1;
+}
+
+message Ping {
+  uint64 timestamp = 1;
+}
+
+message Pong {
+  uint64 timestamp = 1;
+  uint64 previousTimestamp = 2;
+}
+
+message GameStart {
+  FullLevelState level = 1;
+}
+
+message GameEnd {
+  uint64 winnerId = 1;
 }
 
 message EntityProduceAction {

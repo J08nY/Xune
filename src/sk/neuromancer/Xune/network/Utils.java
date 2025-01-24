@@ -8,6 +8,6 @@ import java.util.List;
 public class Utils {
 
     public static IdSerializer getIdSerializer() {
-        return IdSerializer.create(List.of(MessageProto.State.class, MessageProto.Action.class, MessageProto.Note.class));
+        return IdSerializer.create(List.of(MessageProto.State.class, MessageProto.Action.class, MessageProto.Event.class, MessageProto.Connection.class));
     }
 }

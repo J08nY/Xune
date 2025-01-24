@@ -8,6 +8,7 @@ import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.players.Player;
+import sk.neuromancer.Xune.game.players.Remote;
 import sk.neuromancer.Xune.graphics.Effect;
 import sk.neuromancer.Xune.graphics.LevelView;
 import sk.neuromancer.Xune.graphics.Renderable;
@@ -36,6 +37,7 @@ public class Level implements Renderable, Tickable {
     private Map<Long, Entity> entities;
     private List<Worm> worms;
     private List<Effect> effects;
+    private int tickCount;
 
     private Tile[][] level;
     private int width, height;
@@ -52,6 +54,10 @@ public class Level implements Renderable, Tickable {
     }
 
     public Level(LevelProto.FullLevelState savedState) {
+        this(savedState, -1);
+    }
+
+    public Level(LevelProto.FullLevelState savedState, long localPlayerId) {
         this.width = savedState.getWidth();
         this.height = savedState.getHeight();
         this.level = new Tile[this.width][this.height];
@@ -85,7 +91,8 @@ public class Level implements Renderable, Tickable {
                 case BOT_HELI_MASTER -> player = new Bot.HeliMaster(this, playerState);
                 case BOT_JACK_OF_ALL_TRADES -> player = new Bot.JackOfAllTrades(this, playerState);
                 case BOT_ECON_GRADUATE -> player = new Bot.EconGraduate(this, playerState);
-                case REMOTE -> player = null; //TODO
+                case REMOTE ->
+                        player = localPlayerId == playerState.getId() ? new Human(this, playerState) : new Remote(this, playerState);
             }
             if (player == null) {
                 continue;
@@ -104,6 +111,7 @@ public class Level implements Renderable, Tickable {
 
     @Override
     public void tick(int tickCount) {
+        this.tickCount = tickCount;
         for (Player player : players.values()) {
             player.tick(tickCount);
         }
@@ -269,6 +277,7 @@ public class Level implements Renderable, Tickable {
         if (player instanceof Human h) {
             this.human = h;
         }
+        System.out.println("Adding player " + id + " as " + player.getFlag() + " class " + player.getClass().getSimpleName() + " entities " + player.getEntities().size());
         return id;
     }
 
@@ -278,6 +287,17 @@ public class Level implements Renderable, Tickable {
 
     public Collection<Player> getPlayers() {
         return this.players.values();
+    }
+
+    public Player getPlayer(long id) {
+        return this.players.get(id);
+    }
+
+    public Player getWinner() {
+        if (!isDone()) {
+            return null;
+        }
+        return players.values().stream().filter(player -> !player.isEliminated()).findFirst().orElse(null);
     }
 
     public Tile spawnOf(Player player) {
@@ -321,6 +341,14 @@ public class Level implements Renderable, Tickable {
 
     public void addEffect(Effect effect) {
         this.effects.add(effect);
+    }
+
+    public Tile[] getSpawns() {
+        return this.spawns.toArray(new Tile[0]);
+    }
+
+    public int getNumSpawns() {
+        return this.spawns.size();
     }
 
     public Tile[][] getTiles() {
@@ -469,6 +497,10 @@ public class Level implements Renderable, Tickable {
         return (levelY - Tile.TILE_CENTER_Y) / (0.5f * (Tile.TILE_HEIGHT + 1));
     }
 
+    public boolean isFull() {
+        return players.size() == this.spawns.size();
+    }
+
     public boolean isDone() {
         Set<Flag> flags = players.values().stream().filter(player -> !player.isEliminated()).map(Player::getFlag).collect(Collectors.toSet());
         return flags.size() <= 1;
@@ -493,6 +525,7 @@ public class Level implements Renderable, Tickable {
             }
         }
         builder.setSpiceMap(spiceBuilder.build());
+        builder.setTickCount(tickCount);
         return builder.build();
     }
 
@@ -500,6 +533,7 @@ public class Level implements Renderable, Tickable {
         for (PlayerProto.PlayerState playerState : state.getPlayersList()) {
             long id = playerState.getId();
             Player player = players.get(id);
+            System.out.println("Deserializing player " + id);
             player.deserialize(playerState);
         }
         for (LevelProto.SpiceEntry entry : state.getSpiceMap().getEntriesList()) {
@@ -511,6 +545,7 @@ public class Level implements Renderable, Tickable {
             Worm worm = (Worm) getEntity(id);
             worm.deserialize(wormState, this);
         }
+        this.tickCount = state.getTickCount();
     }
 
     public LevelProto.FullLevelState serializeFull() {

@@ -1,7 +1,10 @@
 package sk.neuromancer.Xune.game.players;
 
 import com.google.protobuf.ByteString;
-import sk.neuromancer.Xune.entity.*;
+import sk.neuromancer.Xune.entity.Entity;
+import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.entity.Orientation;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.Base;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.building.Powerplant;
@@ -442,45 +445,44 @@ public class Player implements Tickable, Renderable {
         this.id = savedState.getId();
         this.powerProduction = savedState.getPowerProduction();
         this.powerConsumption = savedState.getPowerConsumption();
+        // TODO: What about getPlayerClass?
+
         if (savedState.getBuildingKlass() != BaseProto.EntityClass.NULL) {
             this.buildingToBuild = Entity.fromEntityClass(savedState.getBuildingKlass()).asSubclass(Building.class);
             this.buildDuration = savedState.getBuildDuration();
             this.buildProgress = savedState.getBuildProgress();
         }
+        this.entities = new ArrayList<>(savedState.getEntitiesCount());
         for (PlayerProto.PlayerEntity entity : savedState.getEntitiesList()) {
             if (entity.hasUnit()) {
                 EntityStateProto.UnitState unitState = entity.getUnit();
                 long id = unitState.getPlayable().getEntity().getId();
                 Unit unit = (Unit) level.getEntity(id);
                 unit.deserialize(unitState);
+                this.entities.add(unit);
             } else if (entity.hasBuilding()) {
                 EntityStateProto.BuildingState buildingState = entity.getBuilding();
                 long id = buildingState.getPlayable().getEntity().getId();
                 Building building = (Building) level.getEntity(id);
                 building.deserialize(buildingState);
+                this.entities.add(building);
             }
         }
+        System.out.println("Entities count: " + entities.size());
         deserializeVisibility(savedState.getVisible().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.visible);
         deserializeVisibility(savedState.getDiscovered().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.discovered);
     }
 
     public static PlayerProto.PlayerClass toPlayerClass(Class<? extends Player> klass) {
-        if (klass == Human.class) {
-            return PlayerProto.PlayerClass.HUMAN;
-        } else if (klass == Bot.ArmyGeneral.class) {
-            return PlayerProto.PlayerClass.BOT_ARMY_GENERAL;
-        } else if (klass == Bot.BuggyBoy.class) {
-            return PlayerProto.PlayerClass.BOT_BUGGY_BOY;
-        } else if (klass == Bot.HeliMaster.class) {
-            return PlayerProto.PlayerClass.BOT_HELI_MASTER;
-        } else if (klass == Bot.JackOfAllTrades.class) {
-            return PlayerProto.PlayerClass.BOT_JACK_OF_ALL_TRADES;
-        } else if (klass == Bot.EconGraduate.class) {
-            return PlayerProto.PlayerClass.BOT_ECON_GRADUATE;
-        } else if (klass == Remote.class) {
-            return PlayerProto.PlayerClass.REMOTE;
-        } else {
-            throw new IllegalArgumentException("Unknown player class: " + klass);
-        }
+        return switch (klass.getSimpleName()) {
+            case "Human" -> PlayerProto.PlayerClass.HUMAN;
+            case "Bot$ArmyGeneral" -> PlayerProto.PlayerClass.BOT_ARMY_GENERAL;
+            case "Bot$BuggyBoy" -> PlayerProto.PlayerClass.BOT_BUGGY_BOY;
+            case "Bot$HeliMaster" -> PlayerProto.PlayerClass.BOT_HELI_MASTER;
+            case "Bot$JackOfAllTrades" -> PlayerProto.PlayerClass.BOT_JACK_OF_ALL_TRADES;
+            case "Bot$EconGraduate" -> PlayerProto.PlayerClass.BOT_ECON_GRADUATE;
+            case "Remote" -> PlayerProto.PlayerClass.REMOTE;
+            default -> throw new IllegalArgumentException("Unknown player class: " + klass);
+        };
     }
 }

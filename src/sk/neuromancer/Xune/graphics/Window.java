@@ -11,22 +11,32 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class Window {
     private long handle;
 
-    private boolean fullscreen = false;
+    private boolean fullscreen;
+    private boolean vsync;
     private int width = 0;
     private int height = 0;
 
-    public Window(int width, int height) {
+    public Window(int width, int height, boolean vsync) {
         this.width = width;
         this.height = height;
-        init(false);
+        init(false, vsync);
+    }
+
+    public Window(int width, int height) {
+        this(width, height, true);
+    }
+
+    public Window(boolean vsync) {
+        init(true, vsync);
     }
 
     public Window() {
-        init(true);
+        init(true, true);
     }
 
-    private void init(boolean fullscreen) {
+    private void init(boolean fullscreen, boolean vsync) {
         this.fullscreen = fullscreen;
+        this.vsync = vsync;
         glfwInit();
 
         glfwDefaultWindowHints();
@@ -52,7 +62,11 @@ public class Window {
             );
         }
         glfwMakeContextCurrent(handle);
-        glfwSwapInterval(1);
+        if (vsync) {
+            glfwSwapInterval(1);
+        } else {
+            glfwSwapInterval(0);
+        }
 
         GL.createCapabilities();
 
@@ -76,6 +90,10 @@ public class Window {
 
     public void show() {
         glfwShowWindow(handle);
+    }
+
+    public void hide() {
+        glfwHideWindow(handle);
     }
 
     public long getHandle() {
