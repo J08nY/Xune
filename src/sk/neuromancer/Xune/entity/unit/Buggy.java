@@ -38,13 +38,13 @@ public class Buggy extends Unit {
     public Buggy(float x, float y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
         updateSprite();
-        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, false));
+        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5));
     }
 
     public Buggy(EntityStateProto.UnitState savedState, Player owner) {
         super(savedState, owner);
         updateSprite();
-        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5, false));
+        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 5));
     }
 
     @Override

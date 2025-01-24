@@ -18,9 +18,9 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.*;
 
 public abstract class PlayableEntity extends Entity {
-    protected static final Map<Class<? extends sk.neuromancer.Xune.entity.PlayableEntity>, List<Prerequisite>> prerequisitesMap = new HashMap<>();
-    protected static final Map<Class<? extends sk.neuromancer.Xune.entity.PlayableEntity>, Integer> costMap = new HashMap<>();
-    protected static final Map<Class<? extends sk.neuromancer.Xune.entity.PlayableEntity>, Integer> buildTimeMap = new HashMap<>();
+    protected static final Map<Class<? extends PlayableEntity>, List<Prerequisite>> prerequisitesMap = new HashMap<>();
+    protected static final Map<Class<? extends PlayableEntity>, Integer> costMap = new HashMap<>();
+    protected static final Map<Class<? extends PlayableEntity>, Integer> buildTimeMap = new HashMap<>();
     protected static final Map<Class<? extends Entity>, Integer> baseSpriteMap = new HashMap<>();
     protected Player owner;
     protected List<Command> commands;
@@ -175,27 +175,27 @@ public abstract class PlayableEntity extends Entity {
         sendCommand(c);
     }
 
-    protected static void setCost(Class<? extends sk.neuromancer.Xune.entity.PlayableEntity> klass, int cost) {
+    protected static void setCost(Class<? extends PlayableEntity> klass, int cost) {
         costMap.put(klass, cost);
     }
 
-    public static int getCost(Class<? extends sk.neuromancer.Xune.entity.PlayableEntity> klass) {
+    public static int getCost(Class<? extends PlayableEntity> klass) {
         return costMap.get(klass);
     }
 
-    protected static void setBuildTime(Class<? extends sk.neuromancer.Xune.entity.PlayableEntity> klass, int buildTime) {
+    protected static void setBuildTime(Class<? extends PlayableEntity> klass, int buildTime) {
         buildTimeMap.put(klass, buildTime);
     }
 
-    public static int getBuildTime(Class<? extends sk.neuromancer.Xune.entity.PlayableEntity> klass) {
+    public static int getBuildTime(Class<? extends PlayableEntity> klass) {
         return buildTimeMap.get(klass);
     }
 
-    protected static void registerPrerequisites(Class<? extends sk.neuromancer.Xune.entity.PlayableEntity> klass, List<Prerequisite> prerequisites) {
+    protected static void registerPrerequisites(Class<? extends PlayableEntity> klass, List<Prerequisite> prerequisites) {
         prerequisitesMap.put(klass, prerequisites);
     }
 
-    public static boolean canBeBuilt(Class<? extends sk.neuromancer.Xune.entity.PlayableEntity> klass, Player owner) {
+    public static boolean canBeBuilt(Class<? extends PlayableEntity> klass, Player owner) {
         int cost = costMap.get(klass);
         if (cost > owner.getMoney()) {
             return false;

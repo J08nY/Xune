@@ -4,9 +4,12 @@ import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Moveable;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.PlayableEntity;
+import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.players.Player;
+import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.graphics.elements.Effect;
 import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
+import sk.neuromancer.Xune.input.Clickable;
 import sk.neuromancer.Xune.level.paths.Point;
 import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
@@ -142,7 +145,15 @@ public abstract class Unit extends PlayableEntity implements Moveable {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, y);
+        glTranslatef(this.x, this.y, this.y);
+        if (Config.DEBUG_CLICKABLE) {
+            for (Clickable clickable : clickableAreas) {
+                if (clickable instanceof Renderable r) {
+                    r.render();
+                }
+            }
+        }
+        glTranslatef(- (float) sprite.getWidth() / 2, - (float) sprite.getHeight() / 2, 0);
         this.sprite.render();
         if (isSelected) {
             SpriteSheet.MISC_SHEET.getSprite(0, 0).render();

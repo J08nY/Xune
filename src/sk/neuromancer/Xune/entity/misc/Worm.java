@@ -73,7 +73,7 @@ public class Worm extends Entity implements Moveable {
         this.level = level;
         this.orientation = Orientation.SOUTH;
         updateSprite();
-        this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6, false));
+        this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6));
     }
 
     public Worm(Level level, EntityStateProto.WormState wormState) {
@@ -99,7 +99,7 @@ public class Worm extends Entity implements Moveable {
         };
         this.target = new EntityReference(wormState.getTargetId(), level);
         updateSprite();
-        this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6, false));
+        this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6));
     }
 
     @Override

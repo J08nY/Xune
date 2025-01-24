@@ -139,9 +139,6 @@ public class Client implements Runnable {
                 sound.tick(tickCount);
                 break;
         }
-        //if (tickCount % TPS == 0) {
-        //    clientChannel.sendMessage(MessageProto.Connection.newBuilder().setPing(MessageProto.Ping.newBuilder().setTimestamp(System.currentTimeMillis()).build()).build());
-        //}
 
         if (glfwWindowShouldClose(window.getHandle())) {
             keepRunning = false;

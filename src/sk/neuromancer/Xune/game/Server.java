@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.command.Command;
@@ -24,7 +23,6 @@ import sk.neuromancer.Xune.network.controllers.LocalController;
 import sk.neuromancer.Xune.proto.MessageProto;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -147,6 +145,10 @@ public class Server implements Runnable {
         } else if (state == State.Done) {
             keepRunning = false;
         }
+
+        if (tickCount % Config.TPS == 0) {
+            serverChannel.sendMessageToAll(MessageProto.Connection.newBuilder().setPing(MessageProto.Ping.newBuilder().setTimestamp(System.currentTimeMillis()).build()).build());
+        }
     }
 
     private void onConnect(SocketAddress address) {
@@ -187,7 +189,6 @@ public class Server implements Runnable {
                 LOGGER.warn("Should not happen, client sent response.");
             }
         } else if (message instanceof MessageProto.Action action) {
-            LOGGER.info("It is an action {}", action.getActionCase());
             clients.stream().filter(c -> c.address().equals(address)).findFirst().ifPresent(client -> {
                 Player player = players.get(client.id());
                 Controller controller = player.getController();
@@ -200,14 +201,12 @@ public class Server implements Runnable {
                     controller.produceBuilding(PlayableEntity.fromEntityClass(produce.getKlass()).asSubclass(Building.class));
                 } else if (action.getActionCase() == MessageProto.Action.ActionCase.BUILDINGPLACE) {
                     MessageProto.BuildingPlaceAction place = action.getBuildingPlace();
-                    Class<? extends Building> buildingClass = PlayableEntity.fromEntityClass(place.getKlass()).asSubclass(Building.class);
-                    try {
-                        Building building = buildingClass.getConstructor(int.class, int.class, Orientation.class, Player.class).newInstance(place.getPosition().getX(), place.getPosition().getY(), Orientation.NORTH, player);
-                        controller.placeBuilding(building);
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                             NoSuchMethodException e) {
-                        LOGGER.error("Failed to create building", e);
+                    Building building = player.getBuildResult(place.getPosition().getX(), place.getPosition().getY());
+                    if (building == null) {
+                        LOGGER.error("Failed to create building");
+                        return;
                     }
+                    controller.placeBuilding(building);
                 } else if (action.getActionCase() == MessageProto.Action.ActionCase.SENDCOMMAND) {
                     MessageProto.SendCommandAction send = action.getSendCommand();
                     Unit unit = (Unit) level.getEntity(send.getEntityId());

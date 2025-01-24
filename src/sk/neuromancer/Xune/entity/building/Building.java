@@ -3,8 +3,11 @@ package sk.neuromancer.Xune.entity.building;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.unit.Unit;
+import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.players.Player;
+import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
+import sk.neuromancer.Xune.input.Clickable;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
@@ -31,7 +34,7 @@ public abstract class Building extends PlayableEntity {
         this.orientation = orientation;
         int spriteRow = this.orientation.ordinal() % 2 == 0 ? 1 : 0;
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(getBaseSprite(getClass()) + SpriteSheet.flagToOffset(owner.getFlag()) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH);
-        this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), false));
+        this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight()));
     }
 
     public Building(EntityStateProto.BuildingState savedState, Player owner) {
@@ -39,13 +42,21 @@ public abstract class Building extends PlayableEntity {
         this.tileX = savedState.getTilePosition().getX();
         this.tileY = savedState.getTilePosition().getY();
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(getBaseSprite(getClass()) + SpriteSheet.flagToOffset(owner.getFlag()) + (orientation.ordinal() % 2 == 0 ? 1 : 0) * SpriteSheet.SPRITE_ROW_LENGTH);
-        this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight(), false));
+        this.clickableAreas.add(ClickableTile.getCentered(this.x, this.y, this.sprite.getWidth(), this.sprite.getHeight()));
     }
 
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(x - (float) sprite.getWidth() / 2, y - (float) sprite.getHeight() / 2, y);
+        glTranslatef(this.x, this.y, this.y);
+        if (Config.DEBUG_CLICKABLE) {
+            for (Clickable clickable : clickableAreas) {
+                if (clickable instanceof Renderable r) {
+                    r.render();
+                }
+            }
+        }
+        glTranslatef(- (float) sprite.getWidth() / 2, - (float) sprite.getHeight() / 2, 0);
         this.sprite.render();
         if (isSelected) {
             SpriteSheet.MISC_SHEET.getSprite(1, 0).render();
@@ -74,9 +85,10 @@ public abstract class Building extends PlayableEntity {
 
     @Override
     public void setPosition(float x, float y) {
+        System.out.println("Setting building position to " + x + ", " + y);
         super.setPosition(x, y);
-        this.tileX = Level.levelToTileX(x, y);
-        this.tileY = Level.levelToTileY(x, y);
+        this.tileX = Level.levelCenterToTileX(x, y);
+        this.tileY = Level.levelCenterToTileY(x, y);
     }
 
     @Override

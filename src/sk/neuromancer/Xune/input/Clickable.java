@@ -15,14 +15,12 @@ public interface Clickable {
     class ClickableBox implements Clickable, Renderable {
         private float fromX, fromY;
         private float toX, toY;
-        private boolean isStatic;
 
-        private ClickableBox(float fromX, float fromY, float toX, float toY, boolean isStatic) {
+        private ClickableBox(float fromX, float fromY, float toX, float toY) {
             this.fromX = fromX;
             this.fromY = fromY;
             this.toX = toX;
             this.toY = toY;
-            this.isStatic = isStatic;
         }
 
         @Override
@@ -39,8 +37,6 @@ public interface Clickable {
 
         @Override
         public void setPosition(float x, float y) {
-            if (isStatic)
-                return;
             float width = toX - fromX;
             float height = toY - fromY;
             fromX = x;
@@ -49,18 +45,18 @@ public interface Clickable {
             toY = y + height;
         }
 
-        public static ClickableBox getFromCoordinates(float fromX, float fromY, float toX, float toY, boolean isStatic) {
-            return new ClickableBox(fromX, fromY, toX, toY, isStatic);
+        public static ClickableBox getFromCoordinates(float fromX, float fromY, float toX, float toY) {
+            return new ClickableBox(fromX, fromY, toX, toY);
         }
 
-        public static ClickableBox getFromDimensions(float x, float y, float width, float height, boolean isStatic) {
-            return new ClickableBox(x, y, x + width, y + height, isStatic);
+        public static ClickableBox getFromDimensions(float x, float y, float width, float height) {
+            return new ClickableBox(x, y, x + width, y + height);
         }
 
-        public static ClickableBox getCentered(float x, float y, float width, float height, boolean isStatic) {
+        public static ClickableBox getCentered(float x, float y, float width, float height) {
             float halfWidth = width / 2;
             float halfHeight = height / 2;
-            return new ClickableBox(x - halfWidth, y - halfHeight, x + halfWidth, y + halfHeight, isStatic);
+            return new ClickableBox(x - halfWidth, y - halfHeight, x + halfWidth, y + halfHeight);
         }
 
         @Override
@@ -79,13 +75,11 @@ public interface Clickable {
     class ClickableCircle implements Clickable, Renderable {
         private float x, y;
         private float radius;
-        private boolean isStatic;
 
-        private ClickableCircle(float x, float y, float radius, boolean isStatic) {
+        private ClickableCircle(float x, float y, float radius) {
             this.x = x;
             this.y = y;
             this.radius = radius;
-            this.isStatic = isStatic;
         }
 
         @Override
@@ -108,22 +102,20 @@ public interface Clickable {
 
         @Override
         public void setPosition(float x, float y) {
-            if (isStatic)
-                return;
             this.x = x;
             this.y = y;
         }
 
-        public static ClickableCircle getCentered(float x, float y, float radius, boolean isStatic) {
-            return new ClickableCircle(x, y, radius, isStatic);
+        public static ClickableCircle getCentered(float x, float y, float radius) {
+            return new ClickableCircle(x, y, radius);
         }
 
-        public static ClickableCircle getFromDimensions(float x, float y, float width, float height, boolean isStatic) {
+        public static ClickableCircle getFromDimensions(float x, float y, float width, float height) {
             if (width != height)
                 return null;
             float centerX = x + (width / 2);
             float centerY = y + (height / 2);
-            return new ClickableCircle(centerX, centerY, width / 2, isStatic);
+            return new ClickableCircle(centerX, centerY, width / 2);
         }
 
         @Override
@@ -151,9 +143,8 @@ public interface Clickable {
         private float kOffsetTop, kOffsetBottom;
         private float lOffsetTop, lOffsetBottom;
         private float halfWidth, halfHeight;
-        private boolean isStatic;
 
-        private ClickableTile(float x, float y, float width, float height, boolean isStatic) {
+        private ClickableTile(float x, float y, float width, float height) {
             this.x = x;
             this.y = y;
             this.width = width;
@@ -168,7 +159,6 @@ public interface Clickable {
             this.kOffsetBottom = y + height - k * (x + halfWidth);
             this.lOffsetTop = (y - l * (x + halfWidth));
             this.lOffsetBottom = y - l * (x - halfWidth);
-            this.isStatic = isStatic;
         }
 
         @Override
@@ -229,18 +219,18 @@ public interface Clickable {
             return true;
         }
 
-        public static ClickableTile getFromCoordinates(float fromX, float fromY, float toX, float toY, boolean isStatic) {
-            return new ClickableTile(fromX, fromY, toX - fromX, toY - fromY, isStatic);
+        public static ClickableTile getFromCoordinates(float fromX, float fromY, float toX, float toY) {
+            return new ClickableTile(fromX, fromY, toX - fromX, toY - fromY);
         }
 
-        public static ClickableTile getFromDimensions(float x, float y, float width, float height, boolean isStatic) {
-            return new ClickableTile(x, y, width, height, isStatic);
+        public static ClickableTile getFromDimensions(float x, float y, float width, float height) {
+            return new ClickableTile(x, y, width, height);
         }
 
-        public static ClickableTile getCentered(float x, float y, float width, float height, boolean isStatic) {
+        public static ClickableTile getCentered(float x, float y, float width, float height) {
             float halfWidth = width / 2;
             float halfHeight = height / 2;
-            return new ClickableTile(x - halfWidth, y - halfHeight, width, height, isStatic);
+            return new ClickableTile(x - halfWidth, y - halfHeight, width, height);
         }
 
         @Override
@@ -261,8 +251,9 @@ public interface Clickable {
 
         @Override
         public void setPosition(float x, float y) {
-            if (isStatic)
-                return;
+            System.out.println("Setting clickable position to " + x + ", " + y);
+            x -= halfWidth;
+            y -= halfHeight;
             this.x = x;
             this.y = y;
             this.kOffsetTop = y - k * (x + halfWidth);

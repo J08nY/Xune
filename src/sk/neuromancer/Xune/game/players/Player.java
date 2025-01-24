@@ -461,9 +461,12 @@ public class Player implements Tickable, Renderable {
 
         if (savedState.getBuildingKlass() != BaseProto.EntityClass.NULL) {
             this.buildingToBuild = Entity.fromEntityClass(savedState.getBuildingKlass()).asSubclass(Building.class);
-            this.buildDuration = savedState.getBuildDuration();
-            this.buildProgress = savedState.getBuildProgress();
+        } else {
+            this.buildingToBuild = null;
         }
+        this.buildDuration = savedState.getBuildDuration();
+        this.buildProgress = savedState.getBuildProgress();
+
         this.entities = new ArrayList<>(savedState.getEntitiesCount());
         for (PlayerProto.PlayerEntity entity : savedState.getEntitiesList()) {
             if (entity.hasUnit()) {

@@ -40,14 +40,14 @@ public class Harvester extends Unit {
     public Harvester(float x, float y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
         updateSprite();
-        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6, false));
+        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6));
     }
 
     public Harvester(EntityStateProto.UnitState savedState, Player owner) {
         super(savedState, owner);
         this.spice = 0;//TODO: Restore spice levels.
         updateSprite();
-        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6, false));
+        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6));
     }
 
     @Override

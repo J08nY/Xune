@@ -28,7 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 public abstract class Command {
-    private boolean started;
+    protected boolean started;
 
     public boolean isStarted(Entity entity) {
         return started;
@@ -47,30 +47,31 @@ public abstract class Command {
     public abstract CommandProto.Command serialize();
 
     public static Command deserialize(CommandProto.Command command, Level level) {
+        boolean started = command.getStarted();
         switch (command.getCmdCase()) {
             case FLY -> {
-                return new FlyCommand(command.getFly());
+                return new FlyCommand(command.getFly(), started);
             }
             case MOVE -> {
-                return new MoveCommand(command.getMove());
+                return new MoveCommand(command.getMove(), started);
             }
             case ATTACK -> {
-                return new AttackCommand(command.getAttack(), level);
+                return new AttackCommand(command.getAttack(), level, started);
             }
             case MOVEANDATTACK -> {
-                return new MoveAndAttackCommand(command.getMoveAndAttack(), level);
+                return new MoveAndAttackCommand(command.getMoveAndAttack(), level, started);
             }
             case FLYANDATTACK -> {
-                return new FlyAndAttackCommand(command.getFlyAndAttack(), level);
+                return new FlyAndAttackCommand(command.getFlyAndAttack(), level, started);
             }
             case PRODUCE -> {
-                return new ProduceCommand(command.getProduce(), level.getPathfinder());
+                return new ProduceCommand(command.getProduce(), level.getPathfinder(), started);
             }
             case COLLECTSPICE -> {
-                return new CollectSpiceCommand(command.getCollectSpice(), level);
+                return new CollectSpiceCommand(command.getCollectSpice(), level, started);
             }
             case DROPOFFSPICE -> {
-                return new DropOffSpiceCommand(command.getDropOffSpice(), level);
+                return new DropOffSpiceCommand(command.getDropOffSpice(), level, started);
             }
             default -> {
                 throw new IllegalArgumentException("Unknown command type.");
@@ -88,11 +89,12 @@ public abstract class Command {
             this.toY = toY;
         }
 
-        public FlyCommand(CommandProto.CommandFly fly) {
+        public FlyCommand(CommandProto.CommandFly fly, boolean started) {
             this.fromX = fly.getFrom().getX();
             this.fromY = fly.getFrom().getY();
             this.toX = fly.getTo().getX();
             this.toY = fly.getTo().getY();
+            this.started = started;
         }
 
         public float getFromX() {
@@ -186,13 +188,14 @@ public abstract class Command {
             this.next = 0;
         }
 
-        public MoveCommand(CommandProto.CommandMove move) {
+        public MoveCommand(CommandProto.CommandMove move, boolean started) {
             this.fromX = move.getFrom().getX();
             this.fromY = move.getFrom().getY();
             this.toX = move.getTo().getX();
             this.toY = move.getTo().getY();
             this.path = new Path(move.getPoints());
             this.next = move.getNext();
+            this.started = started;
         }
 
         public Point getNext() {
@@ -298,9 +301,10 @@ public abstract class Command {
             this(target, true);
         }
 
-        public AttackCommand(CommandProto.CommandAttack attack, Level level) {
+        public AttackCommand(CommandProto.CommandAttack attack, Level level, boolean started) {
             this.target = new EntityReference(attack.getTargetId(), level);
             this.keep = attack.getKeep();
+            this.started = started;
         }
 
         public EntityReference getTargetReference() {
@@ -380,13 +384,14 @@ public abstract class Command {
             this.targetY = target.y;
         }
 
-        public MoveAndAttackCommand(CommandProto.CommandMoveAndAttack moveAndAttack, Level level) {
-            this.move = new MoveCommand(moveAndAttack.getMove());
-            this.attack = new AttackCommand(moveAndAttack.getAttack(), level);
+        public MoveAndAttackCommand(CommandProto.CommandMoveAndAttack moveAndAttack, Level level, boolean started) {
+            this.move = new MoveCommand(moveAndAttack.getMove(), started);
+            this.attack = new AttackCommand(moveAndAttack.getAttack(), level, started);
             this.pathfinder = level.getPathfinder();
             this.target = attack.getTargetReference();
             this.targetX = Float.NaN;
             this.targetY = Float.NaN;
+            this.started = started;
         }
 
         @Override
@@ -464,12 +469,13 @@ public abstract class Command {
             this.targetY = target.y;
         }
 
-        public FlyAndAttackCommand(CommandProto.CommandFlyAndAttack flyAndAttack, Level level) {
-            this.move = new FlyCommand(flyAndAttack.getMove());
-            this.attack = new AttackCommand(flyAndAttack.getAttack(), level);
+        public FlyAndAttackCommand(CommandProto.CommandFlyAndAttack flyAndAttack, Level level, boolean started) {
+            this.move = new FlyCommand(flyAndAttack.getMove(), started);
+            this.attack = new AttackCommand(flyAndAttack.getAttack(), level, started);
             this.target = attack.getTargetReference();
             this.targetX = Float.NaN;
             this.targetY = Float.NaN;
+            this.started = started;
         }
 
         @Override
@@ -540,12 +546,13 @@ public abstract class Command {
             this.pathfinder = pathFinder;
         }
 
-        public ProduceCommand(CommandProto.CommandProduce produce, Pathfinder pathfinder) {
+        public ProduceCommand(CommandProto.CommandProduce produce, Pathfinder pathfinder, boolean started) {
             this.duration = produce.getDuration();
             this.resultClass = PlayableEntity.fromEntityClass(produce.getResultClass()).asSubclass(Unit.class);
             this.progress = produce.getProgress();
-            this.finished = false;
+            this.finished = produce.getFinished();
             this.pathfinder = pathfinder;
+            this.started = started;
         }
 
         @Override
@@ -616,6 +623,7 @@ public abstract class Command {
                             .setProgress(progress)
                             .setDuration(duration)
                             .setResultClass(PlayableEntity.toEntityClass(resultClass))
+                            .setFinished(finished)
                             .build())
                     .build();
         }
@@ -632,9 +640,10 @@ public abstract class Command {
             this.target = new TileReference(target);
         }
 
-        public CollectSpiceCommand(CommandProto.CommandCollectSpice collectSpice, Level level) {
-            this.move = new MoveCommand(collectSpice.getMove());
+        public CollectSpiceCommand(CommandProto.CommandCollectSpice collectSpice, Level level, boolean started) {
+            this.move = new MoveCommand(collectSpice.getMove(), started);
             this.target = new TileReference(collectSpice.getTarget().getX(), collectSpice.getTarget().getY(), level);
+            this.started = started;
         }
 
         public TileReference getTargetReference() {
@@ -728,9 +737,10 @@ public abstract class Command {
             this.target = new EntityReference(target);
         }
 
-        public DropOffSpiceCommand(CommandProto.CommandDropOffSpice dropOffSpice, Level level) {
-            this.move = new MoveCommand(dropOffSpice.getMove());
+        public DropOffSpiceCommand(CommandProto.CommandDropOffSpice dropOffSpice, Level level, boolean started) {
+            this.move = new MoveCommand(dropOffSpice.getMove(), started);
             this.target = new EntityReference(dropOffSpice.getTargetId(), level);
+            this.started = started;
         }
 
         public boolean dropping(Entity entity) {

@@ -38,13 +38,13 @@ public class Heli extends Unit {
     public Heli(float x, float y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
         updateSprite();
-        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
+        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7));
     }
 
     public Heli(EntityStateProto.UnitState savedState, Player owner) {
         super(savedState, owner);
         updateSprite();
-        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7, false));
+        this.clickableAreas.add(ClickableCircle.getCentered(x, y, 7));
     }
 
     @Override

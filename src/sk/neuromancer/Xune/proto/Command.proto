@@ -41,6 +41,7 @@ message CommandProduce {
   EntityClass resultClass = 1;
   float progress = 2;
   uint32 duration = 3;
+  bool finished = 4;
 }
 
 message CommandCollectSpice {
@@ -54,14 +55,15 @@ message CommandDropOffSpice {
 }
 
 message Command {
+  bool started = 1;
   oneof cmd {
-    CommandMove move = 1;
-    CommandFly fly = 2;
-    CommandAttack attack = 3;
-    CommandMoveAndAttack moveAndAttack = 4;
-    CommandFlyAndAttack flyAndAttack = 5;
-    CommandProduce produce = 6;
-    CommandCollectSpice collectSpice = 7;
-    CommandDropOffSpice dropOffSpice = 8;
+    CommandMove move = 2;
+    CommandFly fly = 3;
+    CommandAttack attack = 4;
+    CommandMoveAndAttack moveAndAttack = 5;
+    CommandFlyAndAttack flyAndAttack = 6;
+    CommandProduce produce = 7;
+    CommandCollectSpice collectSpice = 8;
+    CommandDropOffSpice dropOffSpice = 9;
   }
 }

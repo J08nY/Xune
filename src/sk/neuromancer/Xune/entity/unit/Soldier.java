@@ -39,13 +39,13 @@ public class Soldier extends Unit {
     public Soldier(float x, float y, Orientation orientation, Player owner) {
         super(x, y, orientation, owner);
         updateSprite();
-        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 3, false));
+        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 3));
     }
 
     public Soldier(EntityStateProto.UnitState savedState, Player owner) {
         super(savedState, owner);
         updateSprite();
-        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 3, false));
+        this.clickableAreas.add(Clickable.ClickableCircle.getCentered(x, y, 3));
     }
 
     @Override
