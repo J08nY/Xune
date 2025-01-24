@@ -9,6 +9,7 @@ import sk.neuromancer.Xune.entity.building.Refinery;
 import sk.neuromancer.Xune.entity.unit.Harvester;
 import sk.neuromancer.Xune.entity.unit.Heli;
 import sk.neuromancer.Xune.entity.unit.Unit;
+import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.level.Level;
@@ -33,15 +34,15 @@ public abstract class Command {
         return started;
     }
 
-    public void start(Entity entity, int tickCount) {
+    public void start(Entity entity) {
         started = true;
     }
 
-    public abstract void execute(Entity entity, int tickCount);
+    public abstract void execute(Entity entity);
 
     public abstract boolean isFinished(Entity entity);
 
-    public abstract void finish(Entity entity, int tickCount, boolean done);
+    public abstract void finish(Entity entity, boolean done);
 
     public abstract CommandProto.Command serialize();
 
@@ -121,12 +122,7 @@ public abstract class Command {
         }
 
         @Override
-        public void start(Entity entity, int tickCount) {
-            super.start(entity, tickCount);
-        }
-
-        @Override
-        public void execute(Entity entity, int tickCount) {
+        public void execute(Entity entity) {
             if (entity instanceof Unit unit) {
                 unit.move(toX, toY);
             } else {
@@ -135,7 +131,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finish(Entity entity, int tickCount, boolean done) {
+        public void finish(Entity entity, boolean done) {
             if (entity instanceof Unit unit) {
                 if (done)
                     unit.setPosition(toX, toY);
@@ -247,7 +243,7 @@ public abstract class Command {
         }
 
         @Override
-        public void execute(Entity entity, int tickCount) {
+        public void execute(Entity entity) {
             if (entity instanceof Unit unit) {
                 unit.move(getNext().getLevelX(), getNext().getLevelY());
                 update(unit);
@@ -257,7 +253,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finish(Entity entity, int tickCount, boolean done) {
+        public void finish(Entity entity, boolean done) {
             if (entity instanceof Unit unit) {
                 if (done)
                     unit.setPosition(toX, toY);
@@ -331,7 +327,7 @@ public abstract class Command {
         }
 
         @Override
-        public void execute(Entity entity, int tickCount) {
+        public void execute(Entity entity) {
             if (entity instanceof Unit unit) {
                 Entity t = target.resolve();
                 if (t == null) {
@@ -347,7 +343,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finish(Entity entity, int tickCount, boolean done) {
+        public void finish(Entity entity, boolean done) {
             Entity t = target.resolve();
             if (t == null) {
                 return;
@@ -373,6 +369,7 @@ public abstract class Command {
         private Pathfinder pathfinder;
         private EntityReference target;
         private float targetX, targetY;
+        private int targetMoved;
 
         public MoveAndAttackCommand(float fromX, float fromY, Pathfinder pathFinder, Entity target) {
             this.move = new MoveCommand(fromX, fromY, target.x, target.y, pathFinder);
@@ -398,7 +395,7 @@ public abstract class Command {
         }
 
         @Override
-        public void execute(Entity entity, int tickCount) {
+        public void execute(Entity entity) {
             if (entity instanceof Unit unit) {
                 Entity t = target.resolve();
                 if (t == null) {
@@ -406,10 +403,13 @@ public abstract class Command {
                 }
 
                 if (unit.inRange(t)) {
-                    attack.execute(entity, tickCount);
+                    attack.execute(entity);
                 } else {
-                    if ((t.x != targetX || t.y != targetY) && tickCount % 30 == 0) {
-                        // Target moved, update
+                    if (t.x != targetX || t.y != targetY) {
+                        targetMoved++;
+                    }
+                    if (targetMoved == Config.TPS) {
+                        targetMoved = 0;
                         try {
                             targetX = t.x;
                             targetY = t.y;
@@ -418,7 +418,7 @@ public abstract class Command {
                             return;
                         }
                     }
-                    move.execute(entity, tickCount);
+                    move.execute(entity);
                 }
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
@@ -426,8 +426,8 @@ public abstract class Command {
         }
 
         @Override
-        public void finish(Entity entity, int tickCount, boolean done) {
-            attack.finish(entity, tickCount, done);
+        public void finish(Entity entity, boolean done) {
+            attack.finish(entity, done);
         }
 
         @Override
@@ -454,6 +454,7 @@ public abstract class Command {
         private AttackCommand attack;
         private EntityReference target;
         private float targetX, targetY;
+        private int targetMoved;
 
         public FlyAndAttackCommand(float fromX, float fromY, Entity target) {
             this.move = new FlyCommand(fromX, fromY, target.x, target.y);
@@ -477,22 +478,25 @@ public abstract class Command {
         }
 
         @Override
-        public void execute(Entity entity, int tickCount) {
+        public void execute(Entity entity) {
             if (entity instanceof Unit unit) {
                 Entity t = target.resolve();
                 if (t == null) {
                     return;
                 }
                 if (unit.inRange(t)) {
-                    attack.execute(entity, tickCount);
+                    attack.execute(entity);
                 } else {
-                    if ((t.x != targetX || t.y != targetY) && tickCount % 30 == 0) {
-                        // Target moved, update
+                    if (t.x != targetX || t.y != targetY) {
+                        targetMoved++;
+                    }
+                    if (targetMoved == Config.TPS) {
+                        targetMoved = 0;
                         targetX = t.x;
                         targetY = t.y;
                         move = new FlyCommand(unit.x, unit.y, t.x, t.y);
                     }
-                    move.execute(entity, tickCount);
+                    move.execute(entity);
                 }
             } else {
                 throw new IllegalArgumentException("Entity must be a unit.");
@@ -500,8 +504,8 @@ public abstract class Command {
         }
 
         @Override
-        public void finish(Entity entity, int tickCount, boolean done) {
-            attack.finish(entity, tickCount, done);
+        public void finish(Entity entity, boolean done) {
+            attack.finish(entity, done);
         }
 
         @Override
@@ -545,8 +549,8 @@ public abstract class Command {
         }
 
         @Override
-        public void start(Entity entity, int tickCount) {
-            super.start(entity, tickCount);
+        public void start(Entity entity) {
+            super.start(entity);
             progress = 0;
         }
 
@@ -563,7 +567,7 @@ public abstract class Command {
         }
 
         @Override
-        public void execute(Entity entity, int tickCount) {
+        public void execute(Entity entity) {
             if (entity instanceof Building building) {
                 if (progress >= duration) {
                     Unit result;
@@ -578,7 +582,7 @@ public abstract class Command {
                     }
                     if (resultClass != Heli.class) {
                         try {
-                            result.pushCommand(new MoveCommand(result.x, result.y, result.x, result.y, pathfinder), tickCount);
+                            result.pushCommand(new MoveCommand(result.x, result.y, result.x, result.y, pathfinder));
                         } catch (NoPathFound ignored) {
 
                         }
@@ -602,7 +606,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finish(Entity entity, int tickCount, boolean done) {
+        public void finish(Entity entity, boolean done) {
         }
 
         @Override
@@ -646,7 +650,7 @@ public abstract class Command {
         }
 
         @Override
-        public void execute(Entity entity, int tickCount) {
+        public void execute(Entity entity) {
             if (entity instanceof Harvester harvester) {
                 Tile t = target.resolve();
                 if (t == null) {
@@ -654,7 +658,7 @@ public abstract class Command {
                 }
 
                 if (!move.isFinished(entity)) {
-                    move.execute(entity, tickCount);
+                    move.execute(entity);
                 } else {
                     harvester.collectSpice(t);
                 }
@@ -678,7 +682,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finish(Entity entity, int tickCount, boolean done) {
+        public void finish(Entity entity, boolean done) {
         }
 
         @Override
@@ -734,7 +738,7 @@ public abstract class Command {
         }
 
         @Override
-        public void execute(Entity entity, int tickCount) {
+        public void execute(Entity entity) {
             if (entity instanceof Harvester harvester) {
                 Entity t = target.resolve();
                 if (t == null) {
@@ -742,7 +746,7 @@ public abstract class Command {
                 }
 
                 if (!move.isFinished(entity)) {
-                    move.execute(entity, tickCount);
+                    move.execute(entity);
                 } else {
                     harvester.dropOffSpice((Refinery) t);
                 }
@@ -752,7 +756,7 @@ public abstract class Command {
         }
 
         @Override
-        public void finish(Entity entity, int tickCount, boolean done) {
+        public void finish(Entity entity, boolean done) {
 
         }
 

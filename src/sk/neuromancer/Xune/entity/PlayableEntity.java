@@ -66,12 +66,12 @@ public abstract class PlayableEntity extends Entity {
         if (!commands.isEmpty()) {
             Command current = commands.getFirst();
             if (!current.isStarted(this)) {
-                current.start(this, tickCount);
+                current.start(this);
             }
-            current.execute(this, tickCount);
+            current.execute(this);
             if (current.isFinished(this)) {
                 commands.removeFirst();
-                current.finish(this, tickCount, true);
+                current.finish(this, true);
             }
         }
     }
@@ -161,8 +161,8 @@ public abstract class PlayableEntity extends Entity {
         return this.commands.isEmpty() ? null : this.commands.getFirst();
     }
 
-    public void finishCommands(int tickCount) {
-        this.commands.forEach(cmd -> cmd.finish(this, tickCount, false));
+    public void finishCommands() {
+        this.commands.forEach(cmd -> cmd.finish(this, false));
         this.commands.clear();
     }
 
@@ -170,8 +170,8 @@ public abstract class PlayableEntity extends Entity {
         this.commands.add(c);
     }
 
-    public void pushCommand(Command c, int tickCount) {
-        finishCommands(tickCount);
+    public void pushCommand(Command c) {
+        finishCommands();
         sendCommand(c);
     }
 

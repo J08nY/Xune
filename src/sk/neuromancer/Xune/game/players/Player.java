@@ -252,8 +252,8 @@ public class Player implements Tickable, Renderable {
             e.tick(tickCount);
         }
         handleBuild();
-        handleDead(tickCount);
-        handleUnitBehavior(tickCount);
+        handleDead();
+        handleUnitBehavior();
         entities.removeAll(toRemove);
         toRemove.clear();
         updateVisibility();
@@ -265,11 +265,11 @@ public class Player implements Tickable, Renderable {
         }
     }
 
-    private void handleDead(int tickCount) {
+    private void handleDead() {
         for (PlayableEntity e : entities) {
             if (e.health <= 0) {
                 if (e.hasCommands()) {
-                    e.getCommands().forEach(c -> c.finish(e, tickCount, false));
+                    e.getCommands().forEach(c -> c.finish(e, false));
                 }
                 removeEntity(e);
                 if (!(e instanceof Soldier)) {
@@ -283,14 +283,14 @@ public class Player implements Tickable, Renderable {
         }
     }
 
-    private void handleUnitBehavior(int tickCount) {
+    private void handleUnitBehavior() {
         for (PlayableEntity entity : entities) {
             if (!entity.hasCommands() && !toRemove.contains(entity)) {
                 CommandStrategy strategy = commandStrategies.get(entity.getClass());
                 if (strategy != null) {
                     Command defaultCommand = strategy.defaultBehavior(entity, level);
                     if (defaultCommand != null) {
-                        entity.pushCommand(defaultCommand, tickCount);
+                        entity.pushCommand(defaultCommand);
                     }
                 }
             }

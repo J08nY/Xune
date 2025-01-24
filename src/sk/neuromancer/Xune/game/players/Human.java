@@ -170,7 +170,7 @@ public class Human extends Player {
             if (strategy != null) {
                 Command command = strategy.onClick(only, other, level, levelX, levelY);
                 if (command != null) {
-                    only.pushCommand(command, tickCount);
+                    only.pushCommand(command);
                 }
             }
         }
