@@ -133,6 +133,8 @@ public class Client implements Runnable {
                 break;
             case InGame:
                 level.getHuman().tick(tickCount);
+                level.getPathfinder().tick(tickCount);
+                //level.tick(tickCount); ///TODO: Hmm, cannot tick the worm.
                 view.tick(tickCount);
                 hud.tick(tickCount);
                 input.tick(tickCount);

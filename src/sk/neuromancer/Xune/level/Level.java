@@ -9,9 +9,9 @@ import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.game.players.Remote;
-import sk.neuromancer.Xune.graphics.elements.Effect;
 import sk.neuromancer.Xune.graphics.LevelView;
 import sk.neuromancer.Xune.graphics.Renderable;
+import sk.neuromancer.Xune.graphics.elements.Effect;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
@@ -480,10 +480,6 @@ public class Level implements Renderable, Tickable {
         }
     }
 
-    public static int levelCenterToTileX(float levelX, float levelY) {
-        return levelToTileX(levelX - Tile.TILE_CENTER_X, levelY - Tile.TILE_CENTER_Y);
-    }
-
     public static float tileToLevelY(int tileX, int tileY) {
         return 0.5f * tileY * (Tile.TILE_HEIGHT + 1);
     }
@@ -498,10 +494,6 @@ public class Level implements Renderable, Tickable {
 
     public static float levelToFullTileY(float levelX, float levelY) {
         return (levelY - Tile.TILE_CENTER_Y) / (0.5f * (Tile.TILE_HEIGHT + 1));
-    }
-
-    public static int levelCenterToTileY(float levelX, float levelY) {
-        return levelToTileY(levelX - Tile.TILE_CENTER_X, levelY - Tile.TILE_CENTER_Y);
     }
 
     public boolean isFull() {

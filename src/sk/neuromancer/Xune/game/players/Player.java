@@ -467,6 +467,7 @@ public class Player implements Tickable, Renderable {
         this.buildDuration = savedState.getBuildDuration();
         this.buildProgress = savedState.getBuildProgress();
 
+        List<PlayableEntity> oldEntities = this.entities;
         this.entities = new ArrayList<>(savedState.getEntitiesCount());
         for (PlayerProto.PlayerEntity entity : savedState.getEntitiesList()) {
             if (entity.hasUnit()) {
@@ -484,6 +485,7 @@ public class Player implements Tickable, Renderable {
                     level.addEntity(unit);
                 } else {
                     unit.deserialize(unitState);
+                    oldEntities.remove(unit);
                 }
                 this.entities.add(unit);
             } else if (entity.hasBuilding()) {
@@ -501,10 +503,15 @@ public class Player implements Tickable, Renderable {
                     level.addEntity(building);
                 } else {
                     building.deserialize(buildingState);
+                    oldEntities.remove(building);
                 }
                 this.entities.add(building);
             }
         }
+        for (PlayableEntity e : oldEntities) {
+            level.removeEntity(e);
+        }
+
         deserializeVisibility(savedState.getVisible().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.visible);
         deserializeVisibility(savedState.getDiscovered().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.discovered);
     }

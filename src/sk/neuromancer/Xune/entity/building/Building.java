@@ -85,10 +85,9 @@ public abstract class Building extends PlayableEntity {
 
     @Override
     public void setPosition(float x, float y) {
-        System.out.println("Setting building position to " + x + ", " + y);
         super.setPosition(x, y);
-        this.tileX = Level.levelCenterToTileX(x, y);
-        this.tileY = Level.levelCenterToTileY(x, y);
+        this.tileX = Level.levelToTileX(x, y);
+        this.tileY = Level.levelToTileY(x, y);
     }
 
     @Override
