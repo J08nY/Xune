@@ -519,11 +519,11 @@ public class Player implements Tickable, Renderable {
     public static PlayerProto.PlayerClass toPlayerClass(Class<? extends Player> klass) {
         return switch (klass.getSimpleName()) {
             case "Human" -> PlayerProto.PlayerClass.HUMAN;
-            case "Bot$ArmyGeneral" -> PlayerProto.PlayerClass.BOT_ARMY_GENERAL;
-            case "Bot$BuggyBoy" -> PlayerProto.PlayerClass.BOT_BUGGY_BOY;
-            case "Bot$HeliMaster" -> PlayerProto.PlayerClass.BOT_HELI_MASTER;
-            case "Bot$JackOfAllTrades" -> PlayerProto.PlayerClass.BOT_JACK_OF_ALL_TRADES;
-            case "Bot$EconGraduate" -> PlayerProto.PlayerClass.BOT_ECON_GRADUATE;
+            case "ArmyGeneral" -> PlayerProto.PlayerClass.BOT_ARMY_GENERAL;
+            case "BuggyBoy" -> PlayerProto.PlayerClass.BOT_BUGGY_BOY;
+            case "HeliMaster" -> PlayerProto.PlayerClass.BOT_HELI_MASTER;
+            case "JackOfAllTrades" -> PlayerProto.PlayerClass.BOT_JACK_OF_ALL_TRADES;
+            case "EconGraduate" -> PlayerProto.PlayerClass.BOT_ECON_GRADUATE;
             case "Remote" -> PlayerProto.PlayerClass.REMOTE;
             default -> throw new IllegalArgumentException("Unknown player class: " + klass);
         };
