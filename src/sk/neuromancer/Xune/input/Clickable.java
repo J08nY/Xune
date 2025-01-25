@@ -251,7 +251,6 @@ public interface Clickable {
 
         @Override
         public void setPosition(float x, float y) {
-            System.out.println("Setting clickable position to " + x + ", " + y);
             x -= halfWidth;
             y -= halfHeight;
             this.x = x;

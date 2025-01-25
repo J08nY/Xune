@@ -159,6 +159,7 @@ public abstract class Command {
                             .setFrom(from)
                             .setTo(to)
                             .build())
+                    .setStarted(started)
                     .build();
         }
     }
@@ -284,6 +285,7 @@ public abstract class Command {
                             .setPoints(path.serialize())
                             .setNext(next)
                             .build())
+                    .setStarted(started)
                     .build();
         }
     }
@@ -363,6 +365,7 @@ public abstract class Command {
                             .setTargetId(target.getId())
                             .setKeep(keep)
                             .build())
+                    .setStarted(started)
                     .build();
         }
     }
@@ -442,6 +445,7 @@ public abstract class Command {
                             .setMove(move.serialize().getMove())
                             .setAttack(attack.serialize().getAttack())
                             .build())
+                    .setStarted(started)
                     .build();
         }
 
@@ -521,6 +525,7 @@ public abstract class Command {
                             .setMove(move.serialize().getFly())
                             .setAttack(attack.serialize().getAttack())
                             .build())
+                    .setStarted(started)
                     .build();
         }
 
@@ -547,9 +552,9 @@ public abstract class Command {
         }
 
         public ProduceCommand(CommandProto.CommandProduce produce, Pathfinder pathfinder, boolean started) {
-            this.duration = produce.getDuration();
             this.resultClass = PlayableEntity.fromEntityClass(produce.getResultClass()).asSubclass(Unit.class);
             this.progress = produce.getProgress();
+            this.duration = produce.getDuration();
             this.finished = produce.getFinished();
             this.pathfinder = pathfinder;
             this.started = started;
@@ -625,6 +630,7 @@ public abstract class Command {
                             .setResultClass(PlayableEntity.toEntityClass(resultClass))
                             .setFinished(finished)
                             .build())
+                    .setStarted(started)
                     .build();
         }
     }
@@ -706,6 +712,7 @@ public abstract class Command {
                             .setTarget(tile)
                             .setMove(move.serialize().getMove())
                             .build())
+                    .setStarted(started)
                     .build();
         }
     }
@@ -777,6 +784,7 @@ public abstract class Command {
                             .setTargetId(target.getId())
                             .setMove(move.serialize().getMove())
                             .build())
+                    .setStarted(started)
                     .build();
         }
 

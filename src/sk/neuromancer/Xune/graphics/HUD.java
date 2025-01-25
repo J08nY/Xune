@@ -494,8 +494,8 @@ public class HUD implements Tickable, Renderable {
             }
             sprite.render();
             if (totalInProgress > 0) {
-                int index = 0;
                 if (Unit.class.isAssignableFrom(klass)) {
+                    int index = 0;
                     float textWidth = Text.widthOf(String.valueOf(totalInProgress), 0.4f);
                     float textHeight = Text.heightOf(String.valueOf(totalInProgress), 0.4f);
                     new Text(String.valueOf(totalInProgress), width - textWidth, height - textHeight, true, 0.4f).render();
