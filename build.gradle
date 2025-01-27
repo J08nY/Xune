@@ -20,7 +20,7 @@ dependencies {
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
     implementation "org.lwjgl:lwjgl:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl:$lwjglVersion:sources"
+    implementation "org.lwjgl:lwjgl:$lwjglVersion:sources"
     implementation "org.lwjgl:lwjgl:$lwjglVersion:javadoc"
     implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion"
     implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion:sources"
@@ -60,8 +60,6 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-api:${log4j-api.version}'
     runtimeOnly 'org.apache.logging.log4j:log4j-core'
     runtimeOnly 'org.apache.logging.log4j:log4j-slf4j2-impl'
-
-
 }
 
 sourceSets {
@@ -93,71 +91,102 @@ protobuf {
 }
 
 jar {
-	manifest {
-		attributes 'Main-Class': application.mainClass
-    }
-}
-
-tasks.register('uberJar', Jar) {
-    archiveFileName = "Xune-${version}-all.jar"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
-
-    from sourceSets.main.output
-
     manifest {
         attributes 'Main-Class': application.mainClass
     }
-
-    dependsOn configurations.runtimeClasspath
-    from {
-        configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
-    }
 }
 
-tasks.register('uberJarLinux', Jar) {
-    archiveFileName = "Xune-${version}-linux.jar"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
+def configureUberJarTask(Jar task, String archiveFileName, String mainClass, String os) {
+    task.archiveFileName = archiveFileName
+    task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
 
-    from sourceSets.main.output
+    task.from sourceSets.main.output
 
-    manifest {
-        attributes 'Main-Class': application.mainClass
+    task.manifest {
+        attributes 'Main-Class': mainClass
     }
 
-    dependsOn configurations.runtimeClasspath
-    from {
-        configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") && (!it.name.contains("natives") || it.name.contains("natives-linux")) }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
+    task.dependsOn configurations.runtimeClasspath
+    task.from {
+        configurations.runtimeClasspath.filter {
+            it.name.endsWith('jar') &&
+                    !it.name.contains("javadoc") &&
+                    !it.name.contains("sources") &&
+                    (os == "all" || (!it.name.contains("natives") || it.name.contains("natives-${os}")))
+        }.collect {
+            zipTree(it).matching {
+                exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class'
+            }
+        }
     }
+    return task
 }
 
-tasks.register('uberJarWindows', Jar) {
-    archiveFileName = "Xune-${version}-windows.jar"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
-
-    from sourceSets.main.output
-
-    manifest {
-        attributes 'Main-Class': application.mainClass
-    }
-
-    dependsOn configurations.runtimeClasspath
-    from {
-        configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") && (!it.name.contains("natives") || it.name.contains("natives-windows")) }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
-    }
+tasks.register('gameJar', Jar) {
+    def targetOS = project.hasProperty('targetOS') ? project.property('targetOS') : 'all'
+    configureUberJarTask(it, "Xune-${version}-${targetOS}.jar", application.mainClass.get(), targetOS as String)
 }
 
-tasks.register('uberJarMacos', Jar) {
-    archiveFileName = "Xune-${version}-macos.jar"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE //They are well known.
+tasks.register('gameJarAll', Jar) {
+    configureUberJarTask(it, "Xune-${version}-all.jar", application.mainClass.get(), "all")
+}
 
-    from sourceSets.main.output
+tasks.register('gameJarLinux', Jar) {
+    configureUberJarTask(it, "Xune-${version}-linux.jar", application.mainClass.get(), "linux")
+}
 
-    manifest {
-        attributes 'Main-Class': application.mainClass
-    }
+tasks.register('gameJarWindows', Jar) {
+    configureUberJarTask(it, "Xune-${version}-windows.jar", application.mainClass.get(), "windows")
+}
 
-    dependsOn configurations.runtimeClasspath
-    from {
-        configurations.runtimeClasspath.filter { it.name.endsWith('jar') && !it.name.contains("javadoc") && !it.name.contains("sources") && (!it.name.contains("natives") || it.name.contains("natives-macos")) }.collect { zipTree(it).matching { exclude 'META-INF/*.DSA', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/INDEX.LIST', 'META-INF/**/module-info.class' } }
-    }
+tasks.register('gameJarMacos', Jar) {
+    configureUberJarTask(it, "Xune-${version}-macos.jar", application.mainClass.get(), "macos")
+}
+
+tasks.register('clientJar', Jar) {
+    def targetOS = project.hasProperty('targetOS') ? project.property('targetOS') : 'all'
+    configureUberJarTask(it, "XuneClient-${version}-${targetOS}.jar", "sk.neuromancer.Xune.game.Client", targetOS as String)
+}
+
+tasks.register('clientJarAll', Jar) {
+    configureUberJarTask(it, "XuneClient-${version}-all.jar", "sk.neuromancer.Xune.game.Client", "all")
+}
+
+tasks.register('clientJarLinux', Jar) {
+    configureUberJarTask(it, "XuneClient-${version}-linux.jar", "sk.neuromancer.Xune.game.Client", "linux")
+}
+
+tasks.register('clientJarWindows', Jar) {
+    configureUberJarTask(it, "XuneClient-${version}-windows.jar", "sk.neuromancer.Xune.game.Client", "windows")
+}
+
+tasks.register('clientJarMacos', Jar) {
+    configureUberJarTask(it, "XuneClient-${version}-macos.jar", "sk.neuromancer.Xune.game.Client", "macos")
+}
+
+tasks.register('serverJar', Jar) {
+    def targetOS = project.hasProperty('targetOS') ? project.property('targetOS') : 'all'
+    configureUberJarTask(it, "XuneServer-${version}-${targetOS}.jar", "sk.neuromancer.Xune.game.Server", targetOS as String)
+}
+
+tasks.register('serverJarAll', Jar) {
+    configureUberJarTask(it, "XuneServer-${version}-all.jar", "sk.neuromancer.Xune.game.Server", "all")
+}
+
+tasks.register('serverJarLinux', Jar) {
+    configureUberJarTask(it, "XuneServer-${version}-linux.jar", "sk.neuromancer.Xune.game.Server", "linux")
+}
+
+tasks.register('serverJarWindows', Jar) {
+    configureUberJarTask(it, "XuneServer-${version}-windows.jar", "sk.neuromancer.Xune.game.Server", "windows")
+}
+
+tasks.register('serverJarMacos', Jar) {
+    configureUberJarTask(it, "XuneServer-${version}-macos.jar", "sk.neuromancer.Xune.game.Server", "macos")
+}
+
+tasks.register('allJars') {
+    dependsOn('gameJarAll', 'gameJarLinux', 'gameJarWindows', 'gameJarMacos',
+            'clientJarAll', 'clientJarLinux', 'clientJarWindows', 'clientJarMacos',
+            'serverJarAll', 'serverJarLinux', 'serverJarWindows', 'serverJarMacos')
 }

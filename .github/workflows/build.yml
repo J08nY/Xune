@@ -27,7 +27,7 @@ jobs:
         run: ./gradlew build
 
       - name: Create big JARs
-        run: ./gradlew uberJar uberJarWindows uberJarLinux uberJarMacos
+        run: ./gradlew allJars
 
       - name: Upload big JARs
         uses: actions/upload-artifact@v4
