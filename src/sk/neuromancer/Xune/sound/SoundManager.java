@@ -23,22 +23,22 @@ public class SoundManager implements Tickable {
     private final Sound[] sounds;
 
     private static final String[] soundNames = new String[]{
-            "blip_1.opus",
-            "explosion_1.opus",
-            "explosion_2.opus",
-            "explosion_3.opus",
-            "hit_1.opus",
-            "hit_2.opus",
-            "hit_3.opus",
-            "laser_1.opus",
-            "long_explosion_1.opus",
-            "shot_1.opus",
-            "shot_2.opus",
-            "tada_1.opus",
-            "wilhelm.opus",
-            "worm_death.opus",
-            "worm_kill.opus",
-            "duneshifter.opus"
+            "blip_1.wav",
+            "explosion_1.wav",
+            "explosion_2.wav",
+            "explosion_3.wav",
+            "hit_1.wav",
+            "hit_2.wav",
+            "hit_3.wav",
+            "laser_1.wav",
+            "long_explosion_1.wav",
+            "shot_1.wav",
+            "shot_2.wav",
+            "tada_1.wav",
+            "wilhelm.wav",
+            "worm_death.wav",
+            "worm_kill.wav",
+            "duneshifter.wav"
     };
 
     public static final int SOUND_NONE = -1;
