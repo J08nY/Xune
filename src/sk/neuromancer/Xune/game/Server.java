@@ -103,6 +103,7 @@ public class Server implements Runnable {
         }));
 
         level = new Level(Level.LEVEL_1);
+        tickCount = 0;
         state = State.Lobby;
         clients = new ConcurrentHashMap<>();
     }
@@ -137,8 +138,10 @@ public class Server implements Runnable {
             }
         } else if (state == State.InGame) {
             if (clients.isEmpty()) {
-                LOGGER.info("No clients connected, stopping game.");
-                state = State.Done;
+                LOGGER.info("No clients connected, restarting game.");
+                state = State.Lobby;
+                level = new Level(Level.LEVEL_1);
+                tickCount = 0;
                 return;
             }
 
