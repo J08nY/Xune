@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.graphics;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import sk.neuromancer.Xune.game.Config;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -13,8 +14,8 @@ public class Window {
 
     private boolean fullscreen;
     private boolean vsync;
-    private int width = 0;
-    private int height = 0;
+    private int width = Config.DEFAULT_WIDTH;
+    private int height = Config.DEFAULT_HEIGHT;
 
     public Window(int width, int height, boolean vsync) {
         this.width = width;

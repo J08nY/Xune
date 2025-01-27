@@ -448,7 +448,7 @@ public class Level implements Renderable, Tickable {
     }
 
     public float getHeight() {
-        return (float) (this.height * Tile.TILE_HEIGHT) / 2;
+        return (float) (this.height * (Tile.TILE_HEIGHT + 1)) / 2;
     }
 
     public int getWidthInTiles() {

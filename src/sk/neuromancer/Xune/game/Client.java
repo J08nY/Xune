@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static sk.neuromancer.Xune.game.Config.TPS;
 
 @CommandLine.Command(name = "XuneClient", mixinStandardHelpOptions = true, version = "1.0", description = "Xune 2025 client.")
 public class Client implements Runnable {
@@ -62,18 +61,26 @@ public class Client implements Runnable {
 
         clientChannel.sendMessage(MessageProto.Connection.newBuilder().setRequest(MessageProto.ConnectionRequest.newBuilder().build()).build());
 
-        double nsPerTick = 1000000000.0 / TPS;
+        long lastTick = System.nanoTime();
+        double unprocessed = 0;
+        double nsPerTick = 1000000000.0 / Config.TPS;
         int ticks = 0;
         long lastSecond = System.currentTimeMillis();
 
         while (keepRunning) {
+            long now = System.nanoTime();
+            unprocessed += (now - lastTick) / nsPerTick;
+            lastTick = now;
+            while (unprocessed >= 1) {
+                ticks++;
+                tick();
+                unprocessed -= 1;
+            }
             try {
                 Message msg = messageQueue.poll(Math.round(nsPerTick), TimeUnit.NANOSECONDS);
                 if (msg != null) {
                     handleMessage(msg);
                 }
-                tick();
-                ticks++;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

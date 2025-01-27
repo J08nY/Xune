@@ -16,5 +16,7 @@ public class Config {
 
     public static final int DEFAULT_WIDTH = 1920;
     public static final int DEFAULT_HEIGHT = 1080;
-    public static final int TPS = 60;
+    public static final int TPS = 60; // Ticks per second
+    public static final int UPS = 20; // Updates per second (in multiplayer)
+    public static final int TICKS_PER_UPDATE = TPS / UPS;
 }

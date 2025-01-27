@@ -39,6 +39,7 @@ public class Server implements Runnable {
 
     private boolean keepRunning = true;
     private int tickCount;
+    private int updateCount;
 
     private Level level;
     private List<Client> clients;
@@ -74,8 +75,9 @@ public class Server implements Runnable {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastSecond > 1000) {
                 lastSecond = currentTime;
-                LOGGER.info("{} ticks", ticks);
+                LOGGER.info("{} ticks, {} updates", ticks, updateCount);
                 ticks = 0;
+                updateCount = 0;
             }
         }
 
@@ -141,13 +143,16 @@ public class Server implements Runnable {
             }
             tickCount++;
             level.tick(tickCount);
-            serverChannel.sendMessageToAll(MessageProto.State.newBuilder().setLevel(level.serializeTransient()).build());
+            if (!messages.isEmpty() || tickCount % Config.TICKS_PER_UPDATE == 0) {
+                updateCount++;
+                serverChannel.sendMessageToAll(MessageProto.State.newBuilder().setLevel(level.serializeTransient()).build());
+            }
+
+            if (tickCount % Config.TPS == 0) {
+                serverChannel.sendMessageToAll(MessageProto.Connection.newBuilder().setPing(MessageProto.Ping.newBuilder().setTimestamp(System.currentTimeMillis()).build()).build());
+            }
         } else if (state == State.Done) {
             keepRunning = false;
-        }
-
-        if (tickCount % Config.TPS == 0) {
-            serverChannel.sendMessageToAll(MessageProto.Connection.newBuilder().setPing(MessageProto.Ping.newBuilder().setTimestamp(System.currentTimeMillis()).build()).build());
         }
     }
 
@@ -210,10 +215,18 @@ public class Server implements Runnable {
                 } else if (action.getActionCase() == MessageProto.Action.ActionCase.SENDCOMMAND) {
                     MessageProto.SendCommandAction send = action.getSendCommand();
                     Unit unit = (Unit) level.getEntity(send.getEntityId());
+                    if (unit == null) {
+                        LOGGER.error("Unit not found");
+                        return;
+                    }
                     controller.sendCommand(unit, Command.deserialize(send.getCommand(), level));
                 } else if (action.getActionCase() == MessageProto.Action.ActionCase.PUSHCOMMAND) {
                     MessageProto.PushCommandAction push = action.getPushCommand();
                     Unit unit = (Unit) level.getEntity(push.getEntityId());
+                    if (unit == null) {
+                        LOGGER.error("Unit not found");
+                        return;
+                    }
                     controller.pushCommand(unit, Command.deserialize(push.getCommand(), level));
                 } else {
                     LOGGER.warn("Should not happen, client sent unknown action.");

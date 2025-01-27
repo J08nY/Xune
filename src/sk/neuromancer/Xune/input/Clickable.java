@@ -131,6 +131,7 @@ public interface Clickable {
                 glVertex2d(Math.cos(angle) * radius, Math.sin(angle) * radius);
             }
             glEnd();
+            glLineWidth(1.0f);
             glDisable(GL_LINE_SMOOTH);
             glColor3f(1f, 1f, 1f);
         }
@@ -246,6 +247,7 @@ public interface Clickable {
             glVertex2f(halfWidth, height);
             glEnd();
             glPopMatrix();
+            glLineWidth(1.0f);
             glColor3f(1f, 1f, 1f);
         }
 

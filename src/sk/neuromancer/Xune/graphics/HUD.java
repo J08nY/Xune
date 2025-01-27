@@ -147,6 +147,10 @@ public class HUD implements Tickable, Renderable {
             renderText(0, 110, String.format("XOFF:   %.2f", view.xOff));
             renderText(0, 120, String.format("YOFF:   %.2f", view.yOff));
             renderText(200, 120, String.format("ZOOM:   %.2f", view.zoom));
+
+            float[] depth = new float[1];
+            glReadPixels((int) mouseX, (int) mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, depth);
+            renderText(0, 130, String.format("DEPTH:  %.2f", depth[0]));
         }
 
         glPopMatrix();
@@ -243,12 +247,16 @@ public class HUD implements Tickable, Renderable {
         glEnd();
         glBegin(GL_QUADS);
         for (Entity entity : level.getEntities()) {
-            if (entity instanceof PlayableEntity playable && human.isTileDiscovered(level.tileAt(entity))) {
+            if (!(entity instanceof PlayableEntity playable)) {
+                continue;
+            }
+            Tile tile = level.tileAt(entity);
+            boolean discoveredTile = human.isTileDiscovered(tile);
+            boolean visibleTile = human.isTileVisible(tile);
+            if ((playable instanceof Building && discoveredTile) || (playable instanceof Unit && visibleTile)) {
                 glColor3fv(playable.getOwner().getFlag().getColor());
-                float lx = entity.x;
-                float ly = entity.y;
-                int tx = Level.levelToTileX(lx, ly);
-                int ty = Level.levelToTileY(lx, ly);
+                int tx = tile.getX();
+                int ty = tile.getY();
                 glVertex2f(tx, ty);
                 glVertex2f(tx + 1, ty);
                 glVertex2f(tx + 1, ty + 1);
