@@ -11,6 +11,7 @@ import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
+import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
@@ -115,6 +116,8 @@ public class Worm extends Entity implements Moveable {
 
     @Override
     public void tick(int tickCount) {
+        //System.out.println("Before Tick " + id);
+        //printState();
         State newState = switch (state) {
             case WANDERING -> wandering(tickCount);
             case HUNTING -> hunting(tickCount);
@@ -297,6 +300,7 @@ public class Worm extends Entity implements Moveable {
             nextPoint++;
             if (nextPoint >= current.getPoints().length) {
                 current = null;
+                nextPoint = 0;
             }
         }
     }
@@ -362,9 +366,7 @@ public class Worm extends Entity implements Moveable {
         if (!savedState.getPlanList().isEmpty()) {
             this.plan = new LinkedList<>(savedState.getPlanList().stream().map(Path::new).toList());
         }
-        if (savedState.hasCurrent()) {
-            this.current = new Path(savedState.getCurrent());
-        }
+        this.current = savedState.hasCurrent() ? new Path(savedState.getCurrent()) : null;
         if (savedState.hasNextPoint()) {
             this.nextPoint = savedState.getNextPoint();
         }
@@ -389,7 +391,7 @@ public class Worm extends Entity implements Moveable {
                 default -> throw new IllegalStateException("Unexpected value: " + savedState.getPosition());
             };
         }
-        if (savedState.hasTargetId()) {
+        if (savedState.hasTargetId() && savedState.getTargetId() != -1) {
             this.target = new EntityReference(savedState.getTargetId(), level);
         }
         if (savedState.hasScale()) {
