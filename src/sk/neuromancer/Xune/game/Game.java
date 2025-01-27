@@ -28,7 +28,7 @@ import java.util.Random;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
-@CommandLine.Command(name = "Xune", mixinStandardHelpOptions = true, version = "1.0", description = "Xune 2025.")
+@CommandLine.Command(name = "Xune", mixinStandardHelpOptions = true, version = "1.1.2", description = "Xune 2025.")
 public class Game implements Runnable {
 
     private boolean keepRunning = false;
