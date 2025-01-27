@@ -4,10 +4,13 @@ on:
   push:
     tags:
       - 'v*.*.*'
+      - 'v*.*'
+
+permissions:
+  contents: write
+
 jobs:
-  permissions:
-    contents: write
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:

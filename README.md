@@ -3,7 +3,14 @@
 
 ## Download
 
-Download [here](https://nightly.link/J08nY/Xune/workflows/build/main/artifact.zip) (or check out the latest GitHub actions artifact).
+Download [here](https://nightly.link/J08nY/Xune/workflows/build/main/artifact.zip) (or check out the latest release).
+
+There are several JARs produced, in the format `<name>-<version>-<os>.jar`, name can be one of the following:
+ - Xune: Contains the single-player.
+ - XuneClient: Contains the multi-player client.
+ - XuneServer: Contains the multi-player server.
+
+Version is self-explanatory, and os is the operating system the JAR is built for.
 
 ## Screenshots
 

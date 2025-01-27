@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedTransferQueue;
 
 
-@CommandLine.Command(name = "XuneServer", mixinStandardHelpOptions = true, version = "1.0", description = "Xune 2025 server.")
+@CommandLine.Command(name = "XuneServer", mixinStandardHelpOptions = true, version = "1.1", description = "Xune 2025 server.")
 public class Server implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 

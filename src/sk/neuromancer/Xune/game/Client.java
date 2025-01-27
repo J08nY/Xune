@@ -27,11 +27,11 @@ import java.util.concurrent.TimeUnit;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
-@CommandLine.Command(name = "XuneClient", mixinStandardHelpOptions = true, version = "1.0", description = "Xune 2025 client.")
+@CommandLine.Command(name = "XuneClient", mixinStandardHelpOptions = true, version = "1.1", description = "Xune 2025 client.")
 public class Client implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
 
-    @CommandLine.Option(names = {"-h", "--host"}, description = "Host to connect to.", defaultValue = "localhost")
+    @CommandLine.Option(names = {"-H", "--host"}, description = "Host to connect to.", defaultValue = "localhost")
     private String host;
 
     @CommandLine.Option(names = {"-p", "--port"}, description = "Port to connect to.", defaultValue = "7531")
