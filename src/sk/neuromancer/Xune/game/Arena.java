@@ -5,6 +5,7 @@ import sk.neuromancer.Xune.entity.Flag;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.network.controllers.LocalController;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
@@ -24,7 +25,11 @@ public class Arena {
         for (int i = 0; i < games; i++) {
             Level level = new Level(Level.LEVEL_1);
             Bot one = oneClass.getConstructor(Level.class, Flag.class, int.class, long.class).newInstance(level, Flag.BLUE, 1000, 0);
+            one.setController(new LocalController(level, one));
+            level.addPlayer(one);
             Bot other = otherClass.getConstructor(Level.class, Flag.class, int.class, long.class).newInstance(level, Flag.RED, 1000, 1);
+            other.setController(new LocalController(level, other));
+            level.addPlayer(other);
             int tickCount = 0;
             System.out.println("Starting game");
             while (!level.isDone()) {
