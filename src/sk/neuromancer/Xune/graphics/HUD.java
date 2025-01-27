@@ -251,6 +251,9 @@ public class HUD implements Tickable, Renderable {
                 continue;
             }
             Tile tile = level.tileAt(entity);
+            if (tile == null) {
+                continue;
+            }
             boolean discoveredTile = human.isTileDiscovered(tile);
             boolean visibleTile = human.isTileVisible(tile);
             if ((playable instanceof Building && discoveredTile) || (playable instanceof Unit && visibleTile)) {
