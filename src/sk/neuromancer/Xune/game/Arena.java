@@ -23,8 +23,8 @@ public class Arena {
         int totalTicks = 0;
         for (int i = 0; i < games; i++) {
             Level level = new Level(Level.LEVEL_1);
-            Bot one = oneClass.getConstructor(Level.class, Flag.class, int.class).newInstance(level, Flag.BLUE, 1000);
-            Bot other = otherClass.getConstructor(Level.class, Flag.class, int.class).newInstance(level, Flag.RED, 1000);
+            Bot one = oneClass.getConstructor(Level.class, Flag.class, int.class, long.class).newInstance(level, Flag.BLUE, 1000, 0);
+            Bot other = otherClass.getConstructor(Level.class, Flag.class, int.class, long.class).newInstance(level, Flag.RED, 1000, 1);
             int tickCount = 0;
             System.out.println("Starting game");
             while (!level.isDone()) {

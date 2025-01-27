@@ -49,11 +49,11 @@ public class Player implements Tickable, Renderable {
 
     protected Controller controller;
 
-    protected Player(Level level, Flag flag, int money) {
+    protected Player(Level level, Flag flag, int money, long id) {
         this.level = level;
         this.flag = flag;
         this.money = money;
-        this.id = level.addPlayer(this);
+        this.id = id;
 
         this.visible = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];
         this.discovered = new boolean[level.getWidthInTiles()][level.getHeightInTiles()];

@@ -43,8 +43,8 @@ public class Bot extends Player {
     private int units;
     private int harvesters;
 
-    Bot(Level level, Flag flag, int money) {
-        super(level, flag, money);
+    Bot(Level level, Flag flag, int money, long id) {
+        super(level, flag, money, id);
         this.spawn = setupSpawn();
     }
 
@@ -259,8 +259,8 @@ public class Bot extends Player {
     }
 
     public static class ArmyGeneral extends Bot {
-        public ArmyGeneral(Level level, Flag flag, int money) {
-            super(level, flag, money);
+        public ArmyGeneral(Level level, Flag flag, int money, long id) {
+            super(level, flag, money, id);
             buildingPlan.add(Barracks.class);
             buildingPlan.add(Powerplant.class);
             buildingPlan.add(Barracks.class);
@@ -282,8 +282,8 @@ public class Bot extends Player {
     }
 
     public static class BuggyBoy extends Bot {
-        public BuggyBoy(Level level, Flag flag, int money) {
-            super(level, flag, money);
+        public BuggyBoy(Level level, Flag flag, int money, long id) {
+            super(level, flag, money, id);
             buildingPlan.add(Factory.class);
             buildingPlan.add(Powerplant.class);
             buildingPlan.add(Factory.class);
@@ -305,8 +305,8 @@ public class Bot extends Player {
     }
 
     public static class HeliMaster extends Bot {
-        public HeliMaster(Level level, Flag flag, int money) {
-            super(level, flag, money);
+        public HeliMaster(Level level, Flag flag, int money, long id) {
+            super(level, flag, money, id);
             buildingPlan.add(Helipad.class);
             buildingPlan.add(Powerplant.class);
             buildingPlan.add(Helipad.class);
@@ -328,8 +328,8 @@ public class Bot extends Player {
     }
 
     public static class JackOfAllTrades extends Bot {
-        public JackOfAllTrades(Level level, Flag flag, int money) {
-            super(level, flag, money);
+        public JackOfAllTrades(Level level, Flag flag, int money, long id) {
+            super(level, flag, money, id);
             buildingPlan.add(Powerplant.class);
             buildingPlan.add(Barracks.class);
             buildingPlan.add(Factory.class);
@@ -350,8 +350,8 @@ public class Bot extends Player {
     }
 
     public static class EconGraduate extends Bot {
-        public EconGraduate(Level level, Flag flag, int money) {
-            super(level, flag, money);
+        public EconGraduate(Level level, Flag flag, int money, long id) {
+            super(level, flag, money, id);
             buildingPlan.add(Factory.class);
             buildingPlan.add(Barracks.class);
             buildingPlan.add(Powerplant.class);

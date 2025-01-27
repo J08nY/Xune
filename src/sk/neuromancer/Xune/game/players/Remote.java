@@ -5,8 +5,8 @@ import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.proto.PlayerProto;
 
 public class Remote extends Player {
-    public Remote(Level level, Flag flag, int money) {
-        super(level, flag, money);
+    public Remote(Level level, Flag flag, int money, long id) {
+        super(level, flag, money, id);
         setupSpawn();
     }
 

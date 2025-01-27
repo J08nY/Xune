@@ -2,6 +2,7 @@ package sk.neuromancer.Xune.level;
 
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.entity.Flag;
+import sk.neuromancer.Xune.entity.PlayableEntity;
 import sk.neuromancer.Xune.entity.misc.Worm;
 import sk.neuromancer.Xune.game.Config;
 import sk.neuromancer.Xune.game.Tickable;
@@ -271,13 +272,22 @@ public class Level implements Renderable, Tickable {
         }
     }
 
-    public long addPlayer(Player player) {
-        long id = players.size();
-        this.players.put(id, player);
+    public void addPlayer(Player player) {
+        this.players.put(player.getId(), player);
         if (player instanceof Human h) {
             this.human = h;
         }
-        return id;
+    }
+
+    public void removePlayer(Player player) {
+        this.players.remove(player.getId());
+        List<Entity> toRemove = entities.values().stream().filter(entity -> entity instanceof PlayableEntity playable && playable.getOwner() == player).toList();
+        for (Entity entity : toRemove) {
+            removeEntity(entity);
+        }
+        if (player instanceof Human) {
+            this.human = null;
+        }
     }
 
     public Human getHuman() {

@@ -31,8 +31,8 @@ public class Human extends Player {
     private LevelView view;
     private HUD hud;
 
-    public Human(Level level, Flag flag, int money) {
-        super(level, flag, money);
+    public Human(Level level, Flag flag, int money, long id) {
+        super(level, flag, money, id);
         setupSpawn();
     }
 

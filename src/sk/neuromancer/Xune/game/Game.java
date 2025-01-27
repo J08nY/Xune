@@ -265,11 +265,11 @@ public class Game implements Runnable {
         }
 
         level = new Level(Level.LEVEL_1);
-        human = new Human(level, humanFlag, 1000);
+        human = new Human(level, humanFlag, 1000, 0);
         human.setController(new LocalController(level, human));
         Class<? extends Bot> botClass = intro.getSelectedBot();
         try {
-            Bot bot = botClass.getDeclaredConstructor(Level.class, Flag.class, int.class).newInstance(level, botFlag, 1000);
+            Bot bot = botClass.getDeclaredConstructor(Level.class, Flag.class, int.class, long.class).newInstance(level, botFlag, 1000, 1);
             bot.setController(new LocalController(level, bot));
         } catch (Exception ignored) {
         }

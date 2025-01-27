@@ -4,6 +4,8 @@ import com.github.quantranuk.protobuf.nio.ProtoChannelFactory;
 import com.github.quantranuk.protobuf.nio.ProtoSocketChannel;
 import com.google.protobuf.Message;
 import org.lwjgl.system.Library;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import sk.neuromancer.Xune.entity.Entity;
 import sk.neuromancer.Xune.game.players.Human;
@@ -27,6 +29,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 @CommandLine.Command(name = "XuneClient", mixinStandardHelpOptions = true, version = "1.0", description = "Xune 2025 client.")
 public class Client implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
 
     @CommandLine.Option(names = {"-h", "--host"}, description = "Host to connect to.", defaultValue = "localhost")
     private String host;
@@ -65,6 +68,7 @@ public class Client implements Runnable {
         double unprocessed = 0;
         double nsPerTick = 1000000000.0 / Config.TPS;
         int ticks = 0;
+        int msgs = 0;
         long lastSecond = System.currentTimeMillis();
 
         while (keepRunning) {
@@ -79,6 +83,7 @@ public class Client implements Runnable {
             try {
                 Message msg = messageQueue.poll(Math.round(nsPerTick), TimeUnit.NANOSECONDS);
                 if (msg != null) {
+                    msgs++;
                     handleMessage(msg);
                 }
             } catch (InterruptedException e) {
@@ -87,8 +92,9 @@ public class Client implements Runnable {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastSecond > 1000) {
                 lastSecond = currentTime;
-                System.out.println(ticks + " ticks");
+                LOGGER.info("{} ticks, {} messages", ticks, msgs);
                 ticks = 0;
+                msgs = 0;
             }
         }
 
@@ -172,12 +178,13 @@ public class Client implements Runnable {
             } else if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.PONG) {
                 MessageProto.Pong pong = conn.getPong();
                 long rtt = System.currentTimeMillis() - pong.getPreviousTimestamp();
-                System.out.println("RTT: " + rtt + "ms");
+                LOGGER.info("RTT: {}ms", rtt);
             } else if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.RESPONSE) {
                 this.id = conn.getResponse().getPlayerId();
                 this.state = State.Lobby;
+                LOGGER.info("Connected with id {}", id);
             } else if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.REQUEST) {
-                System.out.println("Should not happen, received connection request.");
+                LOGGER.warn("Should not happen, received connection request.");
             }
 
         } else if (message instanceof MessageProto.Event event) {
@@ -198,13 +205,15 @@ public class Client implements Runnable {
 
                 window.show();
                 this.state = State.InGame;
+                LOGGER.info("Game started");
             } else if (event.getEventCase() == MessageProto.Event.EventCase.GAMEEND) {
-                keepRunning = false;
+                this.state = State.Done;
+                LOGGER.info("Game ended");
             }
         } else if (message instanceof MessageProto.State state) {
             level.deserializeTransient(state.getLevel());
         } else if (message instanceof MessageProto.Action action) {
-            System.out.println("Should not happen, received action.");
+            LOGGER.warn("Should not happen, received action.");
         }
     }
 

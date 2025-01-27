@@ -24,9 +24,10 @@ import sk.neuromancer.Xune.proto.MessageProto;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedTransferQueue;
 
 
@@ -42,8 +43,7 @@ public class Server implements Runnable {
     private int updateCount;
 
     private Level level;
-    private List<Client> clients;
-    private List<Player> players;
+    private Map<Integer, Client> clients;
     private State state;
 
     private ProtoServerSocketChannel serverChannel;
@@ -104,8 +104,7 @@ public class Server implements Runnable {
 
         level = new Level(Level.LEVEL_1);
         state = State.Lobby;
-        clients = Collections.synchronizedList(new LinkedList<>());
-        players = Collections.synchronizedList(new LinkedList<>());
+        clients = new ConcurrentHashMap<>();
     }
 
     private boolean start() {
@@ -130,10 +129,19 @@ public class Server implements Runnable {
         if (state == State.Lobby) {
             if (level.isFull()) {
                 LOGGER.info("Starting game...");
+                for (Client client : clients.values()) {
+                    client.setState(ClientState.InGame);
+                }
                 state = State.InGame;
                 serverChannel.sendMessageToAll(MessageProto.Event.newBuilder().setGameStart(MessageProto.GameStart.newBuilder().setLevel(level.serializeFull()).build()).build());
             }
         } else if (state == State.InGame) {
+            if (clients.isEmpty()) {
+                LOGGER.info("No clients connected, stopping game.");
+                state = State.Done;
+                return;
+            }
+
             if (level.isDone()) {
                 LOGGER.info("Game over...");
                 state = State.Done;
@@ -141,6 +149,7 @@ public class Server implements Runnable {
                 serverChannel.sendMessageToAll(MessageProto.Event.newBuilder().setGameEnd(MessageProto.GameEnd.newBuilder().setWinnerId(winner.getId()).build()).build());
                 return;
             }
+
             tickCount++;
             level.tick(tickCount);
             if (!messages.isEmpty() || tickCount % Config.TICKS_PER_UPDATE == 0) {
@@ -152,16 +161,26 @@ public class Server implements Runnable {
                 serverChannel.sendMessageToAll(MessageProto.Connection.newBuilder().setPing(MessageProto.Ping.newBuilder().setTimestamp(System.currentTimeMillis()).build()).build());
             }
         } else if (state == State.Done) {
+            LOGGER.info("Game done...");
             keepRunning = false;
         }
     }
 
     private void onConnect(SocketAddress address) {
         LOGGER.info("Connection from: {}", address);
+        int id = clients.size();
+        Client client = new Client(address, ClientState.Connected, id, null);
+        clients.put(id, client);
     }
 
     private void onDisconnect(SocketAddress address) {
         LOGGER.info("Disconnect from: {}", address);
+        clients.values().stream().filter(c -> c.getAddress().equals(address)).findFirst().ifPresent(client -> {
+            clients.remove(client.getId());
+            if (client.getPlayer() != null) {
+                level.removePlayer(client.getPlayer());
+            }
+        });
     }
 
     private void handleMessage(Msg msg) {
@@ -170,15 +189,22 @@ public class Server implements Runnable {
         if (message instanceof MessageProto.Connection conn) {
             if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.REQUEST) {
                 LOGGER.info("Connection request from {}", address);
-                Client client = new Client(address, clients.size());
-                LOGGER.info("Client id: {}", client.id());
-                clients.add(client);
+                if (level.isFull() || state != State.Lobby) {
+                    LOGGER.info("Game is full or not in lobby state.");
+                    return;
+                }
+                Client client = clients.values().stream().filter(c -> c.getAddress().equals(address)).findFirst().orElse(null);
+                if (client == null) {
+                    LOGGER.error("Client not found");
+                    return;
+                }
+                LOGGER.info("Client id: {}", client.getId());
                 // TODO: This is nasty.
-                Player player = new Remote(level, Flag.values()[client.id() % 3], 1000);
+                Player player = new Remote(level, Flag.values()[client.getId() % 3], 1000, client.getId());
                 player.setController(new LocalController(level, player));
+                level.addPlayer(player);
+                client.setState(ClientState.Lobby);
                 LOGGER.info("Player flag: {}", player.getFlag());
-                players.add(player);
-                assert player.getId() == client.id;
                 MessageProto.Connection response = MessageProto.Connection.newBuilder().setResponse(MessageProto.ConnectionResponse.newBuilder().setPlayerId(client.id).build()).build();
                 serverChannel.sendMessage(address, response);
             } else if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.PING) {
@@ -190,12 +216,18 @@ public class Server implements Runnable {
                 MessageProto.Pong pong = conn.getPong();
                 long rtt = System.currentTimeMillis() - pong.getPreviousTimestamp();
                 LOGGER.info("Pong from {} RTT: {} ms", address, rtt);
-            } else {
+            } else if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.RESPONSE) {
                 LOGGER.warn("Should not happen, client sent response.");
+            } else {
+                LOGGER.warn("Should not happen, client sent unknown connection mesasge.");
             }
         } else if (message instanceof MessageProto.Action action) {
-            clients.stream().filter(c -> c.address().equals(address)).findFirst().ifPresent(client -> {
-                Player player = players.get(client.id());
+            clients.values().stream().filter(c -> c.getAddress().equals(address)).findFirst().ifPresentOrElse(client -> {
+                if (client.getState() != ClientState.InGame) {
+                    LOGGER.warn("Client not in game state");
+                    return;
+                }
+                Player player = client.getPlayer();
                 Controller controller = player.getController();
                 if (action.getActionCase() == MessageProto.Action.ActionCase.ENTITYPRODUCE) {
                     MessageProto.EntityProduceAction produce = action.getEntityProduce();
@@ -208,7 +240,7 @@ public class Server implements Runnable {
                     MessageProto.BuildingPlaceAction place = action.getBuildingPlace();
                     Building building = player.getBuildResult(place.getPosition().getX(), place.getPosition().getY());
                     if (building == null) {
-                        LOGGER.error("Failed to create building");
+                        LOGGER.error("Failed to create building.");
                         return;
                     }
                     controller.placeBuilding(building);
@@ -216,7 +248,7 @@ public class Server implements Runnable {
                     MessageProto.SendCommandAction send = action.getSendCommand();
                     Unit unit = (Unit) level.getEntity(send.getEntityId());
                     if (unit == null) {
-                        LOGGER.error("Unit not found");
+                        LOGGER.error("Unit not found.");
                         return;
                     }
                     controller.sendCommand(unit, Command.deserialize(send.getCommand(), level));
@@ -224,16 +256,16 @@ public class Server implements Runnable {
                     MessageProto.PushCommandAction push = action.getPushCommand();
                     Unit unit = (Unit) level.getEntity(push.getEntityId());
                     if (unit == null) {
-                        LOGGER.error("Unit not found");
+                        LOGGER.error("Unit not found.");
                         return;
                     }
                     controller.pushCommand(unit, Command.deserialize(push.getCommand(), level));
                 } else {
                     LOGGER.warn("Should not happen, client sent unknown action.");
                 }
-            });
+            }, () -> LOGGER.warn("Client not found"));
         } else if (message instanceof MessageProto.State || message instanceof MessageProto.Event) {
-            LOGGER.warn("Should not happen, client sent or event");
+            LOGGER.warn("Should not happen, client sent state or event.");
         }
     }
 
@@ -246,8 +278,50 @@ public class Server implements Runnable {
         System.exit(exitCode);
     }
 
-    record Client(SocketAddress address, int id) {
+    class Client {
+        private SocketAddress address;
+        private ClientState state;
+        private int id;
+        private Player player;
 
+        public Client(SocketAddress address, ClientState state, int id, Player player) {
+            this.address = address;
+            this.state = state;
+            this.id = id;
+            this.player = player;
+        }
+
+        public SocketAddress getAddress() {
+            return address;
+        }
+
+        public void setAddress(SocketAddress address) {
+            this.address = address;
+        }
+
+        public ClientState getState() {
+            return state;
+        }
+
+        public void setState(ClientState state) {
+            this.state = state;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
+        public void setPlayer(Player player) {
+            this.player = player;
+        }
     }
 
     record Msg(SocketAddress address, Message message) {
@@ -258,5 +332,11 @@ public class Server implements Runnable {
         Lobby,
         InGame,
         Done
+    }
+
+    enum ClientState {
+        Connected,
+        Lobby,
+        InGame
     }
 }
