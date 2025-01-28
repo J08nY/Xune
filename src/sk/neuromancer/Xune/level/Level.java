@@ -565,10 +565,22 @@ public class Level implements Renderable, Tickable {
             BaseProto.Tile tile = entry.getKey();
             this.level[tile.getX()][tile.getY()].setSpice(entry.getValue());
         }
+        List<Worm> oldWorms = this.worms;
+        this.worms = new ArrayList<>(state.getWormsCount());
         for (EntityStateProto.WormState wormState : state.getWormsList()) {
             long id = wormState.getEntity().getId();
             Worm worm = (Worm) getEntity(id);
-            worm.deserialize(wormState, this);
+            if (worm != null) {
+            	worm.deserialize(wormState, this);
+            	oldWorms.remove(worm);
+            } else {
+            	Worm worm = new Worm(this, wormState);
+            	this.worms.add(worm);
+            	addEntity(worm);
+            }
+        }
+        for (Worm worm : oldWorms) {
+        	level.removeEntity(worm);
         }
         this.tickCount = state.getTickCount();
         this.rand.setState(state.getSeed0(), state.getSeed1());

@@ -38,6 +38,9 @@ public class Server implements Runnable {
     @CommandLine.Option(names = {"-p", "--port"}, description = "Port to listen on.", defaultValue = "7531")
     private int port;
 
+    @CommandLine.Option(names = {"-k", "--keep"}, description = "Whether to keep running after game end.")
+    private boolean keep;
+
     private boolean keepRunning = true;
     private int tickCount;
     private int updateCount;
@@ -147,9 +150,15 @@ public class Server implements Runnable {
 
             if (level.isDone()) {
                 LOGGER.info("Game over...");
-                state = State.Done;
                 Player winner = level.getWinner();
                 serverChannel.sendMessageToAll(MessageProto.Event.newBuilder().setGameEnd(MessageProto.GameEnd.newBuilder().setWinnerId(winner.getId()).build()).build());
+				if (keep) {
+					state = State.Lobby;
+					level = new Level(Level.LEVEL_1);
+                	tickCount = 0;
+				} else {
+					state = State.Done;
+				}
                 return;
             }
 
