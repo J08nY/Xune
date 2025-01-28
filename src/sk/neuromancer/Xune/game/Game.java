@@ -64,6 +64,8 @@ public class Game implements Runnable {
     }
 
     private void init() {
+        Library.initialize();
+
         if (fullscreen) {
             window = new Window();
         } else {
@@ -315,36 +317,7 @@ public class Game implements Runnable {
         glfwTerminate();
     }
 
-    public Window getWindow() {
-        return window;
-    }
-
-    public InputHandler getInput() {
-        return input;
-    }
-
-    public Level getLevel() {
-        return level;
-    }
-
-    public HUD getHud() {
-        return hud;
-    }
-
-    public LevelView getView() {
-        return view;
-    }
-
-    public GameState getState() {
-        return state;
-    }
-
-    public static int currentTick() {
-        return tickCount;
-    }
-
     public static void main(String[] args) {
-        Library.initialize();
         int exitCode = new CommandLine(new Game()).execute(args);
         System.exit(exitCode);
     }
