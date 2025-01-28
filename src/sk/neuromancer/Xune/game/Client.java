@@ -174,7 +174,7 @@ public class Client implements Runnable {
         glfwPollEvents();
 
         switch (state) {
-            case Init, Lobby, Done:
+            case Init, Lobby:
                 break;
             case InGame:
                 level.tick(tickCount);
@@ -182,6 +182,9 @@ public class Client implements Runnable {
                 hud.tick(tickCount);
                 input.tick(tickCount);
                 sound.tick(tickCount);
+                break;
+            case Done:
+                keepRunning = false;
                 break;
         }
 
