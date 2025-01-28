@@ -15,6 +15,7 @@ import sk.neuromancer.Xune.graphics.Window;
 import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.level.Level;
+import sk.neuromancer.Xune.level.Tile;
 import sk.neuromancer.Xune.network.Utils;
 import sk.neuromancer.Xune.network.controllers.CombinedController;
 import sk.neuromancer.Xune.network.controllers.Controller;
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
-@CommandLine.Command(name = "XuneClient", mixinStandardHelpOptions = true, version = "1.1.2", description = "Xune 2025 client.")
+@CommandLine.Command(name = "XuneClient", mixinStandardHelpOptions = true, versionProvider = Version.class, description = "Xune 2025 client.")
 public class Client implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
 
@@ -57,6 +58,7 @@ public class Client implements Runnable {
     private SoundManager sound;
 
     private ProtoSocketChannel clientChannel;
+    private ConnectionState connectionState;
     private LinkedBlockingQueue<Message> messageQueue;
 
     @Override
@@ -64,6 +66,26 @@ public class Client implements Runnable {
         setup();
 
         clientChannel.connect();
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ignored) {}
+
+        while (true) {
+            if (connectionState != ConnectionState.Connected) {
+                if (connectionState == ConnectionState.Disconnected) {
+                    clientChannel = prepareChannel();
+                    clientChannel.connect();
+                }
+                LOGGER.warn("Not connected, retrying in 1s");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                break;
+            }
+        }
 
         clientChannel.sendMessage(MessageProto.Connection.newBuilder().setRequest(MessageProto.ConnectionRequest.newBuilder().build()).build());
 
@@ -106,6 +128,15 @@ public class Client implements Runnable {
         quit();
     }
 
+    private ProtoSocketChannel prepareChannel() {
+        ProtoChannelFactory.ClientBuilder clientBuilder = ProtoChannelFactory.newClient(host, port).setSerializer(Utils.getIdSerializer());
+        ProtoSocketChannel channel = clientBuilder.build();
+        channel.addConnectionHandler(this::onConnect);
+        channel.addDisconnectionHandler(this::onDisconnect);
+        channel.addMessageReceivedHandler(this::onMessageReceived);
+        return channel;
+    }
+
     private void setup() {
         Library.initialize();
         SpriteSheet.initSheets();
@@ -116,10 +147,8 @@ public class Client implements Runnable {
         input = new InputHandler(window);
         state = State.Init;
 
-        ProtoChannelFactory.ClientBuilder clientBuilder = ProtoChannelFactory.newClient(host, port).setSerializer(Utils.getIdSerializer());
-        clientChannel = clientBuilder.build();
-        clientChannel.addMessageReceivedHandler(this::onMessageReceived);
-
+        clientChannel = prepareChannel();
+        connectionState = ConnectionState.Connecting;
         messageQueue = new LinkedBlockingQueue<>();
     }
 
@@ -208,19 +237,32 @@ public class Client implements Runnable {
                 hud.setView(view);
                 hud.setLevel(level);
                 view.setLevel(level, true);
+                Tile spawn = level.spawnOf(human);
+                view.centerOn(spawn.getLevelX(), spawn.getLevelY());
 
                 window.show();
                 this.state = State.InGame;
                 LOGGER.info("Game started");
             } else if (event.getEventCase() == MessageProto.Event.EventCase.GAMEEND) {
                 this.state = State.Done;
-                LOGGER.info("Game ended");
+                MessageProto.GameEnd gameEnd = event.getGameEnd();
+                LOGGER.info("Game ended: you {}.", gameEnd.getWinnerId() == id ? "won" : "lost");
             }
         } else if (message instanceof MessageProto.State state) {
             level.deserializeTransient(state.getLevel());
         } else if (message instanceof MessageProto.Action action) {
             LOGGER.warn("Should not happen, received action.");
         }
+    }
+
+    private void onConnect(SocketAddress address) {
+        LOGGER.info("Connected to {}", address);
+        connectionState = ConnectionState.Connected;
+    }
+
+    private void onDisconnect(SocketAddress address) {
+        LOGGER.info("Disconnected from {}", address);
+        connectionState = ConnectionState.Disconnected;
     }
 
     private void onMessageReceived(SocketAddress socketAddress, Message message) {
@@ -237,5 +279,11 @@ public class Client implements Runnable {
         Lobby,
         InGame,
         Done
+    }
+
+    enum ConnectionState {
+        Disconnected,
+        Connecting,
+        Connected
     }
 }

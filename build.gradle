@@ -92,7 +92,9 @@ protobuf {
 
 jar {
     manifest {
-        attributes 'Main-Class': application.mainClass
+        attributes 'Main-Class': application.mainClass,
+                "Implementation-Version": project.version,
+                "Implementation-Title": project.name
     }
 }
 
@@ -103,7 +105,9 @@ def configureUberJarTask(Jar task, String archiveFileName, String mainClass, Str
     task.from sourceSets.main.output
 
     task.manifest {
-        attributes 'Main-Class': mainClass
+        attributes 'Main-Class': mainClass,
+                "Implementation-Version": project.version,
+                "Implementation-Title": project.name
     }
 
     task.dependsOn configurations.runtimeClasspath
