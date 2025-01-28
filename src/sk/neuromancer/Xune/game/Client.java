@@ -16,6 +16,9 @@ import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.network.Utils;
+import sk.neuromancer.Xune.network.controllers.CombinedController;
+import sk.neuromancer.Xune.network.controllers.Controller;
+import sk.neuromancer.Xune.network.controllers.LocalController;
 import sk.neuromancer.Xune.network.controllers.RemoteController;
 import sk.neuromancer.Xune.proto.MessageProto;
 import sk.neuromancer.Xune.sound.SoundManager;
@@ -193,9 +196,12 @@ public class Client implements Runnable {
                 human = level.getHuman();
                 hud = new HUD(input, window);
                 view = new LevelView(input, window, hud);
+                Controller local = new LocalController(level, human);
+                Controller remote = new RemoteController(clientChannel);
+                Controller combined = new CombinedController(local, remote);
 
                 level.setView(view);
-                human.setController(new RemoteController(clientChannel));
+                human.setController(combined);
                 human.setInput(input);
                 human.setView(view);
                 human.setHud(hud);

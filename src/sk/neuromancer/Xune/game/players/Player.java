@@ -93,7 +93,6 @@ public class Player implements Tickable, Renderable {
                     Building b = klass.getConstructor(EntityStateProto.BuildingState.class, Player.class).newInstance(entity.getBuilding(), this);
                     entities.add(b);
                     level.addEntity(b);
-                    //TODO: Add power production/consumption computation, or is it already done by the deserializetion?
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
                     throw new RuntimeException(e);
@@ -455,9 +454,6 @@ public class Player implements Tickable, Renderable {
     public void deserialize(PlayerProto.PlayerState savedState) {
         this.money = savedState.getMoney();
         this.id = savedState.getId();
-        this.powerProduction = savedState.getPowerProduction();
-        this.powerConsumption = savedState.getPowerConsumption();
-        // TODO: What about getPlayerClass?
 
         if (savedState.getBuildingKlass() != BaseProto.EntityClass.NULL) {
             this.buildingToBuild = Entity.fromEntityClass(savedState.getBuildingKlass()).asSubclass(Building.class);
@@ -482,12 +478,11 @@ public class Player implements Tickable, Renderable {
                              NoSuchMethodException e) {
                         throw new RuntimeException(e);
                     }
-                    level.addEntity(unit);
+                    addEntity(unit);
                 } else {
                     unit.deserialize(unitState);
                     oldEntities.remove(unit);
                 }
-                this.entities.add(unit);
             } else if (entity.hasBuilding()) {
                 EntityStateProto.BuildingState buildingState = entity.getBuilding();
                 long id = buildingState.getPlayable().getEntity().getId();
@@ -500,17 +495,19 @@ public class Player implements Tickable, Renderable {
                              NoSuchMethodException e) {
                         throw new RuntimeException(e);
                     }
-                    level.addEntity(building);
+                    addEntity(building);
                 } else {
                     building.deserialize(buildingState);
                     oldEntities.remove(building);
                 }
-                this.entities.add(building);
             }
         }
         for (PlayableEntity e : oldEntities) {
-            level.removeEntity(e);
+            removeEntity(e);
         }
+
+        this.powerProduction = savedState.getPowerProduction();
+        this.powerConsumption = savedState.getPowerConsumption();
 
         deserializeVisibility(savedState.getVisible().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.visible);
         deserializeVisibility(savedState.getDiscovered().toByteArray(), level.getWidthInTiles(), level.getHeightInTiles(), this.discovered);

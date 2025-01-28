@@ -124,7 +124,6 @@ public abstract class PlayableEntity extends Entity {
         this.owner = owner;
 
         // Convert commands
-        // TODO: Handle command diffs.
         this.commands = new LinkedList<>();
         for (CommandProto.Command commandState : state.getCommandsList()) {
             Command command = Command.deserialize(commandState, level);

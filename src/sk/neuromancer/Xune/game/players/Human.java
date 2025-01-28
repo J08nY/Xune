@@ -53,6 +53,7 @@ public class Human extends Player {
     @Override
     public void tick(int tickCount) {
         handleInput(tickCount);
+        selected.removeIf(e -> level.getEntity(e.getId()) == null);
         super.tick(tickCount);
     }
 

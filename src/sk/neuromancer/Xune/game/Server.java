@@ -207,6 +207,7 @@ public class Server implements Runnable {
                 player.setController(new LocalController(level, player));
                 level.addPlayer(player);
                 client.setState(ClientState.Lobby);
+                client.setPlayer(player);
                 LOGGER.info("Player flag: {}", player.getFlag());
                 MessageProto.Connection response = MessageProto.Connection.newBuilder().setResponse(MessageProto.ConnectionResponse.newBuilder().setPlayerId(client.id).build()).build();
                 serverChannel.sendMessage(address, response);
