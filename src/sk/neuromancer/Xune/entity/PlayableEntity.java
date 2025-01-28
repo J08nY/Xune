@@ -1,7 +1,6 @@
 package sk.neuromancer.Xune.entity;
 
 import sk.neuromancer.Xune.entity.command.Command;
-import sk.neuromancer.Xune.entity.misc.Road;
 import sk.neuromancer.Xune.entity.misc.Worm;
 import sk.neuromancer.Xune.input.Clickable;
 import sk.neuromancer.Xune.game.players.Player;
@@ -28,7 +27,7 @@ public abstract class PlayableEntity extends Entity {
     protected boolean isSelected;
 
     public PlayableEntity(float x, float y, Player owner) {
-        super(x, y);
+        super(x, y, owner.getLevel());
         this.owner = owner;
         this.commands = new LinkedList<>();
         this.flag = owner.getFlag();
@@ -135,9 +134,6 @@ public abstract class PlayableEntity extends Entity {
     public boolean isEnemyOf(Entity other) {
         if (other instanceof Worm) {
             return true;
-        }
-        if (other instanceof Road) {
-            return false;
         }
         return ((PlayableEntity) other).owner != this.owner;
     }

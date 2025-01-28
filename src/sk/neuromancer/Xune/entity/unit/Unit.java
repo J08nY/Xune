@@ -97,9 +97,9 @@ public abstract class Unit extends PlayableEntity implements Moveable {
         if (rate == 0) {
             return;
         }
-        if (ready % rate == 0 && inRange(target) && rand.nextFloat() < this.accuracy) {
+        if (ready % rate == 0 && inRange(target) && level.getRandom().nextFloat() < this.accuracy) {
             target.takeDamage(damage);
-            owner.getLevel().addEffect(new Effect.Hit(target.x + rand.nextFloat(3) * (rand.nextBoolean() ? 1 : -1), target.y + rand.nextFloat(3) * (rand.nextBoolean() ? 1 : -1)));
+            owner.getLevel().addEffect(new Effect.Hit(target.x + level.getRandom().nextFloat(3) * (level.getRandom().nextBoolean() ? 1 : -1), target.y + level.getRandom().nextFloat(3) * (level.getRandom().nextBoolean() ? 1 : -1)));
             SoundManager.play(getShotSound(getClass()), false, 1.0f);
         }
     }
@@ -153,7 +153,7 @@ public abstract class Unit extends PlayableEntity implements Moveable {
                 }
             }
         }
-        glTranslatef(- (float) sprite.getWidth() / 2, - (float) sprite.getHeight() / 2, 0);
+        glTranslatef(-(float) sprite.getWidth() / 2, -(float) sprite.getHeight() / 2, 0);
         this.sprite.render();
         if (isSelected) {
             SpriteSheet.MISC_SHEET.getSprite(0, 0).render();

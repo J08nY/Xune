@@ -11,7 +11,6 @@ import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.paths.Path;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
 import sk.neuromancer.Xune.level.paths.Point;
-import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.sound.SoundManager;
 
@@ -23,7 +22,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static sk.neuromancer.Xune.game.Config.TPS;
 
 public class Worm extends Entity implements Moveable {
-    private final Level level;
     private int animation = 0;
     private int dir = 1;
     private Queue<Path> plan = new LinkedList<>();
@@ -68,10 +66,9 @@ public class Worm extends Entity implements Moveable {
     }
 
     public Worm(Level level, float x, float y) {
-        super(x, y);
+        super(x, y, level);
         this.state = State.WANDERING;
         this.position = Position.BELOW;
-        this.level = level;
         this.orientation = Orientation.SOUTH;
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(this.x, this.y, 6));
@@ -79,7 +76,6 @@ public class Worm extends Entity implements Moveable {
 
     public Worm(Level level, EntityStateProto.WormState wormState) {
         super(wormState.getEntity(), level);
-        this.level = level;
         this.animation = wormState.getAnimation();
         this.dir = wormState.getDir();
         this.plan = new LinkedList<>(wormState.getPlanList().stream().map(Path::new).toList());
@@ -225,7 +221,7 @@ public class Worm extends Entity implements Moveable {
         }
 
         if ((tickCount - stateSince) % (TPS * 30) == 0) {
-            if (rand.nextFloat() > 0.25f) {
+            if (level.getRandom().nextFloat() > 0.25f) {
                 // Keep on wandering...
                 return State.WANDERING;
             }
@@ -247,8 +243,8 @@ public class Worm extends Entity implements Moveable {
 
         int limit = 10;
         while (plan.isEmpty()) {
-            int targetX = rand.nextInt(level.getWidthInTiles());
-            int targetY = rand.nextInt(level.getHeightInTiles());
+            int targetX = level.getRandom().nextInt(level.getWidthInTiles());
+            int targetY = level.getRandom().nextInt(level.getHeightInTiles());
             float targetLevelX = Level.tileToCenterLevelX(targetX, targetY);
             float targetLevelY = Level.tileToCenterLevelY(targetX, targetY);
             int targetGridX = Pathfinder.levelXToGrid(targetLevelX);

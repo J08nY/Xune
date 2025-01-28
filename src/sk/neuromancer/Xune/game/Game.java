@@ -80,6 +80,7 @@ public class Game implements Runnable {
 
         intro = new Intro(window, input);
         pause = new Pause(window, input);
+        gameover = new Gameover(window, input);
 
         SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
         window.show();

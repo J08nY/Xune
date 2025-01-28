@@ -22,8 +22,8 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected static final Map<Class<? extends Entity>, Integer> healthMap = new HashMap<>();
     protected static final Map<Class<? extends Entity>, Integer> sightMap = new HashMap<>();
     protected static final Map<Class<? extends Entity>, Integer> deathSoundMap = new HashMap<>();
-    protected final Random rand = new Random();
 
+    protected Level level;
     protected long id;
     public float x, y;
     public int health;
@@ -39,8 +39,9 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     protected boolean underAttack;
     protected Set<EntityReference> attackers;
 
-    public Entity(float x, float y) {
-        this.id = rand.nextLong();
+    public Entity(float x, float y, Level level) {
+        this.level = level;
+        this.id = level.nextId();
         this.x = x;
         this.y = y;
         this.health = getMaxHealth(getClass());
@@ -51,6 +52,7 @@ public abstract class Entity implements Renderable, Tickable, Clickable {
     }
 
     public Entity(EntityStateProto.EntityState savedState, Level level) {
+        this.level = level;
         this.id = savedState.getId();
         this.x = savedState.getPosition().getX();
         this.y = savedState.getPosition().getY();

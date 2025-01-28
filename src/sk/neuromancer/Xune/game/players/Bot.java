@@ -38,7 +38,6 @@ public class Bot extends Player {
     protected boolean buildsHelipad = true;
     protected boolean buildsPowerplant = true;
 
-    private Random rand = new Random();
     private int buildings;
     private int units;
     private int harvesters;
@@ -116,7 +115,7 @@ public class Bot extends Player {
 
     private void planUnitBuild() {
         if (unitPlan.size() < 5) {
-            int r = rand.nextInt(100);
+            int r = level.getRandom().nextInt(100);
             if (r < soldierPriority) {
                 unitPlan.add(Soldier.class);
             } else if (r < soldierPriority + buggyPriority) {
@@ -149,7 +148,7 @@ public class Bot extends Player {
     private void attack() {
         Iterator<Entity> others = level.findClosestEntity(spawn.getLevelX(), spawn.getLevelY(), e -> e instanceof PlayableEntity other && other.getOwner() != this);
         PlayableEntity target = null;
-        int r = rand.nextInt(3);
+        int r = level.getRandom().nextInt(3);
         try {
             for (int i = 0; i < r; i++) {
                 target = (PlayableEntity) others.next();
@@ -165,7 +164,7 @@ public class Bot extends Player {
                     .sorted(Comparator.comparingDouble(e -> Math.abs(e.x - finalTarget.x) + Math.abs(e.y - finalTarget.y))).collect(Collectors.toCollection(ArrayList::new));
             if (!attackers.isEmpty()) {
                 int total = attackers.size();
-                int participating = rand.nextInt(total);
+                int participating = level.getRandom().nextInt(total);
                 log("Attacking with " + participating + " units. Target: " + target);
                 int successful = 0;
                 for (int i = 0; i < participating; i++) {
@@ -196,7 +195,7 @@ public class Bot extends Player {
     }
 
     private void produce() {
-        int r = rand.nextInt(4);
+        int r = level.getRandom().nextInt(4);
         for (int i = 0; i < r; i++) {
             if (unitPlan.isEmpty()) {
                 return;
@@ -227,7 +226,7 @@ public class Bot extends Player {
 
     private void placeBuild() {
         Iterator<Tile> close = level.findClosestTile(spawn, tile -> level.isTileBuildable(tile.getX(), tile.getY(), Building.getPassable(buildingToBuild)));
-        int pos = rand.nextInt(3 + buildings);
+        int pos = level.getRandom().nextInt(3 + buildings);
         Tile last = null;
         try {
             for (int i = 0; i < pos; i++) {

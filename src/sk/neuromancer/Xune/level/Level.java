@@ -14,6 +14,7 @@ import sk.neuromancer.Xune.graphics.LevelView;
 import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.graphics.elements.Effect;
 import sk.neuromancer.Xune.level.paths.Pathfinder;
+import sk.neuromancer.Xune.network.Utils;
 import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
 import sk.neuromancer.Xune.proto.LevelProto;
@@ -26,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -39,6 +41,7 @@ public class Level implements Renderable, Tickable {
     private List<Worm> worms;
     private List<Effect> effects;
     private int tickCount;
+    private Utils.Xoroshiro128PlusPlus rand;
 
     private Tile[][] level;
     private int width, height;
@@ -51,6 +54,7 @@ public class Level implements Renderable, Tickable {
         this.entities = new TreeMap<>();
         this.worms = new LinkedList<>();
         this.effects = new LinkedList<>();
+        this.rand = new Utils.Xoroshiro128PlusPlus();
         loadLevel(levelName);
     }
 
@@ -108,6 +112,7 @@ public class Level implements Renderable, Tickable {
             addEntity(worm);
         }
         this.effects = new LinkedList<>();
+        this.rand = new Utils.Xoroshiro128PlusPlus(savedState.getTransient().getSeed0(), savedState.getTransient().getSeed1());
     }
 
     @Override
@@ -307,6 +312,10 @@ public class Level implements Renderable, Tickable {
             return null;
         }
         return players.values().stream().filter(player -> !player.isEliminated()).findFirst().orElse(null);
+    }
+
+    public RandomGenerator getRandom() {
+        return rand;
     }
 
     public Tile spawnOf(Player player) {
@@ -515,6 +524,10 @@ public class Level implements Renderable, Tickable {
         return flags.size() <= 1;
     }
 
+    public long nextId() {
+        return rand.nextLong();
+    }
+
     public LevelProto.LevelState serializeTransient() {
         LevelProto.LevelState.Builder builder = LevelProto.LevelState.newBuilder();
         for (Player player : players.values()) {
@@ -535,6 +548,9 @@ public class Level implements Renderable, Tickable {
         }
         builder.setSpiceMap(spiceBuilder.build());
         builder.setTickCount(tickCount);
+        long[] seed = rand.getState();
+        builder.setSeed0(seed[0]);
+        builder.setSeed1(seed[1]);
         return builder.build();
     }
 
@@ -554,6 +570,7 @@ public class Level implements Renderable, Tickable {
             worm.deserialize(wormState, this);
         }
         this.tickCount = state.getTickCount();
+        this.rand.setState(state.getSeed0(), state.getSeed1());
     }
 
     public LevelProto.FullLevelState serializeFull() {
