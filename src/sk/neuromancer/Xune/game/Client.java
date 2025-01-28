@@ -147,6 +147,11 @@ public class Client implements Runnable {
         input = new InputHandler(window);
         state = State.Init;
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            LOGGER.info("Shutting down...");
+            keepRunning = false;
+        }));
+
         clientChannel = prepareChannel();
         connectionState = ConnectionState.Connecting;
         messageQueue = new LinkedBlockingQueue<>();
@@ -245,6 +250,7 @@ public class Client implements Runnable {
 
                 window.show();
                 this.state = State.InGame;
+                SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
                 LOGGER.info("Game started");
             } else if (event.getEventCase() == MessageProto.Event.EventCase.GAMEEND) {
                 this.state = State.Done;
