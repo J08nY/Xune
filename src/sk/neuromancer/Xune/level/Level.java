@@ -128,6 +128,7 @@ public class Level implements Renderable, Tickable {
         for (Worm dead : toRemove) {
             SoundManager.play(Entity.getDeathSound(dead.getClass()), false, 1.0f);
             worms.remove(dead);
+            removeEntity(dead);
         }
         for (Effect e : effects) {
             e.tick(tickCount);
