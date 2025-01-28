@@ -68,24 +68,11 @@ public class Utils {
         /* ---------------- static fields ---------------- */
 
         /**
-         * The first 32 bits of the golden ratio (1+sqrt(5))/2, forced to be odd.
-         * Useful for producing good Weyl sequences or as an arbitrary nonzero odd
-         * value.
-         */
-        public static final int GOLDEN_RATIO_32 = 0x9e3779b9;
-
-        /**
          * The first 64 bits of the golden ratio (1+sqrt(5))/2, forced to be odd.
          * Useful for producing good Weyl sequences or as an arbitrary nonzero odd
          * value.
          */
         public static final long GOLDEN_RATIO_64 = 0x9e3779b97f4a7c15L;
-
-        /**
-         * The first 32 bits of the silver ratio 1+sqrt(2), forced to be odd. Useful
-         * for producing good Weyl sequences or as an arbitrary nonzero odd value.
-         */
-        public static final int SILVER_RATIO_32 = 0x6A09E667;
 
         /**
          * The first 64 bits of the silver ratio 1+sqrt(2), forced to be odd. Useful
