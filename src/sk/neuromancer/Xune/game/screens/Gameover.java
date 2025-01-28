@@ -1,33 +1,38 @@
 package sk.neuromancer.Xune.game.screens;
 
-import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.graphics.Renderable;
+import sk.neuromancer.Xune.graphics.Window;
+import sk.neuromancer.Xune.input.InputHandler;
+import sk.neuromancer.Xune.level.Level;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class Gameover implements Tickable, Renderable {
-    private final Game game;
+    private final Window window;
+    private final InputHandler input;
+    private Level level;
     private Menu menu;
     private boolean confirmed;
 
-    public Gameover(Game game) {
-        this.game = game;
+    public Gameover(Window window, InputHandler input) {
+        this.window = window;
+        this.input = input;
     }
 
     @Override
     public void tick(int tickCount) {
         if (menu == null) {
-            if (game.getLevel().getHuman().isEliminated()) {
-                menu = new Menu(game.getInput(), "Game Over", new String[]{"Spectate", "Exit"}, 5f);
+            if (level.getHuman().isEliminated()) {
+                menu = new Menu(input, "Game Over", new String[]{"Spectate", "Exit"}, 5f);
             } else {
-                menu = new Menu(game.getInput(), "Game Over", new String[]{"Continue", "Exit"}, 5f);
+                menu = new Menu(input, "Game Over", new String[]{"Continue", "Exit"}, 5f);
             }
             menu.activate();
             return;
         }
         menu.tick(tickCount);
-        if (game.getInput().ENTER.wasPressed()) {
+        if (input.ENTER.wasPressed()) {
             confirmed = true;
         }
     }
@@ -41,9 +46,9 @@ public class Gameover implements Tickable, Renderable {
         glBegin(GL_QUADS);
         glColor4f(0.2f, 0.2f, 0.2f, 0.5f);
         glVertex2i(0, 0);
-        glVertex2i(game.getWindow().getWidth(), 0);
-        glVertex2i(game.getWindow().getWidth(), game.getWindow().getHeight());
-        glVertex2i(0, game.getWindow().getHeight());
+        glVertex2i(window.getWidth(), 0);
+        glVertex2i(window.getWidth(), window.getHeight());
+        glVertex2i(0, window.getHeight());
         glColor4f(1, 1, 1, 1);
         glEnd();
 
@@ -52,12 +57,16 @@ public class Gameover implements Tickable, Renderable {
         // If human is dead, allow them to spectate
         // Always allow them to exit
         glPushMatrix();
-        glTranslatef(game.getWindow().getCenterX(), game.getWindow().getCenterY(), 0);
+        glTranslatef(window.getCenterX(), window.getCenterY(), 0);
         if (menu != null)
-        	menu.render();
+            menu.render();
         glPopMatrix();
 
         glEnable(GL_DEPTH_TEST);
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
     }
 
     public boolean shouldContinue() {

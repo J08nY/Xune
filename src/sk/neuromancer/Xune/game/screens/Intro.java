@@ -1,19 +1,20 @@
 package sk.neuromancer.Xune.game.screens;
 
 import sk.neuromancer.Xune.entity.Flag;
-import sk.neuromancer.Xune.game.Game;
-import sk.neuromancer.Xune.input.InputHandler;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.game.players.Bot;
 import sk.neuromancer.Xune.graphics.Renderable;
+import sk.neuromancer.Xune.graphics.Window;
 import sk.neuromancer.Xune.graphics.elements.Sprite;
 import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.graphics.elements.Text;
+import sk.neuromancer.Xune.input.InputHandler;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class Intro implements Tickable, Renderable {
-    private final Game game;
+    private final InputHandler input;
+    private final float screenCenterX, screenCenterY;
     private float scaleOld, scaleNew, scaleStart;
     private final Sprite oldLogo;
     private final Sprite newLogo;
@@ -29,21 +30,22 @@ public class Intro implements Tickable, Renderable {
 
     private boolean done;
 
-    public Intro(Game game) {
-        this.game = game;
+    public Intro(Window window, InputHandler input) {
+        this.input = input;
+        this.screenCenterX = window.getCenterX();
+        this.screenCenterY = window.getCenterY();
         this.scaleOld = 0.1f;
         this.scaleNew = 0.1f;
         this.oldLogo = SpriteSheet.TITLE.getSprite(0);
         this.newLogo = SpriteSheet.TITLE.getSprite(1);
-        this.flagMenu = new Menu(game.getInput(), "Flag", new String[]{"RED", "BLUE", "GREEN"}, 2f);
-        this.botMenu = new Menu(game.getInput(), "Bot", new String[]{"Army General", "Buggy Boy", "Heli Master", "Jack of All Trades", "Econ Graduate"}, 2f);
-        this.loadMenu = new Menu(game.getInput(), "", new String[]{"Load Game"}, 2f);
+        this.flagMenu = new Menu(input, "Flag", new String[]{"RED", "BLUE", "GREEN"}, 2f);
+        this.botMenu = new Menu(input, "Bot", new String[]{"Army General", "Buggy Boy", "Heli Master", "Jack of All Trades", "Econ Graduate"}, 2f);
+        this.loadMenu = new Menu(input, "", new String[]{"Load Game"}, 2f);
         this.flagMenu.activate();
     }
 
     @Override
     public void tick(int tickCount) {
-        InputHandler input = game.getInput();
         if (scaleOld < 3.0f) {
             scaleOld += 0.01f;
             if (input.mouse.isLeftReleased() || input.mouse.isRightReleased() || input.ENTER.wasPressed()) {
@@ -106,7 +108,7 @@ public class Intro implements Tickable, Renderable {
         if (scaleNew >= 3.0f) {
             glPushMatrix();
             float width = Text.widthOf("Click to start", scaleStart + 3);
-            glTranslatef(game.getWindow().getCenterX(), game.getWindow().getCenterY() + newLogo.getHeight() * 2f, 0);
+            glTranslatef(screenCenterX, screenCenterY + newLogo.getHeight() * 2f, 0);
             new Text("Click to start", -(width / 2), 0, true, scaleStart + 3).render();
 
             if (worm) {
@@ -128,30 +130,30 @@ public class Intro implements Tickable, Renderable {
             glPopMatrix();
 
             glPushMatrix();
-            glTranslatef(game.getWindow().getCenterX() * 0.5f, game.getWindow().getCenterY() * 1.5f, 0);
+            glTranslatef(screenCenterX * 0.5f, screenCenterY * 1.5f, 0);
             flagMenu.render();
             glPopMatrix();
 
             glPushMatrix();
-            glTranslatef(game.getWindow().getCenterX() * 1.0f, game.getWindow().getCenterY() * 1.5f, 0);
+            glTranslatef(screenCenterX * 1.0f, screenCenterY * 1.5f, 0);
             botMenu.render();
             glPopMatrix();
 
             glPushMatrix();
-            glTranslatef(game.getWindow().getCenterX() * 1.5f, game.getWindow().getCenterY() * 1.5f, 0);
+            glTranslatef(screenCenterX * 1.5f, screenCenterY * 1.5f, 0);
             loadMenu.render();
             glPopMatrix();
         }
 
         glPushMatrix();
-        glTranslatef(game.getWindow().getCenterX() - (oldLogo.getWidth() * scaleOld) / 2, game.getWindow().getCenterY() - (oldLogo.getHeight() * 2 * scaleOld) / 2, 0);
+        glTranslatef(screenCenterX - (oldLogo.getWidth() * scaleOld) / 2, screenCenterY - (oldLogo.getHeight() * 2 * scaleOld) / 2, 0);
         glScalef(scaleOld, scaleOld, 1);
         oldLogo.render();
         glPopMatrix();
 
         if (scaleOld >= 3.0f) {
             glPushMatrix();
-            glTranslatef(game.getWindow().getCenterX() - (newLogo.getWidth() * scaleNew) / 2, game.getWindow().getCenterY() - (newLogo.getHeight() * scaleNew) / 2, 0);
+            glTranslatef(screenCenterX - (newLogo.getWidth() * scaleNew) / 2, screenCenterY - (newLogo.getHeight() * scaleNew) / 2, 0);
             glScalef(scaleNew, scaleNew, 1);
             newLogo.render();
             glPopMatrix();

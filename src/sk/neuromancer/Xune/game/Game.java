@@ -76,9 +76,8 @@ public class Game implements Runnable {
         input = new InputHandler(window);
         sound = new SoundManager();
 
-        intro = new Intro(this);
-        pause = new Pause(this);
-        gameover = new Gameover(this);
+        intro = new Intro(window, input);
+        pause = new Pause(window, input);
 
         SoundManager.play(SoundManager.TRACK_DUNESHIFTER, true, 0.5f);
         window.show();
@@ -286,6 +285,8 @@ public class Game implements Runnable {
         human.setHud(hud);
         human.setView(view);
         human.setInput(input);
+
+        gameover.setLevel(level);
     }
 
     private void pause() {

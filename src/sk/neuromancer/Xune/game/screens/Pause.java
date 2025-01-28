@@ -1,26 +1,29 @@
 package sk.neuromancer.Xune.game.screens;
 
-import sk.neuromancer.Xune.game.Game;
 import sk.neuromancer.Xune.game.Tickable;
 import sk.neuromancer.Xune.graphics.Renderable;
+import sk.neuromancer.Xune.graphics.Window;
+import sk.neuromancer.Xune.input.InputHandler;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class Pause implements Tickable, Renderable {
-    private final Game game;
+    private final Window window;
+    private final InputHandler input;
     private final Menu menu;
     private boolean confirmed;
 
-    public Pause(Game game) {
-        this.game = game;
-        this.menu = new Menu(game.getInput(), "Pause", new String[]{"Continue", "Save", "Load", "Exit"}, 5f);
+    public Pause(Window window, InputHandler input) {
+        this.window = window;
+        this.input = input;
+        this.menu = new Menu(input, "Pause", new String[]{"Continue", "Save", "Load", "Exit"}, 5f);
         this.menu.activate();
     }
 
     @Override
     public void tick(int tickCount) {
         menu.tick(tickCount);
-        if (game.getInput().ENTER.wasPressed()) {
+        if (input.ENTER.wasPressed()) {
             confirmed = true;
         }
     }
@@ -31,14 +34,14 @@ public class Pause implements Tickable, Renderable {
         glBegin(GL_QUADS);
         glColor4f(0.2f, 0.2f, 0.2f, 0.5f);
         glVertex2i(0, 0);
-        glVertex2i(game.getWindow().getWidth(), 0);
-        glVertex2i(game.getWindow().getWidth(), game.getWindow().getHeight());
-        glVertex2i(0, game.getWindow().getHeight());
+        glVertex2i(window.getWidth(), 0);
+        glVertex2i(window.getWidth(), window.getHeight());
+        glVertex2i(0, window.getHeight());
         glColor4f(1, 1, 1, 1);
         glEnd();
 
         glPushMatrix();
-        glTranslatef(game.getWindow().getCenterX(), game.getWindow().getCenterY(), 0);
+        glTranslatef(window.getCenterX(), window.getCenterY(), 0);
         menu.render();
         glPopMatrix();
 

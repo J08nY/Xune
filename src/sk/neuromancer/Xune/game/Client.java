@@ -172,6 +172,7 @@ public class Client implements Runnable {
     }
 
     private void handleMessage(Message message) {
+        System.out.println(message.getClass().getSimpleName() + " handled " + System.currentTimeMillis());
         if (message instanceof MessageProto.Connection conn) {
             if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.PING) {
                 MessageProto.Ping ping = conn.getPing();
@@ -224,6 +225,7 @@ public class Client implements Runnable {
     }
 
     private void onMessageReceived(SocketAddress socketAddress, Message message) {
+        System.out.println(message.getClass().getSimpleName() + " got " + System.currentTimeMillis());
         messageQueue.offer(message);
     }
 
