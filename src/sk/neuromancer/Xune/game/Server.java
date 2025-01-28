@@ -75,7 +75,7 @@ public class Server implements Runnable {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastSecond > 1000) {
                 lastSecond = currentTime;
-                LOGGER.info("{} ticks, {} updates", ticks, updateCount);
+                LOGGER.info("{} ticks, {} updates, state: {}, clients: {}", ticks, updateCount, state, clients.size());
                 ticks = 0;
                 updateCount = 0;
             }

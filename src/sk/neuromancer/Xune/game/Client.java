@@ -95,7 +95,7 @@ public class Client implements Runnable {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastSecond > 1000) {
                 lastSecond = currentTime;
-                LOGGER.info("{} ticks, {} messages", ticks, msgs);
+                LOGGER.info("{} ticks, {} messages, state: {}", ticks, msgs, state);
                 ticks = 0;
                 msgs = 0;
             }
@@ -172,7 +172,6 @@ public class Client implements Runnable {
     }
 
     private void handleMessage(Message message) {
-        System.out.println(message.getClass().getSimpleName() + " handled " + System.currentTimeMillis());
         if (message instanceof MessageProto.Connection conn) {
             if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.PING) {
                 MessageProto.Ping ping = conn.getPing();
@@ -225,7 +224,6 @@ public class Client implements Runnable {
     }
 
     private void onMessageReceived(SocketAddress socketAddress, Message message) {
-        System.out.println(message.getClass().getSimpleName() + " got " + System.currentTimeMillis());
         messageQueue.offer(message);
     }
 
