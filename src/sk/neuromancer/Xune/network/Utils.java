@@ -88,7 +88,7 @@ public class Utils {
         /**
          * The seed generator for default constructors.
          */
-        private static final AtomicLong defaultGen = new AtomicLong(System.nanoTime() + Thread.currentThread().threadId());
+        private static final AtomicLong defaultGen = new AtomicLong(System.nanoTime() + Thread.currentThread().threadId() ^ System.currentTimeMillis());
 
         /* ---------------- instance fields ---------------- */
 
