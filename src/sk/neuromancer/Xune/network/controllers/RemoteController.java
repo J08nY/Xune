@@ -10,6 +10,7 @@ import sk.neuromancer.Xune.proto.MessageProto;
 
 public class RemoteController implements Controller {
     private final ProtoSocketChannel channel;
+    private int tickCount = 0;
 
     public RemoteController(ProtoSocketChannel channel) {
         this.channel = channel;
@@ -21,6 +22,7 @@ public class RemoteController implements Controller {
                 .setEntityProduce(MessageProto.EntityProduceAction.newBuilder()
                         .setKlass(PlayableEntity.toEntityClass(klass))
                         .setProducerId(producer.getId())
+                        .setAtTick(tickCount)
                         .build())
                 .build());
     }
@@ -30,6 +32,7 @@ public class RemoteController implements Controller {
         channel.sendMessage(MessageProto.Action.newBuilder()
                 .setBuildingProduce(MessageProto.BuildingProduceAction.newBuilder()
                         .setKlass(PlayableEntity.toEntityClass(klass))
+                        .setAtTick(tickCount)
                         .build())
                 .build());
     }
@@ -43,6 +46,7 @@ public class RemoteController implements Controller {
                                 .setX(building.tileX)
                                 .setY(building.tileY)
                                 .build())
+                        .setAtTick(tickCount)
                         .build())
                 .build());
     }
@@ -53,6 +57,7 @@ public class RemoteController implements Controller {
                 .setSendCommand(MessageProto.SendCommandAction.newBuilder()
                         .setEntityId(unit.getId())
                         .setCommand(command.serialize())
+                        .setAtTick(tickCount)
                         .build())
                 .build());
     }
@@ -63,7 +68,13 @@ public class RemoteController implements Controller {
                 .setPushCommand(MessageProto.PushCommandAction.newBuilder()
                         .setEntityId(unit.getId())
                         .setCommand(command.serialize())
+                        .setAtTick(tickCount)
                         .build())
                 .build());
+    }
+
+    @Override
+    public void tick(int tickCount) {
+        this.tickCount = tickCount;
     }
 }

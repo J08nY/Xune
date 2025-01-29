@@ -3,8 +3,9 @@ package sk.neuromancer.Xune.network.controllers;
 import sk.neuromancer.Xune.entity.building.Building;
 import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.unit.Unit;
+import sk.neuromancer.Xune.game.Tickable;
 
-public interface Controller {
+public interface Controller extends Tickable {
 
     void produceUnit(Class<? extends Unit> klass, Building producer);
 

@@ -21,6 +21,8 @@ import static sk.neuromancer.Xune.game.Config.TPS;
 public class Harvester extends Unit {
     private int spice;
 
+    private float offX, offY;
+
     static {
         setMaxHealth(Harvester.class, 300);
         setCost(Harvester.class, 1200);
@@ -53,23 +55,26 @@ public class Harvester extends Unit {
     @Override
     public void tick(int tickCount) {
         super.tick(tickCount);
+        Command current = currentCommand();
+        if (current instanceof Command.CollectSpiceCommand collect && collect.collecting(this)) {
+            offX = owner.getRandom().nextFloat();
+            offY = owner.getRandom().nextFloat();
+        } else {
+            offX = 0;
+            offY = 0;
+        }
     }
 
     @Override
     public void render() {
         Command current = currentCommand();
-        float sx = 0;
-        float sy = 0;
         if (current instanceof Command.MoveCommand move) {
             glDisable(GL_DEPTH_TEST);
             move.getNextPath().render();
             glEnable(GL_DEPTH_TEST);
         } else if (current instanceof Command.CollectSpiceCommand collect) {
             Tile target = collect.getTarget();
-            if (collect.collecting(this)) {
-                sx = owner.getRandom().nextFloat();
-                sy = owner.getRandom().nextFloat();
-            } else {
+            if (!collect.collecting(this)) {
                 glPushMatrix();
                 glTranslatef(target.getLevelX(), target.getLevelY(), 0);
                 SpriteSheet.TILE_SHEET.getSprite(17).render();
@@ -77,7 +82,7 @@ public class Harvester extends Unit {
             }
         }
         glPushMatrix();
-        glTranslatef(sx, sy, 0);
+        glTranslatef(offX, offY, 0);
         super.render();
         if (isSelected) {
             glPushMatrix();

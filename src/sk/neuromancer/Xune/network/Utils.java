@@ -3,6 +3,7 @@ package sk.neuromancer.Xune.network;
 import com.github.quantranuk.protobuf.nio.serializer.IdSerializer;
 import sk.neuromancer.Xune.proto.MessageProto;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.random.RandomGenerator;
@@ -85,11 +86,6 @@ public class Utils {
          */
         private static final String GROUP = "Xoroshiro";
 
-        /**
-         * The seed generator for default constructors.
-         */
-        private static final AtomicLong defaultGen = new AtomicLong(System.nanoTime() + Thread.currentThread().threadId() ^ System.currentTimeMillis());
-
         /* ---------------- instance fields ---------------- */
 
         /**
@@ -143,8 +139,7 @@ public class Utils {
          * but may, and typically does, vary across program invocations.
          */
         public Xoroshiro128PlusPlus() {
-            // Using GOLDEN_RATIO_64 here gives us a good Weyl sequence of values.
-            this(defaultGen.getAndAdd(GOLDEN_RATIO_64));
+            this(new SecureRandom().generateSeed(16));
         }
 
         /**
@@ -156,9 +151,10 @@ public class Utils {
          */
         public Xoroshiro128PlusPlus(byte[] seed) {
             // Convert the seed to 2 long values, which are not both zero.
-            long[] data = new long[]{
-                    ((long) seed[0]) << 8 | ((long) seed[1] & 0xff),
-                    ((long) seed[2]) << 8 | ((long) seed[3] & 0xff)};
+            long[] data = new long[]{ 0L, 0L };
+            for (int i = 0; i < Math.min(seed.length, 16); i++) {
+                data[i / 8] |= (long) (seed[i] & 0xff) << (8 * (i % 8));
+            }
             long x0 = data[0], x1 = data[1];
             this.x0 = x0;
             this.x1 = x1;

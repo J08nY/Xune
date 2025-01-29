@@ -232,7 +232,7 @@ public class Server implements Runnable {
             } else if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.RESPONSE) {
                 LOGGER.warn("Should not happen, client sent response.");
             } else {
-                LOGGER.warn("Should not happen, client sent unknown connection mesasge.");
+                LOGGER.warn("Should not happen, client sent unknown connection message.");
             }
         } else if (message instanceof MessageProto.Action action) {
             clients.values().stream().filter(c -> c.getAddress().equals(address)).findFirst().ifPresentOrElse(client -> {
@@ -242,15 +242,19 @@ public class Server implements Runnable {
                 }
                 Player player = client.getPlayer();
                 Controller controller = player.getController();
+                int tick = 0;
                 if (action.getActionCase() == MessageProto.Action.ActionCase.ENTITYPRODUCE) {
                     MessageProto.EntityProduceAction produce = action.getEntityProduce();
+                    tick = produce.getAtTick();
                     Building producer = (Building) level.getEntity(produce.getProducerId());
                     controller.produceUnit(PlayableEntity.fromEntityClass(produce.getKlass()).asSubclass(Unit.class), producer);
                 } else if (action.getActionCase() == MessageProto.Action.ActionCase.BUILDINGPRODUCE) {
                     MessageProto.BuildingProduceAction produce = action.getBuildingProduce();
+                    tick = produce.getAtTick();
                     controller.produceBuilding(PlayableEntity.fromEntityClass(produce.getKlass()).asSubclass(Building.class));
                 } else if (action.getActionCase() == MessageProto.Action.ActionCase.BUILDINGPLACE) {
                     MessageProto.BuildingPlaceAction place = action.getBuildingPlace();
+                    tick = place.getAtTick();
                     Building building = player.getBuildResult(place.getPosition().getX(), place.getPosition().getY());
                     if (building == null) {
                         LOGGER.error("Failed to create building.");
@@ -259,22 +263,43 @@ public class Server implements Runnable {
                     controller.placeBuilding(building);
                 } else if (action.getActionCase() == MessageProto.Action.ActionCase.SENDCOMMAND) {
                     MessageProto.SendCommandAction send = action.getSendCommand();
-                    Unit unit = (Unit) level.getEntity(send.getEntityId());
-                    if (unit == null) {
-                        LOGGER.error("Unit not found.");
+                    tick = send.getAtTick();
+                    PlayableEntity e = (PlayableEntity) level.getEntity(send.getEntityId());
+                    if (e == null) {
+                        LOGGER.error("Entity not found.");
                         return;
                     }
+                    if (e.getOwner() != player) {
+                        LOGGER.error("Entity not owned by player.");
+                        return;
+                    }
+                    Unit unit = (Unit) e;
                     controller.sendCommand(unit, Command.deserialize(send.getCommand(), level));
                 } else if (action.getActionCase() == MessageProto.Action.ActionCase.PUSHCOMMAND) {
                     MessageProto.PushCommandAction push = action.getPushCommand();
-                    Unit unit = (Unit) level.getEntity(push.getEntityId());
-                    if (unit == null) {
-                        LOGGER.error("Unit not found.");
+                    tick = push.getAtTick();
+                    PlayableEntity e = (PlayableEntity) level.getEntity(push.getEntityId());
+                    if (e == null) {
+                        LOGGER.error("Entity not found.");
                         return;
                     }
+                    if (e.getOwner() != player) {
+                        LOGGER.error("Entity not owned by player.");
+                        return;
+                    }
+                    Unit unit = (Unit) e;
                     controller.pushCommand(unit, Command.deserialize(push.getCommand(), level));
                 } else {
                     LOGGER.warn("Should not happen, client sent unknown action.");
+                }
+                if (tick != tickCount) {
+                    if (tick > tickCount) {
+                        LOGGER.warn("Client action tick in future, client: {}, server: {}, diff: {}", tick, tickCount, tick - tickCount);
+                    } else {
+                        LOGGER.warn("Client action tick in past, client: {}, server: {}, diff: {}", tick, tickCount, tickCount - tick);
+                    }
+                } else {
+                    LOGGER.info("Client action tick OK: {}", tick);
                 }
             }, () -> LOGGER.warn("Client not found"));
         } else if (message instanceof MessageProto.State || message instanceof MessageProto.Event) {

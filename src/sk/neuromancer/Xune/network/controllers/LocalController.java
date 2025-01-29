@@ -10,6 +10,7 @@ import sk.neuromancer.Xune.level.Level;
 public class LocalController implements Controller {
     private final Level level;
     private final Player player;
+    private int tickCount = 0;
 
     public LocalController(Level level, Player player) {
         this.level = level;
@@ -40,5 +41,10 @@ public class LocalController implements Controller {
     @Override
     public void sendCommand(Unit unit, Command command) {
         unit.sendCommand(command);
+    }
+
+    @Override
+    public void tick(int tickCount) {
+        this.tickCount = tickCount;
     }
 }

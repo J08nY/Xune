@@ -70,23 +70,28 @@ message GameEnd {
 message EntityProduceAction {
   EntityClass klass = 1;
   uint64 producerId = 2;
+  uint32 atTick = 3;
 }
 
 message BuildingProduceAction {
   EntityClass klass = 1;
+  uint32 atTick = 2;
 }
 
 message BuildingPlaceAction {
   EntityClass klass = 1;
   Tile position = 2;
+  uint32 atTick = 3;
 }
 
 message PushCommandAction {
   uint64 entityId = 1;
   Command command = 2;
+  uint32 atTick = 3;
 }
 
 message SendCommandAction {
   uint64 entityId = 1;
   Command command = 2;
+  uint32 atTick = 3;
 }

@@ -259,6 +259,14 @@ public class Client implements Runnable {
             }
         } else if (message instanceof MessageProto.State state) {
             level.deserializeTransient(state.getLevel());
+            int ticks = state.getLevel().getTickCount();
+            if (ticks > tickCount) {
+                LOGGER.warn("Received state from the future: {}", ticks - tickCount);
+            } else if (ticks < tickCount) {
+                LOGGER.warn("Received state from the past: {}", ticks - tickCount);
+            } else {
+                LOGGER.info("Received state OK");
+            }
         } else if (message instanceof MessageProto.Action action) {
             LOGGER.warn("Should not happen, received action.");
         }

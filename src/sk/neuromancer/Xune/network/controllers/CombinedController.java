@@ -5,7 +5,6 @@ import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.unit.Unit;
 
 public class CombinedController implements Controller {
-
     private final Controller[] controllers;
 
     public CombinedController(Controller... controllers) {
@@ -45,6 +44,13 @@ public class CombinedController implements Controller {
     public void sendCommand(Unit unit, Command command) {
         for (Controller controller : controllers) {
             controller.sendCommand(unit, command);
+        }
+    }
+
+    @Override
+    public void tick(int tickCount) {
+        for (Controller controller : controllers) {
+            controller.tick(tickCount);
         }
     }
 }

@@ -268,6 +268,8 @@ public class Player implements Tickable, Renderable {
         handleBuild();
         handleDead();
         handleUnitBehavior();
+        if (controller != null)
+            controller.tick(tickCount);
         entities.removeAll(toRemove);
         toRemove.clear();
         updateVisibility();
@@ -480,6 +482,13 @@ public class Player implements Tickable, Renderable {
         this.buildProgress = savedState.getBuildProgress();
 
         BaseProto.RandomState randomState = savedState.getRandomState();
+        /*
+        if (randomState.getSeed0() != rand.getX0() || randomState.getSeed1() != rand.getX1()) {
+            System.err.println(id + " " + getClass().getSimpleName() + " Random state mismatch: " + randomState.getSeed0() + " != " + rand.getX0() + " || " + randomState.getSeed1() + " != " + rand.getX1());
+        } else {
+            System.err.println(id + " " + getClass().getSimpleName() + " Random OK: " + randomState.getSeed0() + " == " + rand.getX0() + " || " + randomState.getSeed1() + " == " + rand.getX1());
+        }
+         */
         this.rand.setState(randomState.getSeed0(), randomState.getSeed1());
 
         List<PlayableEntity> oldEntities = this.entities;
