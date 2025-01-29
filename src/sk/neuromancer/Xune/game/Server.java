@@ -181,7 +181,7 @@ public class Server implements Runnable {
     private void onConnect(SocketAddress address) {
         LOGGER.info("Connection from: {}", address);
         int id = clients.size();
-        Client client = new Client(address, ClientState.Connected, id, null);
+        Client client = new Client(address, ClientState.Connected, id, null, 0);
         clients.put(id, client);
     }
 
@@ -228,6 +228,7 @@ public class Server implements Runnable {
             } else if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.PONG) {
                 MessageProto.Pong pong = conn.getPong();
                 long rtt = System.currentTimeMillis() - pong.getPreviousTimestamp();
+                clients.values().stream().filter(c -> c.getAddress().equals(address)).findFirst().ifPresent(client -> client.setRtt((int) rtt));
                 LOGGER.info("Pong from {} RTT: {} ms", address, rtt);
             } else if (conn.getConnectionCase() == MessageProto.Connection.ConnectionCase.RESPONSE) {
                 LOGGER.warn("Should not happen, client sent response.");
@@ -321,12 +322,14 @@ public class Server implements Runnable {
         private ClientState state;
         private int id;
         private Player player;
+        private int rtt;
 
-        public Client(SocketAddress address, ClientState state, int id, Player player) {
+        public Client(SocketAddress address, ClientState state, int id, Player player, int rtt) {
             this.address = address;
             this.state = state;
             this.id = id;
             this.player = player;
+            this.rtt = rtt;
         }
 
         public SocketAddress getAddress() {
@@ -359,6 +362,14 @@ public class Server implements Runnable {
 
         public void setPlayer(Player player) {
             this.player = player;
+        }
+
+        public int getRtt() {
+            return rtt;
+        }
+
+        public void setRtt(int rtt) {
+            this.rtt = rtt;
         }
     }
 

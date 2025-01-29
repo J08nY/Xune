@@ -53,6 +53,8 @@ public class Client implements Runnable {
 
     private boolean keepRunning = true;
     private int tickCount;
+    private int serverTickCount;
+    private double nsPerTick = 1000000000.0 / Config.TPS;
     private State state;
     private InputHandler input;
     private SoundManager sound;
@@ -91,9 +93,10 @@ public class Client implements Runnable {
 
         long lastTick = System.nanoTime();
         double unprocessed = 0;
-        double nsPerTick = 1000000000.0 / Config.TPS;
+        double nsPerFrame = 1000000000.0 / Config.FPS;
         int ticks = 0;
         int msgs = 0;
+        int renders = 0;
         long lastSecond = System.currentTimeMillis();
 
         while (keepRunning) {
@@ -106,7 +109,7 @@ public class Client implements Runnable {
                 unprocessed -= 1;
             }
             try {
-                Message msg = messageQueue.poll(Math.round(nsPerTick), TimeUnit.NANOSECONDS);
+                Message msg = messageQueue.poll(Math.round(nsPerFrame), TimeUnit.NANOSECONDS);
                 if (msg != null) {
                     msgs++;
                     handleMessage(msg);
@@ -114,12 +117,15 @@ public class Client implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            render();
+            renders++;
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastSecond > 1000) {
                 lastSecond = currentTime;
-                LOGGER.info("{} ticks, {} messages, state: {}", ticks, msgs, state);
+                LOGGER.info("{} ticks, {} messages, {} fps, state: {}", ticks, msgs, renders, state);
                 ticks = 0;
                 msgs = 0;
+                renders = 0;
             }
         }
 
@@ -174,6 +180,21 @@ public class Client implements Runnable {
         glfwSwapBuffers(window.getHandle());
     }
 
+    private void adjustTickRate(int serverTickCount) {
+        int tickDifference = serverTickCount - tickCount;
+        if (tickDifference > 0) {
+            // Client is behind, speed up
+            nsPerTick = 1000000000.0 / (Config.TPS + Math.min(tickDifference, 10));
+        } else if (tickDifference < 0) {
+            // Client is ahead, slow down
+            nsPerTick = 1000000000.0 / (Config.TPS - Math.min(-tickDifference, 10));
+        } else {
+            // Client is in sync
+            nsPerTick = 1000000000.0 / Config.TPS;
+        }
+        //System.out.println("Tick rate: " + (1000000000.0 / nsPerTick));
+    }
+
     private void tick() {
         tickCount++;
         glfwPollEvents();
@@ -196,8 +217,6 @@ public class Client implements Runnable {
         if (glfwWindowShouldClose(window.getHandle())) {
             keepRunning = false;
         }
-
-        render();
     }
 
     private void quit() {
@@ -259,14 +278,15 @@ public class Client implements Runnable {
             }
         } else if (message instanceof MessageProto.State state) {
             level.deserializeTransient(state.getLevel());
-            int ticks = state.getLevel().getTickCount();
-            if (ticks > tickCount) {
-                LOGGER.warn("Received state from the future: {}", ticks - tickCount);
-            } else if (ticks < tickCount) {
-                LOGGER.warn("Received state from the past: {}", ticks - tickCount);
+            serverTickCount = state.getLevel().getTickCount();
+            if (serverTickCount > tickCount) {
+                LOGGER.warn("Received state from the future: {}", serverTickCount - tickCount);
+            } else if (serverTickCount < tickCount) {
+                LOGGER.warn("Received state from the past: {}", serverTickCount - tickCount);
             } else {
-                LOGGER.info("Received state OK");
+                //LOGGER.info("Received state OK");
             }
+            adjustTickRate(serverTickCount);
         } else if (message instanceof MessageProto.Action action) {
             LOGGER.warn("Should not happen, received action.");
         }
