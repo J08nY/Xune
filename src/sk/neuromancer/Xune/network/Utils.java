@@ -188,6 +188,13 @@ public class Utils {
             x1 = state1;
         }
 
+        public long getX0() {
+            return x0;
+        }
+
+        public long getX1() {
+            return x1;
+        }
         /*
          * The following two comments are quoted from http://prng.di.unimi.it/xoroshiro128plusplus.c
          */

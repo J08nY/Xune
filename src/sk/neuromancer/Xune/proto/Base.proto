@@ -55,3 +55,8 @@ message Tile {
   uint32 x = 1;
   uint32 y = 2;
 }
+
+message RandomState {
+  uint64 seed0 = 1;
+  uint64 seed1 = 2;
+}

@@ -112,7 +112,8 @@ public class Level implements Renderable, Tickable {
             addEntity(worm);
         }
         this.effects = new LinkedList<>();
-        this.rand = new Utils.Xoroshiro128PlusPlus(savedState.getTransient().getSeed0(), savedState.getTransient().getSeed1());
+        BaseProto.RandomState random = savedState.getTransient().getRandomState();
+        this.rand = new Utils.Xoroshiro128PlusPlus(random.getSeed0(), random.getSeed1());
     }
 
     @Override
@@ -550,8 +551,7 @@ public class Level implements Renderable, Tickable {
         builder.setSpiceMap(spiceBuilder.build());
         builder.setTickCount(tickCount);
         long[] seed = rand.getState();
-        builder.setSeed0(seed[0]);
-        builder.setSeed1(seed[1]);
+        builder.setRandomState(BaseProto.RandomState.newBuilder().setSeed0(seed[0]).setSeed1(seed[1]));
         return builder.build();
     }
 
@@ -574,16 +574,17 @@ public class Level implements Renderable, Tickable {
             	worm.deserialize(wormState, this);
             	oldWorms.remove(worm);
             } else {
-            	Worm worm = new Worm(this, wormState);
+            	worm = new Worm(this, wormState);
             	this.worms.add(worm);
             	addEntity(worm);
             }
         }
         for (Worm worm : oldWorms) {
-        	level.removeEntity(worm);
+        	removeEntity(worm);
         }
         this.tickCount = state.getTickCount();
-        this.rand.setState(state.getSeed0(), state.getSeed1());
+        BaseProto.RandomState random = state.getRandomState();
+        this.rand.setState(random.getSeed0(), random.getSeed1());
     }
 
     public LevelProto.FullLevelState serializeFull() {

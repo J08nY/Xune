@@ -67,8 +67,8 @@ public class Harvester extends Unit {
         } else if (current instanceof Command.CollectSpiceCommand collect) {
             Tile target = collect.getTarget();
             if (collect.collecting(this)) {
-                sx = level.getRandom().nextFloat();
-                sy = level.getRandom().nextFloat();
+                sx = owner.getRandom().nextFloat();
+                sy = owner.getRandom().nextFloat();
             } else {
                 glPushMatrix();
                 glTranslatef(target.getLevelX(), target.getLevelY(), 0);

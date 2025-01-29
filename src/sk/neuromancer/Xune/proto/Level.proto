@@ -23,8 +23,7 @@ message LevelState {
   }
   SpiceMap spiceMap = 3;
   uint32 tickCount = 4;
-  uint64 seed0 = 5;
-  uint64 seed1 = 6;
+  RandomState randomState = 5;
 }
 
 message FullLevelState {

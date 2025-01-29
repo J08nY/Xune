@@ -17,6 +17,7 @@ import sk.neuromancer.Xune.graphics.Renderable;
 import sk.neuromancer.Xune.graphics.elements.Effect;
 import sk.neuromancer.Xune.level.Level;
 import sk.neuromancer.Xune.level.Tile;
+import sk.neuromancer.Xune.network.Utils;
 import sk.neuromancer.Xune.network.controllers.Controller;
 import sk.neuromancer.Xune.proto.BaseProto;
 import sk.neuromancer.Xune.proto.EntityStateProto;
@@ -26,6 +27,7 @@ import sk.neuromancer.Xune.sound.SoundManager;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.random.RandomGenerator;
 
 public class Player implements Tickable, Renderable {
     protected final Level level;
@@ -48,6 +50,7 @@ public class Player implements Tickable, Renderable {
     protected int buildDuration;
 
     protected Controller controller;
+    protected Utils.Xoroshiro128PlusPlus rand;
 
     protected Player(Level level, Flag flag, int money, long id) {
         this.level = level;
@@ -62,6 +65,8 @@ public class Player implements Tickable, Renderable {
         commandStrategies.put(Buggy.class, new CommandStrategy.GroundAttackStrategy());
         commandStrategies.put(Harvester.class, new CommandStrategy.SpiceCollectStrategy());
         commandStrategies.put(Soldier.class, new CommandStrategy.GroundAttackStrategy());
+
+        rand = new Utils.Xoroshiro128PlusPlus();
     }
 
     protected Player(Level level, PlayerProto.PlayerState savedState) {
@@ -109,6 +114,9 @@ public class Player implements Tickable, Renderable {
         commandStrategies.put(Buggy.class, new CommandStrategy.GroundAttackStrategy());
         commandStrategies.put(Harvester.class, new CommandStrategy.SpiceCollectStrategy());
         commandStrategies.put(Soldier.class, new CommandStrategy.GroundAttackStrategy());
+
+        BaseProto.RandomState randomState = savedState.getRandomState();
+        rand = new Utils.Xoroshiro128PlusPlus(randomState.getSeed0(), randomState.getSeed1());
     }
 
     public void addEntity(PlayableEntity e) {
@@ -147,6 +155,10 @@ public class Player implements Tickable, Renderable {
 
     public Flag getFlag() {
         return flag;
+    }
+
+    public RandomGenerator getRandom() {
+        return rand;
     }
 
     public int getMoney() {
@@ -439,7 +451,8 @@ public class Player implements Tickable, Renderable {
                 .setBuildProgress(buildProgress)
                 .setBuildDuration(buildDuration)
                 .setVisible(ByteString.copyFrom(serializeVisibility(visible)))
-                .setDiscovered(ByteString.copyFrom(serializeVisibility(discovered)));
+                .setDiscovered(ByteString.copyFrom(serializeVisibility(discovered)))
+                .setRandomState(BaseProto.RandomState.newBuilder().setSeed0(rand.getX0()).setSeed1(rand.getX1()));
 
         for (PlayableEntity e : entities) {
             if (e instanceof Unit unit) {
@@ -465,6 +478,9 @@ public class Player implements Tickable, Renderable {
         }
         this.buildDuration = savedState.getBuildDuration();
         this.buildProgress = savedState.getBuildProgress();
+
+        BaseProto.RandomState randomState = savedState.getRandomState();
+        this.rand.setState(randomState.getSeed0(), randomState.getSeed1());
 
         List<PlayableEntity> oldEntities = this.entities;
         this.entities = new ArrayList<>(savedState.getEntitiesCount());

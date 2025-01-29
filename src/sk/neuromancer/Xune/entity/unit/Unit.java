@@ -97,9 +97,9 @@ public abstract class Unit extends PlayableEntity implements Moveable {
         if (rate == 0) {
             return;
         }
-        if (ready % rate == 0 && inRange(target) && level.getRandom().nextFloat() < this.accuracy) {
+        if (ready % rate == 0 && inRange(target) && owner.getRandom().nextFloat() < this.accuracy) {
             target.takeDamage(damage);
-            owner.getLevel().addEffect(new Effect.Hit(target.x + level.getRandom().nextFloat(3) * (level.getRandom().nextBoolean() ? 1 : -1), target.y + level.getRandom().nextFloat(3) * (level.getRandom().nextBoolean() ? 1 : -1)));
+            owner.getLevel().addEffect(new Effect.Hit(target.x + owner.getRandom().nextFloat(3) * (owner.getRandom().nextBoolean() ? 1 : -1), target.y + owner.getRandom().nextFloat(3) * (owner.getRandom().nextBoolean() ? 1 : -1)));
             SoundManager.play(getShotSound(getClass()), false, 1.0f);
         }
     }

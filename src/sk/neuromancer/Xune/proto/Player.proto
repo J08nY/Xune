@@ -50,9 +50,10 @@ message PlayerState {
   float buildProgress = 10;
   uint32 buildDuration = 11;
   repeated PlayerEntity entities = 12;
+  RandomState randomState = 13;
   oneof playerState {
-    HumanState human = 13;
-    BotState bot = 14;
+    HumanState human = 14;
+    BotState bot = 15;
   }
 }
 
