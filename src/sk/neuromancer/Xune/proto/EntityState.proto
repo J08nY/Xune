@@ -40,11 +40,13 @@ message UnitState {
   PlayableEntityState playable = 1;
   optional uint32 ready = 2;
   optional bool immobile = 3;
+  optional bytes extra = 4;
 }
 
 message BuildingState {
   PlayableEntityState playable = 1;
   optional Tile tilePosition = 2;
+  optional bytes extra = 3;
 }
 
 message WormState {

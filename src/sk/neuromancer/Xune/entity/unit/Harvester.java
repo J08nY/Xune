@@ -1,5 +1,6 @@
 package sk.neuromancer.Xune.entity.unit;
 
+import com.google.protobuf.ByteString;
 import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
@@ -47,7 +48,12 @@ public class Harvester extends Unit {
 
     public Harvester(EntityStateProto.UnitState savedState, Player owner) {
         super(savedState, owner);
-        this.spice = 0;//TODO: Restore spice levels.
+        if (savedState.hasExtra()) {
+            byte[] extra = savedState.getExtra().toByteArray();
+            this.spice = (extra[0] << 24) | ((extra[1] & 0xFF) << 16) | ((extra[2] & 0xFF) << 8) | (extra[3] & 0xFF);
+        } else {
+            this.spice = 0;    
+        }
         updateSprite();
         this.clickableAreas.add(ClickableCircle.getCentered(x, y, 6));
     }
@@ -111,6 +117,27 @@ public class Harvester extends Unit {
         int spriteRow = orientation.ordinal() / 4;
         int spriteOffset = orientation.ordinal() % 4;
         this.sprite = SpriteSheet.ENTITY_SHEET.getSprite(getBaseSprite(getClass()) + SpriteSheet.flagToOffset(flag) + spriteRow * SpriteSheet.SPRITE_ROW_LENGTH + spriteOffset);
+    }
+
+    @Override
+    public EntityStateProto.UnitState serialize() {
+        byte[] extra = new byte[4];
+        extra[0] = (byte) (spice >> 24);
+        extra[1] = (byte) (spice >> 16);
+        extra[2] = (byte) (spice >> 8);
+        extra[3] = (byte) spice;
+        return super.serialize().toBuilder().setExtra(ByteString.copyFrom(extra)).build();
+    }
+
+    @Override
+    public void deserialize(EntityStateProto.UnitState state) {
+        super.deserialize(state);
+        if (state.hasExtra()) {
+            byte[] extra = state.getExtra().toByteArray();
+            this.spice = (extra[0] << 24) | ((extra[1] & 0xFF) << 16) | ((extra[2] & 0xFF) << 8) | (extra[3] & 0xFF);
+        } else {
+            this.spice = 0;
+        }
     }
 
     public boolean collectSpice(Tile target) {
