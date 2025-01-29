@@ -4,6 +4,7 @@ import sk.neuromancer.Xune.entity.command.Command;
 import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Helipad;
+import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.level.paths.Point;
@@ -50,7 +51,7 @@ public class Heli extends Unit {
     @Override
     public void render() {
         Command current = currentCommand();
-        if (current instanceof Command.FlyCommand fly) {
+        if (current instanceof Command.FlyCommand fly && owner instanceof Human) {
             glDisable(GL_DEPTH_TEST);
             glEnable(GL_POINT_SMOOTH);
             glPointSize(10);

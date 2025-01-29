@@ -6,6 +6,7 @@ import sk.neuromancer.Xune.entity.Orientation;
 import sk.neuromancer.Xune.entity.Prerequisite;
 import sk.neuromancer.Xune.entity.building.Factory;
 import sk.neuromancer.Xune.entity.building.Refinery;
+import sk.neuromancer.Xune.game.players.Human;
 import sk.neuromancer.Xune.game.players.Player;
 import sk.neuromancer.Xune.graphics.elements.SpriteSheet;
 import sk.neuromancer.Xune.level.Tile;
@@ -74,14 +75,14 @@ public class Harvester extends Unit {
     @Override
     public void render() {
         Command current = currentCommand();
-        if (current instanceof Command.MoveCommand move) {
+        if (current instanceof Command.MoveCommand move && owner instanceof Human) {
             glDisable(GL_DEPTH_TEST);
             move.getNextPath().render();
             glEnable(GL_DEPTH_TEST);
-        } else if (current instanceof Command.CollectSpiceCommand collect) {
-            Tile target = collect.getTarget();
+        } else if (current instanceof Command.CollectSpiceCommand collect && owner instanceof Human) {
             if (!collect.collecting(this)) {
                 glPushMatrix();
+                Tile target = collect.getTarget();
                 glTranslatef(target.getLevelX(), target.getLevelY(), 0);
                 SpriteSheet.TILE_SHEET.getSprite(17).render();
                 glPopMatrix();
